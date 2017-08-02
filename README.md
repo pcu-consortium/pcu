@@ -20,7 +20,7 @@ It is bundled with a default application : the PCU Entreprise Search engine.
 
 
 Features
-   * ElasticSearch client API. It is built on built on Apache CXF, Jackson, Spring Boot. See TODO providers/search/elasticsearch/Readme.md
+   * ElasticSearch client API. It is built on built on Apache CXF, Jackson, Spring Boot. See https://github.com/pcu-consortium/pcu/blob/master/providers/search/elasticsearch & its README.
    * upcoming : search provider SPI, other providers (Spark compute, storage, Kafka messaging),
 text mining / NLP, core Manager, search and ecommerce ML algorithms...
 
