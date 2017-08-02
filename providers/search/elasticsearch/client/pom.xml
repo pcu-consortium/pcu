@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>pcu-providers-search-elasticsearch-parent</artifactId>
+        <groupId>org.pcu-consortium.pcu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent> 
+    <artifactId>pcu-providers-search-elasticsearch-client</artifactId>
+    <name>PCU Providers ElasticSearch Spring CXF Client</name>
+    <description>PCU Providers ElasticSearch Spring CXF Client</description>
+    
+    <dependencies>
+
+        <!-- PCU -->   
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-api</artifactId>
+        </dependency>
+
+        <!-- TODO move UUID -->
+        <!-- http://johannburkard.de/software/uuid/ https://github.com/stephenc/eaio-uuid -->
+        <dependency>
+            <groupId>com.github.stephenc.eaio-uuid</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId><!-- imported from other starters anyway -->
+        </dependency>
+
+        <!-- CXF -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxrs</artifactId><!-- brings autoconfigure & (needs) starter-web, validation-api, cxf http & jaxws -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-spring-boot-autoconfigure</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+            <!-- Jackson (only what's not obligatorily already in -api) -->
+            <!-- json : -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId><!-- for tests ; or only annotations ? brings core, databind, jaxrs, annotations -->
+            </dependency>
+
+
+            <!-- loggging : SLF4J & test-only logback backend -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId><!-- also brought back by logback-classic, spring-boot-starter-logging -->
+                <!-- scope>test</scope -->
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId><!-- ?? -->
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId><!-- ? for conf ? -->
+                <scope>test</scope>
+            </dependency>
+
+
+        <!-- tests -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+

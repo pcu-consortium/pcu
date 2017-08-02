@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.pcu-consortium.pcu</groupId>
+    <artifactId>pcu-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>PCU Parent POM</name>
+    <description>PCU Parent POM</description>
+    
+
+    <!-- =================== -->
+    <!-- Project information -->
+    <!-- =================== -->
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>PCU Consortium</name>
+        <url>http://pcu-consortium.github.io</url>
+    </organization>
+
+    <url>https://github.com/pcu-consortium/pcu</url>
+    <mailingLists>
+        <!-- mailingList>
+            <name>PCU Developers mailing list</name>
+            <archive>https://groups.google.com/forum/?fromgroups#!forum/pcu-dev</archive>
+            <post>pcu-dev@googlegroups.com</post>
+        </mailingList -->
+        <!-- LATER : also users... -->
+    </mailingLists>
+    <scm>
+        <connection>scm:git:git://github.com/pcu-consortium/pcu.git</connection>
+        <developerConnection>scm:git:git@github.com:pcu-consortium/pcu.git</developerConnection>
+        <url>https://github.com/pcu-consortium/pcu</url>
+    </scm>
+    <ciManagement>
+        <system>travis (jenkins ??)</system>
+        <url>TODO</url>
+        <!-- notifiers></notifiers -->
+    </ciManagement>
+    <issueManagement>
+        <url>https://github.com/pcu-consortium/pcu/issues</url>
+        <system>Github Issues</system>
+    </issueManagement>
+    <!-- distributionManagement>
+        <repository>
+            <id>MyNexus</id>
+            <name>MyNexus</name>
+            <url>https://mynexus</url>
+        </repository>
+        <site>
+            <id>local-site</id>
+            <url>file:target/site/</url>
+        </site>
+    </distributionManagement -->
+
+    <developers>
+        <developer>
+            <id>mdutoo</id>
+            <name>Marc Dutoo</name>
+            <email>marc.dutoo@smile.fr</email>
+            <organization>Smile</organization>
+            <organizationUrl>http://www.smile.fr</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+   
+
+    <modules>
+        <module>providers</module>
+        <!-- module>core</module -->
+        <!-- module>search</module -->
+        <!-- module>ecommerce</module -->
+    </modules>
+    
+    <properties>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding><!-- else [WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent -->
+        
+        <java.version>1.8</java.version>
+        <spring-boot.version>1.4.5.RELEASE</spring-boot.version><!-- 1.4.0.RELEASE 1.5.6.RELEASE -->
+        <spring.version>4.3.7.RELEASE</spring.version><!-- 4.3.2.RELEASE -->
+
+        <cxf.version>3.1.12</cxf.version><!-- 3.1.7 -->
+        <jaxrs.version>2.0.1</jaxrs.version><!-- cxf's -->
+        <jackson.version>2.8.7</jackson.version><!-- spring-boot's ; 2.8.1 -->
+        <swagger.version>1.5.12</swagger.version><!-- cxf's ; 1.5.9 -->
+        <swagger-ui.version>2.2.2</swagger-ui.version><!-- TODO 2.1.0 ; LATER migrate to 3.0.20, 2.2.10-1 -->
+        <!-- spring.cloud.eureka.version>1.1.3.RELEASE</spring.cloud.eureka.version -->
+
+        <slf4j.version>1.7.24</slf4j.version><!-- spring-boot & logback's ; 1.7.21 -->
+        <logback.version>1.1.11</logback.version><!-- spring-boot's ; 1.1.7 -->
+        <groovy.version>2.4.9</groovy.version><!-- spring-boot's (2.4.7 : logback's is 2.4.0) -->
+        <!-- thymeleaf.conditionalcomment.version>2.1.1.RELEASE</thymeleaf.conditionalcomment.version>
+        <thymeleaf.version>2.1.3.RELEASE</thymeleaf.version -->
+        <org.jacoco.version>0.7.7.201606060606</org.jacoco.version>
+    </properties>
+
+    <dependencyManagement>
+    <dependencies>
+        <!-- PCU -->
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-service</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type> <!-- also ? -->
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Spring -->
+        <dependency>
+            <!-- Import dependency management from Spring Boot -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope><!-- same as parent -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId><!-- imported from other starters anyway -->
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+
+        <!-- REST/XML -->   
+
+        <!-- JAX-RS (elsewhere brought by cxf) -->
+         <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${jaxrs.version}</version>
+         </dependency>     
+
+        <!-- CXF -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxrs</artifactId><!-- brings autoconfigure & (needs) starter-web, validation-api, cxf http & jaxws -->
+            <version>${cxf.version}</version>
+        </dependency>
+
+        <!-- Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-xml-provider</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId><!-- for tests -->
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- dependency> NOO jsr310 instead
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!- Joda Time ->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda.version}</version>
+        </dependency -->
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId><!-- to be used in -api, otherwise brought by cxf -->
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-swagger</artifactId><!-- ?!? -->
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>${swagger-ui.version}</version>
+        </dependency>
+
+        <!-- Eureka Service Discovery Client>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
+            <version>${spring.cloud.eureka.version}</version>
+        </dependency -->
+        <!-- Actuator Endpoints --> 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+
+        <!-- SLF4J TODO -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId><!-- also brought back by logback-classic -->
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId><!-- ?? -->
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId><!-- ? for conf ? -->
+            <version>${groovy.version}</version>
+        </dependency>
+          
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+            <version>1.4.192</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>-->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-core</artifactId>
+            <version>3.3</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.opentable.components</groupId>
+            <artifactId>otj-pg-embedded</artifactId>
+            <scope>test</scope>
+            <version>0.7.1</version>
+        </dependency>
+
+            <!-- UI -->
+        
+		      <!-- upload>
+		      <dependency>
+		          <groupId>commons-fileupload</groupId>
+		          <artifactId>commons-fileupload</artifactId>
+		          <version>1.3.1</version>
+		      </dependency -->
+
+            <!-- Thymeleaf
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf-spring4</artifactId>
+                <version>${thymeleaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf</artifactId>
+                <version>${thymeleaf.version}</version>
+            </dependency>
+            <!- for IE see #112->
+            <dependency>
+                <groupId>org.thymeleaf.extras</groupId>
+                <artifactId>thymeleaf-extras-conditionalcomments</artifactId>
+                <version>${thymeleaf.conditionalcomment.version}</version>
+            </dependency -->
+
+            <!-- Webjars -->
+            <!-- dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>bootstrap</artifactId>
+                <version>${bootstrap.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>font-awesome</artifactId>
+                <version>${font-awesome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>jquery</artifactId>
+                <version>${jquery.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>jquery-ui</artifactId>
+                <version>${jquery-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>momentjs</artifactId>
+                <version>${momentjs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>react</artifactId>
+                <version>${react.version}</version>
+            </dependency -->
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+    </dependencies>
+    </dependencyManagement>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <!-- new syntax since 2.19.1 : http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html -->
+                        <include>org.pcu.search.elasticsearch.*.integration.*</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <!-- includes>
+                        <include>**/*.class</include>
+                    </includes -->
+                    <excludes>
+                        <!-- new syntax since 2.19.1 : http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html -->
+                        <exclude>org.pcu.search.elasticsearch.*.integration.*</exclude>
+                        <exclude>org.pcu.search.elasticsearch.*.test.util.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId><!-- ?? -->
+                <!-- version>2.5</version -->
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${org.jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- replace BCEL dep with Java 8 compatible version :
+            else JarAnalyzer warnings when generating site
+            org.apache.bcel.classfile.ClassFormatException: Invalid byte tag in constant pool: 18
+            see https://github.com/RichardWarburton/lambda-behave/issues/31 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.8</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-shared-jar</artifactId>
+                        <version>1.1</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.apache.bcel</groupId>
+                                <artifactId>bcel</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>bcel-findbugs</artifactId>
+                        <version>6.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+
+    </build>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- else error even if provide repository :
+                    ex. repository url 'http://dist.gemstone.com/maven/release' is invalid
+                    see http://stackoverflow.com/questions/28098566/maven-site-warning-the-repository-url-https-maven-repository-dev-java-net-no -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId><!-- generates links to source code in failed tests -->
+            </plugin>
+            
+        </plugins>
+    </reporting>
+    
+</project>
+
