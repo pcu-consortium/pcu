@@ -184,9 +184,11 @@ public class PcuElasticSearchApiClientTest {
       fileContentContentFrMapping.setAnalyzer("french"); // TODO have to redefine it to add shingles (but stopwords ex. et, stemming ex. developpeu informat, elision ex. l', asciifolding ex. expérience work OK)
       fileContentMapping.getProperties().put("content_fr", fileContentContentFrMapping);
       // multi-field, for alt phonetic analyzer :
+      /*
       fileContentMapping.setFields(new LinkedHashMap<>());
       PropertyMapping fileContentFrPhoneticMapping = new PropertyMapping();
-      fileContentMapping.getFields().put("phonetic", fileContentFrPhoneticMapping );
+      fileContentMapping.getFields().put("phonetic", fileContentFrPhoneticMapping);
+      */
       PropertyMapping fileContentPathMapping = new PropertyMapping();
       fileContentPathMapping.setType("keyword"); // for find by dfs path ? not analyzed ; NB. auto sets ingore_above=256
       fileContentMapping.getProperties().put("path", fileContentPathMapping); // on dfs
