@@ -11,10 +11,17 @@ public class ESApiException extends /*WebApplication*/Exception {
    
    private ESApiError error;
    private int status;
+   private String asJsonCache = null;
 
+   /** for deser */
+   public ESApiException() {
+      super();
+   }
+   /** TODO build ESApiError from message */
    public ESApiException(String message) {
       super(message);
    }
+   /** TODO build ESApiError from message */
    public ESApiException(String message, Throwable cause) {
       super(message, cause);
    }
@@ -29,25 +36,35 @@ public class ESApiException extends /*WebApplication*/Exception {
       return response;
    }
    */
-
+   
    public ESApiError getError() {
       return error;
    }
-
    public void setError(ESApiError error) {
       this.error = error;
+      this.asJsonCache = null;
    }
-
    public int getStatus() {
       return status;
    }
-
    public void setStatus(int status) {
       this.status = status;
+      this.asJsonCache = null;
    }
 
-   public static long getSerialversionuid() {
-      return serialVersionUID;
+   @Override
+   public String getMessage() {
+      String msg = super.getMessage();
+      if (msg != null) {
+         return msg;
+      }
+      return getAsJson();
    }
-   
+   public String getAsJson() {
+      return this.asJsonCache;
+   }
+   public void setAsJson(String errAsJson) {
+      this.asJsonCache = errAsJson;
+      // TODO generate from error using Jackson ObjectMapper
+   }
 }

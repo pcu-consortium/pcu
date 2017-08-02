@@ -27,7 +27,9 @@ public class ESApiResponseExceptionMapper implements ResponseExceptionMapper<ESA
       try {
          String errMsg = IOUtils.toString((InputStream) r.getEntity());
          try {
-            return mapper.readValue(errMsg, ESApiException.class);
+            ESApiException ex = mapper.readValue(errMsg, ESApiException.class);
+            ex.setAsJson(errMsg); // to help debugging
+            return ex;
          } catch (IOException ioex) {
             throw new RuntimeException("Can't parse REST error JSON from " + errMsg, ioex);
          }
