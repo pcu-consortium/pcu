@@ -15,13 +15,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  *
  */
 @JsonTypeInfo(include=As.WRAPPER_OBJECT, use=Id.NAME)
-public class bool extends ESQuery { // ESBoolQuery
-   public List<ESQuery> must; // TODO DONE ? accept single element without array (required on server-side only)
-   public List<ESQuery> must_not;
-   public List<ESQuery> should;
-   public List<ESQuery> filter;
-   public String minimum_should_match; // "2<-25% 9<3"
-   public float boost = 1.0f;
+public class bool implements ESQuery { // ESBoolQuery
+   
+   private List<ESQuery> must; // TODO DONE ? accept single element without array (required on server-side only)
+   private List<ESQuery> must_not;
+   private List<ESQuery> should;
+   private List<ESQuery> filter;
+   private String minimum_should_match; // "2<-25% 9<3" default 1 ; 100% for pure stopwords or fuzzy ; minimum number of optional should clauses to match
+   private float boost = 1.0f;
    
    public List<ESQuery> getMust() {
       return must;

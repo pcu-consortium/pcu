@@ -30,8 +30,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 @Import(JaxRsConfig.class) // creates cxf bus (@EnableJaxRsProxyClient not conf'ble enough : address...)
 public class PcuElasticSearchClientConfiguration {
 
-   //public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
-   //public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
+   ///public static final String PCU_ELASTICSEARCH_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
+   ///public static final DateTimeFormatter PCU_ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ofPattern(PCU_ELASTICSEARCH_DATE_PATTERN);
    
    @Value("${pcu.rest.enableIndenting:false}")
    private boolean enableIndenting;
@@ -56,9 +56,10 @@ public class PcuElasticSearchClientConfiguration {
       // default 2016-09-30T16:53:40.255Z is ES'
       // see https://github.com/FasterXML/jackson-datatype-jsr310/issues/39
       JavaTimeModule javaTimeModule = new JavaTimeModule();
-      //javaTimeModule.addSerializer(LocalDateTime.class, // else 2016-09-30T16:53:40.255Z
-      //      new LocalDateTimeSerializer(PCU_ELASTICSEARCH_DATE_FORMATTER)); // else 2016-09-30T16:53:40.255
+      ///javaTimeModule.addSerializer(ZonedDateTime.class, // else 2016-09-30T16:53:40.255Z
+      ///      new ZonedDateTimeSerializer(PCU_ELASTICSEARCH_DATE_FORMATTER)); // else 2016-09-30T16:53:40.255
       mapper.registerModule(javaTimeModule);
+      mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // else 1501857549.048000000 http://www.baeldung.com/jackson-serialize-dates
       
       // more lenient parsing that accepts single element as array :
       // NB. required on server-side only for ESQueryClause.must/...

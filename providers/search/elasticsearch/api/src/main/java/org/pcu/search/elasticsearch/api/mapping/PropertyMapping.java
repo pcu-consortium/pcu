@@ -4,7 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * TODO a separate class per type ?!
+ * TODO a separate class per type ?! => WHEN REFACTORING TO UNIFIED SPI
+ * TODO enums ?
  * 
  * Q primitive or object params ? object allow null, while primitive require a default value.
  * Q inited to default value ? clearer, but most of the time not possible
@@ -35,7 +36,7 @@ public class PropertyMapping extends TypeMapping { // for object/nested type
    private String doc_values;
    private String dynamic;
    private Boolean enabled; // to disable _all (only, else Mapping definition ... unsupported parameters) https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html
-   private Boolean fielddata; // else on script_fields : Fielddata is disabled on text fields by default.
+   private Boolean fielddata; // else error on script_fields, aggregations, sorting : Fielddata is disabled on text fields by default. https://www.elastic.co/guide/en/elasticsearch/reference/master/fielddata.html
    private Integer ignore_above; // https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-above.html
    private Boolean ignore_malformed; // defaults to false, BUT not allowed on text (can't be malformed) https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html
    private Boolean include_in_all; // defaults to true, unless index is set to no https://www.elastic.co/guide/en/elasticsearch/reference/current/include-in-all.html

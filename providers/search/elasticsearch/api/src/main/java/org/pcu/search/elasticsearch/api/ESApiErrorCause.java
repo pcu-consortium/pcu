@@ -5,14 +5,23 @@ import java.util.LinkedHashMap;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-public class ESApiErrorRootCause {
+/**
+ * see error_trace=true in https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
+ * @author mardut
+ *
+ */
+public class ESApiErrorCause {
    
    private String type;
    private String reason;
-   private String index_uuid;
-   private String index;
+   /** enabled by error_trace=true common param https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html */
+   private String stack_trace;
    
-   /** ex. delete mapping error : "resource.type":"index_or_alias","resource.id":"files" */
+   /** ex.
+    * _search error : index_uuid, index, resource.type, resource.id https://discuss.elastic.co/t/elasticsearch-index-issues/73871
+    * delete mapping error : "resource.type":"index_or_alias","resource.id":"files"
+    * script error : "script_stack":["org.elasticsearch.search.lookup.LeafDocLookup.g...", ...],"script":"doc['my_field'].value...","lang":"painless","caused_by":{"type":"illegal_argument_exception","reason":"No field found for [my_field] in mapping with types []"}}
+    */
    private LinkedHashMap<String,Object> properties;
    @JsonAnyGetter
    public LinkedHashMap<String, Object> getProperties() {
@@ -41,17 +50,11 @@ public class ESApiErrorRootCause {
    public void setReason(String reason) {
       this.reason = reason;
    }
-   public String getIndex_uuid() {
-      return index_uuid;
+   public String getStack_trace() {
+      return stack_trace;
    }
-   public void setIndex_uuid(String index_uuid) {
-      this.index_uuid = index_uuid;
-   }
-   public String getIndex() {
-      return index;
-   }
-   public void setIndex(String index) {
-      this.index = index;
+   public void setStack_trace(String stack_trace) {
+      this.stack_trace = stack_trace;
    }
 
 }

@@ -9,19 +9,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 /**
  * not analyzed
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-script-query.html
+ * OBSOLETE https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html
  * @author mdutoo
  *
  */
 @JsonTypeInfo(include=As.WRAPPER_OBJECT, use=Id.NAME)
-public class script extends ESQuery { // ESTermsQuery
-   
-   private ESScriptScript script;
-
-   public ESScriptScript getScript() {
-      return script;
-   }
-   public void setScript(ESScriptScript script) {
-      this.script = script;
-   }
+public class script extends ESScript implements ESQuery { // ESScriptQuery
    
 }

@@ -11,11 +11,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 /**
  * multi_match
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
  * @author mdutoo
  *
  */
 @JsonTypeInfo(include=As.WRAPPER_OBJECT, use=Id.NAME)
-public class multi_match extends ESQuery { // ESMultiMatchQuery
+public class multi_match implements ESQuery { // ESMultiMatchQuery
 
    private String query;
    private List<String> fields;
@@ -25,9 +26,9 @@ public class multi_match extends ESQuery { // ESMultiMatchQuery
    private String analyzer; // also phrase(_prefix)
    private String boost; // also phrase(_prefix)
    private String operator; // or (default), and
-   private int minimum_should_match;
-   private String fuzziness;
-   private boolean lenient = false; // also phrase(_prefix)
+   private String minimum_should_match; // default 1 ; 100% for pure stopwords or fuzzy ; minimum number of optional should clauses to match
+   private String fuzziness; // AUTO (preferred, term length-based) or lehvenstein distance https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#fuzziness
+   private boolean lenient = false; // also phrase(_prefix) ; data-type mismatches ex. query a numeric field with a text query string
    private String prefix_length; // (fuzzy)
    private String max_expansions; // (fuzzy) also phrase_prefix
    private String rewrite;
@@ -80,10 +81,10 @@ public class multi_match extends ESQuery { // ESMultiMatchQuery
    public void setOperator(String operator) {
       this.operator = operator;
    }
-   public int getMinimum_should_match() {
+   public String getMinimum_should_match() {
       return minimum_should_match;
    }
-   public void setMinimum_should_match(int minimum_should_match) {
+   public void setMinimum_should_match(String minimum_should_match) {
       this.minimum_should_match = minimum_should_match;
    }
    public String getFuzziness() {

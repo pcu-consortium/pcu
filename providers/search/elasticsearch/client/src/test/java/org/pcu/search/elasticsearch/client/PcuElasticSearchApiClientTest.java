@@ -1,10 +1,13 @@
 package org.pcu.search.elasticsearch.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -26,9 +29,21 @@ import org.pcu.search.elasticsearch.api.mapping.PutMappingResult;
 import org.pcu.search.elasticsearch.api.mapping.TokenFilter;
 import org.pcu.search.elasticsearch.api.mapping.TypeMapping;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
+import org.pcu.search.elasticsearch.api.query.ESRescore;
+import org.pcu.search.elasticsearch.api.query.Highlight;
+import org.pcu.search.elasticsearch.api.query.HighlightParameters;
 import org.pcu.search.elasticsearch.api.query.Hit;
 import org.pcu.search.elasticsearch.api.query.SearchResult;
+import org.pcu.search.elasticsearch.api.query.clause.DecayFunctionScoreField;
+import org.pcu.search.elasticsearch.api.query.clause.ESScript;
+import org.pcu.search.elasticsearch.api.query.clause.ESScriptScript;
+import org.pcu.search.elasticsearch.api.query.clause.FieldValueFactorFunctionScore;
+import org.pcu.search.elasticsearch.api.query.clause.FunctionScoreFilter;
+import org.pcu.search.elasticsearch.api.query.clause.bool;
+import org.pcu.search.elasticsearch.api.query.clause.function_score;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
+import org.pcu.search.elasticsearch.api.query.clause.query_string;
+import org.pcu.search.elasticsearch.api.query.clause.script;
 import org.pcu.search.elasticsearch.api.query.clause.terms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +58,14 @@ import com.eaio.uuid.UUID;
 
 /**
  * Test of ES search API and features
- * WARNING requires ElasticSearch 5.5 to have been started independently
- * TODO auto provision ES
+ * WARNING requires ElasticSearch 5.5 to have been started independently.
+ * 
+ * TODO :
+ * - missing features
+ * - auto provision ES
+ * - move index mapping building to generic buildXXMapping() methods, then to service,
+ * and while refactoring to unified api, think about PCU metadata manager.
+ * 
  * @author mdutoo
  *
  */
@@ -97,12 +118,9 @@ public class PcuElasticSearchApiClientTest {
       
       // define indexing features :
       // see MES' at https://github.com/Smile-SA/elasticsuite/blob/master/src/module-elasticsuite-core/etc/elasticsuite_analysis.xml
-      analysis.setFilter(new LinkedHashMap<String,TokenFilter>());
-      TokenFilter elision_fr = new TokenFilter();
-      analysis.getFilter().put("elision_fr", elision_fr);
-      elision_fr.setType("elision");
-      ///elision_fr.setArticles(Arrays.asList("l", "m", "t", "qu", "n", "s", "j"));
       analysis.setAnalyzer(new LinkedHashMap<String,Analyzer>());
+      
+      // fulltext for file names (with word_delimiter) :
       Analyzer fileNameAnalyzer = new Analyzer();
       analysis.getAnalyzer().put("fileNameAnalyzer", fileNameAnalyzer);
       fileNameAnalyzer.setTokenizer("standard"); // else none
@@ -115,6 +133,8 @@ public class PcuElasticSearchApiClientTest {
       analysis.getFilter().put("wordDelimiter", wordDelimiterTF);*/
       // fulltext conf :
       // ex. test : curl -XGET 'localhost:9200/files/_analyze?analyzer=fileContentAnalyzer&pretty' -d 'Test text to see shingles and stopwords'
+      
+      // fulltext (with shingle) :
       Analyzer fileContentAnalyzer = new Analyzer();
       analysis.getAnalyzer().put("fileContentAnalyzer", fileContentAnalyzer);
       /*fileContentAnalyzer.setType("standard");
@@ -129,19 +149,57 @@ public class PcuElasticSearchApiClientTest {
       fileContentAnalyzer.getFilter().add("asciifolding"); // for ex. french within english
       fileContentAnalyzer.getFilter().add("stop"); // stopwords that work with shingles
       fileContentAnalyzer.getFilter().add("shingle");
-      // french conf :
-      // taken from example https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html
+      // alt phonetic conf NOT USED YET :
+      // requires plugin https://www.elastic.co/guide/en/elasticsearch/plugins/5.5/analysis-phonetic.html
+      TokenFilter phonetic = new TokenFilter();
+      ///analysis.getFilter().put("phonetic", phonetic);
+      phonetic.setType("phonetic");
+      phonetic.setEncoder("metaphone");
+      Analyzer fileContentAnalyzerPhonetic = new Analyzer();
+      analysis.getAnalyzer().put("fileContentAnalyzerPhonetic", fileContentAnalyzerPhonetic);
+      fileContentAnalyzerPhonetic.setTokenizer("standard");
+      fileContentAnalyzerPhonetic.setFilter(new ArrayList<String>());
+      fileContentAnalyzerPhonetic.getFilter().add("standard"); // noop
+      fileContentAnalyzerPhonetic.getFilter().add("lowercase");
+      fileContentAnalyzerPhonetic.getFilter().add("asciifolding"); // for ex. french within english
+      fileContentAnalyzerPhonetic.getFilter().add("stop"); // stopwords that work with shingles
+      ///fileContentAnalyzerPhonetic.getFilter().add("phonetic");
+      
+      // french conf NOT USED YET :
+      // rather using default, but could be redefined to add ex. shingle or phonetic
+      // taken from example https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html#french-analyzer
+      analysis.setFilter(new LinkedHashMap<String,TokenFilter>());
+      TokenFilter elision_fr = new TokenFilter();
+      analysis.getFilter().put("elision_fr", elision_fr);
+      elision_fr.setType("elision");
+      elision_fr.setArticles(Arrays.asList("l", "m", "t", "qu", "n", "s", "j"));
+      TokenFilter stop_fr = new TokenFilter();
+      analysis.getFilter().put("stop_fr", stop_fr);
+      stop_fr.setType("stop");
+      stop_fr.setStop("_french_");
+      TokenFilter stemmer_fr = new TokenFilter();
+      analysis.getFilter().put("stemmer_fr", stemmer_fr);
+      stemmer_fr.setType("stemmer");
+      stemmer_fr.setLanguage("light_french");
       Analyzer fileContentFrAnalyzer = new Analyzer(); // redefine fr analyzer to add shingles
       analysis.getAnalyzer().put("fileContentFrAnalyzer", fileContentFrAnalyzer);
       fileContentFrAnalyzer.setTokenizer("standard");
       fileContentFrAnalyzer.setFilter(new ArrayList<String>());
       fileContentFrAnalyzer.getFilter().add("standard"); // noop
-      /*fileContentFrAnalyzer.getFilter().add("french_elision");
+      fileContentFrAnalyzer.getFilter().add("elision_fr");
       fileContentFrAnalyzer.getFilter().add("lowercase");
-      fileContentFrAnalyzer.getFilter().add("french_stop");
+      fileContentFrAnalyzer.getFilter().add("stop_fr");
       //fileContentFrAnalyzer.getFilter().add("french_keywords"); // stemmer excluder
-      fileContentFrAnalyzer.getFilter().add("french_stemmer");*/
-      fileContentFrAnalyzer.getFilter().add("shingle");
+      fileContentFrAnalyzer.getFilter().add("stemmer_fr");
+      fileContentFrAnalyzer.getFilter().add("shingle");//
+      ///fileContentFrAnalyzer.getFilter().add("phonetic_fr");
+      // alt french phonetic conf :
+      // requires plugin https://www.elastic.co/guide/en/elasticsearch/plugins/5.5/analysis-phonetic.html
+      TokenFilter phonetic_fr = new TokenFilter();
+      ///analysis.getFilter().put("phonetic_fr", phonetic_fr);
+      phonetic_fr.setType("phonetic");
+      phonetic_fr.setEncoder("beidermorse");
+      phonetic_fr.setLanguageset(Arrays.asList("french"));
       
       // define model mapping :
       TypeMapping fileMapping = new TypeMapping();
@@ -184,11 +242,12 @@ public class PcuElasticSearchApiClientTest {
       fileContentContentFrMapping.setAnalyzer("french"); // TODO have to redefine it to add shingles (but stopwords ex. et, stemming ex. developpeu informat, elision ex. l', asciifolding ex. expérience work OK)
       fileContentMapping.getProperties().put("content_fr", fileContentContentFrMapping);
       // multi-field, for alt phonetic analyzer :
-      /*
-      fileContentMapping.setFields(new LinkedHashMap<>());
-      PropertyMapping fileContentFrPhoneticMapping = new PropertyMapping();
-      fileContentMapping.getFields().put("phonetic", fileContentFrPhoneticMapping);
-      */
+      fileContentContentMapping.setFields(new LinkedHashMap<>());
+      PropertyMapping fileContentContentFrPhoneticMapping = new PropertyMapping();
+      fileContentContentMapping.getFields().put("phonetic", fileContentContentFrPhoneticMapping);
+      fileContentContentFrPhoneticMapping.setType("text");
+      fileContentContentFrPhoneticMapping.setAnalyzer("fileContentFrAnalyzer");
+      fileContentContentFrPhoneticMapping.setStore(true); // false TODO NOO
       PropertyMapping fileContentPathMapping = new PropertyMapping();
       fileContentPathMapping.setType("keyword"); // for find by dfs path ? not analyzed ; NB. auto sets ingore_above=256
       fileContentMapping.getProperties().put("path", fileContentPathMapping); // on dfs
@@ -199,6 +258,9 @@ public class PcuElasticSearchApiClientTest {
       PropertyMapping fileContentLengthMapping = new PropertyMapping();
       fileContentLengthMapping.setType("long"); // [SPEC] numeric
       fileContentMapping.getProperties().put("length", fileContentLengthMapping); // binary size
+      PropertyMapping fileContentModifiedMapping = new PropertyMapping();
+      fileContentModifiedMapping.setType("date"); // [SPEC] date
+      fileContentMapping.getProperties().put("modified", fileContentModifiedMapping); // NB. "created" etc. if file through java.nio http://docs.oracle.com/javase/tutorial/essential/io/fileAttr.html https://stackoverflow.com/questions/2723838/determine-file-creation-date-in-java
       
       return indexMapping;
    }
@@ -229,6 +291,7 @@ public class PcuElasticSearchApiClientTest {
       docContentProps.put("path", "node1/mycompany/employees/cv_johndoe.doc"); // on dfs
       docContentProps.put("hash", "AEBGD");
       docContentProps.put("length", 1234123);
+      docContentProps.put("modified", Instant.now());
       // sample content : en & fr, stop
       docContentProps.put("content", "John Doe - CV\nExperiences:\n"
             + "2016-2017 ElasticSearch and Spark developer\n"
@@ -250,6 +313,11 @@ public class PcuElasticSearchApiClientTest {
       assertNotNull(getRes);
       assertEquals(index, getRes.get_index());
       assertEquals("cv_johndoe.doc", getRes.get_source().getProperties().get("name"));
+      // BEWARE dates are returned as string
+      // => TODO format them explicitly OR write a custom Jackson deserializer that recognizes formats OR knows mappings
+      String foundDate = (String) ((LinkedHashMap<String, Object>)
+            getRes.get_source().getProperties().get("content")).get("modified");
+      assertEquals(docContentProps.get("modified").toString(), foundDate);
       docId = getRes.get_id();
       
       Document foundDoc = es.getDocumentSource(index, type, id, null, null, null, null, null, null, null);
@@ -275,7 +343,7 @@ public class PcuElasticSearchApiClientTest {
       assertNotNull(searchRes);
       assertNotNull(searchRes.getHits());
       assertEquals(1, searchRes.getHits().getTotal());
-      Hit firstHit = searchRes.getHits().getHits().iterator().next();
+      Hit firstHit = searchRes.getHits().getHits().get(0);
       assertEquals(index, firstHit.get_index());// found in file field
       assertEquals(docId, firstHit.get_id());
       assertEquals("cv_johndoe.doc", firstHit.get_source().getProperties().get("name"));
@@ -283,17 +351,17 @@ public class PcuElasticSearchApiClientTest {
       // file name letter tokenizing thanks to word_delimiter :
       multiMatch.setQuery("cv_johndoe.doc");
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("cv_johndoe");
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("johndoe"); // thanks to word_delimiter
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setFields(Arrays.asList("name_default"));
       multiMatch.setQuery("cv_johndoe.doc");
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("cv_johndoe");
       searchRes = es.search(queryMessage , null, null);
       assertEquals(0, searchRes.getHits().getTotal()); // no word_delimiter
@@ -303,7 +371,7 @@ public class PcuElasticSearchApiClientTest {
       searchRes = es.search(queryMessage , null, null);
       assertEquals(0, searchRes.getHits().getTotal());
 
-      // stopwords :
+      // stopwords (TODO rm, rather through TF/IDF) :
       multiMatch.setFields(Arrays.asList("content.content"));
       multiMatch.setQuery("and");
       //multiMatch.setQuery("et"); // TODO fr
@@ -313,7 +381,7 @@ public class PcuElasticSearchApiClientTest {
       // no stemming (?) :
       multiMatch.setQuery("experiences");
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("experience");
       searchRes = es.search(queryMessage , null, null);
       assertEquals(0, searchRes.getHits().getTotal());
@@ -324,12 +392,12 @@ public class PcuElasticSearchApiClientTest {
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("phone"));
       queryMessage.setQuery(terms);
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // shingles :
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("i phone"));
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("i developer"));
       searchRes = es.search(queryMessage , null, null);
       assertEquals(0, searchRes.getHits().getTotal());
@@ -339,18 +407,18 @@ public class PcuElasticSearchApiClientTest {
       terms.getFieldToTermListOrLookupMap().put("content.length", Arrays.asList(1234123));
       queryMessage.setQuery(terms);
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // french :
       multiMatch.setFields(Arrays.asList("content.content_fr"));
       multiMatch.setQuery("expériences");
       queryMessage.setQuery(multiMatch);
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       // french stemming :
       multiMatch.setQuery("expérience");
       searchRes = es.search(queryMessage , null, null);
-      assertEquals(docId, searchRes.getHits().getHits().iterator().next().get_id());
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       // french elision :
       multiMatch.setQuery("l");
       searchRes = es.search(queryMessage , null, null);
@@ -359,6 +427,137 @@ public class PcuElasticSearchApiClientTest {
       multiMatch.setQuery("et");
       searchRes = es.search(queryMessage , null, null);
       assertEquals(0, searchRes.getHits().getTotal());
+
+      // bool - must / AND :
+      bool bool = new bool();
+      queryMessage.setQuery(bool);
+      multiMatch.setQuery("phone");
+      multi_match multiMatch2 = new multi_match();
+      multiMatch2.setQuery("smartphone");
+      multiMatch2.setFields(Arrays.asList("content.content"));
+      bool.setMust(Arrays.asList(multiMatch, multiMatch2));
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(0, searchRes.getHits().getTotal());
+      
+      // query-time synonyms (manual, not ES', still requires dict, & for acronyms), bool should / OR, boost :
+      bool.setMust(null);
+      bool.setShould(Arrays.asList(multiMatch, multiMatch2));
+      //bool.setBoost(boost);
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      
+      // native Lucene query :
+      query_string nativeQuery = new query_string();
+      queryMessage.setQuery(nativeQuery);
+      nativeQuery.setQuery("+content.content:\"i phone\"^2");
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      
+      // explain :
+      queryMessage.setExplain(true);
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertTrue(searchRes.getHits().getHits().get(0).get_explanation().toString().contains("description"));
+      queryMessage.setExplain(false);
+      
+      // filter_path :
+      searchRes = es.search(queryMessage , null, null, "took, hits.hits._id");
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertNull(searchRes.getHits().getHits().get(0).get_index());
+      
+      // sort :
+      queryMessage.setSort(new LinkedHashMap<>());
+      queryMessage.getSort().put("name", "asc");
+      queryMessage.getSort().put("_score", "desc");
+      Hit hit = searchRes.getHits().getHits().get(0);
+      assertEquals(docId, hit.get_id());
+      queryMessage.setSort(null);
+      
+      // function score - script :
+      ESScript esScript = new ESScript();
+      ESScriptScript esScriptScript = esScript.getScript();
+      function_score function_score = new function_score();
+      queryMessage.setQuery(function_score);
+      function_score.setScript_score(esScript);
+      esScriptScript.setInline("Math.log(2 + doc['content.length'].value)");
+      float previousScore = searchRes.getHits().getHits().get(0).get_score();
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertNotEquals(previousScore, searchRes.getHits().getHits().get(0).get_score());
+      
+      // function score - field value factor AND gaussian decay :
+      //function_score = new function_score(); // reset (null not enough)
+      //queryMessage.setQuery(function_score);
+      function_score.setScript_score(null);
+      function_score.setFunctions(new ArrayList<>());
+      FunctionScoreFilter field_value_factor_filter = new FunctionScoreFilter();
+      function_score.getFunctions().add(field_value_factor_filter);
+      FieldValueFactorFunctionScore field_value_factor = new FieldValueFactorFunctionScore();
+      field_value_factor_filter.setField_value_factor(field_value_factor);
+      field_value_factor.setField("content.length");
+      FunctionScoreFilter gaussian_decay_filter = new FunctionScoreFilter();
+      function_score.getFunctions().add(gaussian_decay_filter);
+      gaussian_decay_filter.setGauss(new LinkedHashMap<>());
+      DecayFunctionScoreField decayFunctionScoreField = new DecayFunctionScoreField();
+      gaussian_decay_filter.getGauss().put("content.length", decayFunctionScoreField);
+      decayFunctionScoreField.setOrigin("0");
+      decayFunctionScoreField.setScale("20");
+      previousScore = searchRes.getHits().getHits().get(0).get_score();
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertNotEquals(previousScore, searchRes.getHits().getHits().get(0).get_score());
+      
+      // script_field :
+      esScriptScript.setInline("doc['content.length'].value * params.multiplier");
+      esScriptScript.setParams(new LinkedHashMap<>());
+      esScriptScript.getParams().put("multiplier", 2);
+      queryMessage.setScript_fields(new LinkedHashMap<>());
+      queryMessage.getScript_fields().put("content.length_doubled", esScript);
+      searchRes = es.search(queryMessage , null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertNull(searchRes.getHits().getHits().get(0).get_source());
+      assertEquals(Arrays.asList(2468246), // TODO Q why list ?
+            searchRes.getHits().getHits().get(0).getFields().get("content.length_doubled"));
+      queryMessage.setScript_fields(null);
+      
+      // script :
+      script script = new script();
+      queryMessage.setQuery(script);
+      script.setScript(esScriptScript);
+      searchRes = es.search(queryMessage , null, null);
+      hit = searchRes.getHits().getHits().get(0);
+      assertEquals(docId, hit.get_id());
+      
+      // error (script) :
+      esScriptScript.setInline("doc['nofield'].value * params.multiplier");
+      searchRes = es.search(queryMessage , null, null);
+      assertTrue(searchRes.get_shards().getFailures().get(0).getReason().getCaused_by().getReason().contains("No field found"));
+      
+      // highlight :
+      queryMessage.setQuery(bool);
+      Highlight highlight = new Highlight();
+      highlight.setFields(new LinkedHashMap<>());
+      HighlightParameters contentContentHighlightParameters = new HighlightParameters();
+      highlight.getFields().put("content.content", contentContentHighlightParameters);
+      queryMessage.setHighlight(highlight);
+      searchRes = es.search(queryMessage, null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      //assertTrue(searchRes.getHits().getHits().get(0)
+      //      .getHighlight().get("content.content").get(0).toLowerCase().contains("phone")); // NOO none TODO Q why ???
+      
+      // with rescore :
+      contentContentHighlightParameters.setHighlight_query(nativeQuery);
+      queryMessage.setRescore(new ArrayList<>());
+      ESRescore rescore = new ESRescore();
+      queryMessage.getRescore().add(rescore);
+      rescore.setWindow_size(50);
+      rescore.getQuery().setRescore_query(bool);
+      rescore.getQuery().setQuery_weight(0.7f);
+      rescore.getQuery().setRescore_query_weight(0.7f);
+      searchRes = es.search(queryMessage, null, null);
+      assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      assertTrue(searchRes.getHits().getHits().get(0)
+            .getHighlight().get("content.content").get(0).toLowerCase().contains("phone"));
    }
    
 }

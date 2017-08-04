@@ -1,7 +1,10 @@
 package org.pcu.search.elasticsearch.api.mapping;
 
+import java.util.List;
+
 /**
- * TODO a separate class per type ?!
+ * TODO a separate class per type ?! => WHEN REFACTORING TO UNIFIED SPI
+ * TODO enums ?
  * 
  * Q primitive or object params ? object allow null, while primitive require a default value.
  * Q inited to default value ? clearer, but most of the time not possible
@@ -14,8 +17,8 @@ package org.pcu.search.elasticsearch.api.mapping;
 public class TokenFilter {
    
    private String type; // usually : stop, lower/uppercase, phonetic (plugin), elision (l'avion), asciifolding (é)
-   // stemming :  porter_stem, shingle (token n-grams), nGram, edgeNGram, kstem, snowball
-   // also decimal_digit, pattern(_capture), length, trim, classic, reverse, apostrophe (turkish), flatten_graph, standard (noop) https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html
+   // stemming : stemmer (unified ; language=english/light_french...) porter_stem, shingle (token n-grams), nGram, edgeNGram, kstem, snowball
+   // also decimal_digit, pattern(_capture), length, trim, classic, reverse, truncate, apostrophe (turkish), flatten_graph, standard (noop) https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html
    // TODO pattern_replace(replacement), word_delimiter, word_delimiter_graph, stemmer(_override), keyword_marker/repeat, synonym_graph, compound (german...), truncate (length=10), unique (only_on_same_position=false), hunspell(locale, dictionary, dedup, longest_only), common_grams, cjk_width/bigram, delimited_payload_filter, limit, keep(_types), min_hash(hash/bucket_count, hash_set_size, with_rotation), fingerprint(separator, max_output_size),
    // TODO normalization : arabic/german/hindi/indic/sorani/persian/scandinavian/serbian
    // synonym ONLY FOR QUERY TIME
@@ -62,6 +65,9 @@ public class TokenFilter {
    
    // TODO after word_delimiter... https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-word-delimiter-tokenfilter.html
    
+   // stemmer https://www.elastic.co/guide/en/elasticsearch/reference/2.4/analysis-stemmer-tokenfilter.html
+   //private String language; // english, light_french...
+   
    // snowball https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-snowball-tokenfilter.html
    private String language; // Armenian, Basque, Catalan, Danish, Dutch, English, Finnish, French, German, German2, Hungarian, Italian, Kp, Lithuanian, Lovins, Norwegian, Porter, Portuguese, Romanian, Russian, Spanish, Swedish, Turkish
    
@@ -77,7 +83,10 @@ public class TokenFilter {
    private int max_code_len = 4; // doublemetaphone
    private String rule_type = "approx"; // beider_morse ; exact
    private String name_type = "generic" ; // beider_morse ; ashkenazi, sephardic
-   private String languageset; // any, comomon, cyrillic, english, french, german, hebrew, hungarian, polish, romanian, russian, spanish
+   private List<String> languageset; // any, comomon, cyrillic, english, french, german, hebrew, hungarian, polish, romanian, russian, spanish
+   
+   // elision https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-elision-tokenfilter.html
+   private List<String> articles;
    
    public String getType() {
       return type;
@@ -289,11 +298,17 @@ public class TokenFilter {
    public void setName_type(String name_type) {
       this.name_type = name_type;
    }
-   public String getLanguageset() {
+   public List<String> getLanguageset() {
       return languageset;
    }
-   public void setLanguageset(String languageset) {
+   public void setLanguageset(List<String> languageset) {
       this.languageset = languageset;
+   }
+   public List<String> getArticles() {
+      return articles;
+   }
+   public void setArticles(List<String> articles) {
+      this.articles = articles;
    }
    
 }

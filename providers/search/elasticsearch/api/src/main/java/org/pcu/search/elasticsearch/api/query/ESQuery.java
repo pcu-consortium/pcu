@@ -12,6 +12,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import io.swagger.annotations.ApiModel;
 
+/**
+ * Interface because no field is shared overall but some can be among concrete query classes
+ * through extending another abstract class (ex. FunctionScoreFunctions).
+ * @author mardut
+ *
+ */
 @ApiModel(description = "query",
         subTypes={
             bool.class,
@@ -24,6 +30,6 @@ import io.swagger.annotations.ApiModel;
    @JsonSubTypes.Type(value = terms.class),
    @JsonSubTypes.Type(value = script.class)
 })
-public abstract class ESQuery {
+public interface ESQuery {
 
 }

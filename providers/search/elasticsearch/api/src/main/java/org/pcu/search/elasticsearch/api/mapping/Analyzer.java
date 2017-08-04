@@ -3,7 +3,8 @@ package org.pcu.search.elasticsearch.api.mapping;
 import java.util.List;
 
 /**
- * TODO a separate class per type ?!
+ * TODO a separate class per type ?! => WHEN REFACTORING TO UNIFIED SPI
+ * TODO enums ?
  * 
  * Q primitive or object params ? object allow null, while primitive require a default value.
  * Q inited to default value ? clearer, but most of the time not possible

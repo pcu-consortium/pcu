@@ -13,6 +13,7 @@ import org.pcu.search.elasticsearch.api.DeleteByQueryResult;
 import org.pcu.search.elasticsearch.api.DeleteResult;
 import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.DocumentResult;
+import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.GetResult;
 import org.pcu.search.elasticsearch.api.UpdateRequest;
@@ -183,6 +184,12 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
       }
       res.setHits(hits);
       return res ;
+   }
+
+   @Override
+   public SearchResult search(ESQueryMessage queryMessage, String search_type, Boolean request_cache,
+         String filter_path) throws ESApiException {
+      return null;
    }
 
 }

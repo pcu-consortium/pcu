@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  *
  */
 @JsonTypeInfo(include=As.WRAPPER_OBJECT, use=Id.NAME)
-public class terms extends ESQuery { // ESTermsQuery
+public class terms implements ESQuery { // ESTermsQuery
    
    /** ex. list : [ "kimchy", "elasticsearch" ]
     * ex. lookup : { "index" : "users", "type" : "user", "id" : "2", "path" : "followers"(, routing:"...") }

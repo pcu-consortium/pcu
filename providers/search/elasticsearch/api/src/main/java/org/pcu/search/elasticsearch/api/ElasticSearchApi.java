@@ -36,8 +36,8 @@ import io.swagger.annotations.ApiParam;
  * 
  * unsupported :
  * - _cat (plain text output)
- * - common params : pretty, human, error_trace (TODO !), source, filter_path (TODO ?!) https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
- * - TODO explain, bulk
+ * - common params : pretty, human, error_trace (TODO !), source, filter_path outside _search (TODO ?!) https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
+ * - TODO bulk
  * - ? mget/search/...
  * - TODO requirements : MES (function_score, index mgmt ex. reindex ?), ekeller's list...
  * 
@@ -203,5 +203,15 @@ public interface ElasticSearchApi {
    SearchResult search(ESQueryMessage queryMessage,
          @ApiParam(value = "or dfs_query_then_fetch", defaultValue = "query_then_fetch") @QueryParam("search_type") String search_type,
          @ApiParam(value = "overrides index conf whose default is true") @QueryParam("request_cache") Boolean request_cache) throws ESApiException;
+   // with common options :
+   // filter_path pattern https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
+   // TODO transversal for all operations
+   @Path("/_search")
+   @POST
+   @GET
+   SearchResult search(ESQueryMessage queryMessage,
+         @ApiParam(value = "or dfs_query_then_fetch", defaultValue = "query_then_fetch") @QueryParam("search_type") String search_type,
+         @ApiParam(value = "overrides index conf whose default is true") @QueryParam("request_cache") Boolean request_cache,
+         @ApiParam(value = "ex. took,hits.hits._id,hits.hits.name*") @QueryParam("filter_path") String filter_path) throws ESApiException;
 
 }
