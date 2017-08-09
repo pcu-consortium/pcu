@@ -33,10 +33,10 @@ public class PropertyMapping extends TypeMapping { // for object/nested type
    // not supported : boost (use at query time instead)
    private String coerce;
    private List<String> copy_to;
-   private String doc_values;
+   private String doc_values; // defaults to true if supported https://www.elastic.co/guide/en/elasticsearch/reference/current/doc-values.html
    private String dynamic;
    private Boolean enabled; // to disable _all (only, else Mapping definition ... unsupported parameters) https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html
-   private Boolean fielddata; // else error on script_fields, aggregations, sorting : Fielddata is disabled on text fields by default. https://www.elastic.co/guide/en/elasticsearch/reference/master/fielddata.html
+   private Boolean fielddata; // = doc_values cache ; else error on script_fields, aggregations, sorting : Fielddata is disabled on text fields by default. https://www.elastic.co/guide/en/elasticsearch/reference/master/fielddata.html
    private Integer ignore_above; // https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-above.html
    private Boolean ignore_malformed; // defaults to false, BUT not allowed on text (can't be malformed) https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html
    private Boolean include_in_all; // defaults to true, unless index is set to no https://www.elastic.co/guide/en/elasticsearch/reference/current/include-in-all.html
@@ -47,8 +47,8 @@ public class PropertyMapping extends TypeMapping { // for object/nested type
    private String null_value; // ex. NULL, to search null values https://www.elastic.co/guide/en/elasticsearch/reference/current/null-value.html
    private Integer position_increment_gap; // defaults to 100, but not supported by all types https://www.elastic.co/guide/en/elasticsearch/reference/current/position-increment-gap.html
    private String similarity; // classic (default), BM25, boolean, TODO duke's https://www.elastic.co/guide/en/elasticsearch/reference/current/similarity.html
-   private Boolean store; // for GET?stored_fields ; not for object/nested, default true https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
-   private String term_vector; // no, yes, with_positions, with_offsets, with_positions_offsets
+   private Boolean store; // for GET?stored_fields ; default true, not for object/nested https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
+   private String term_vector; // no, yes, with_positions, with_offsets, with_positions_offsets (for fulltext BM25, very big)
    
    public String getType() {
       return type;

@@ -17,7 +17,7 @@ import java.util.List;
 public class TokenFilter {
    
    private String type; // usually : stop, lower/uppercase, phonetic (plugin), elision (l'avion), asciifolding (é)
-   // stemming : stemmer (unified ; language=english/light_french...) porter_stem, shingle (token n-grams), nGram, edgeNGram, kstem, snowball
+   // stemming : stemmer (unified ; language=english/light_french...) porter_stem, shingle (token n-grams), nGram, edgeNGram, kstem, snowball, hunspell (dictionary)
    // also decimal_digit, pattern(_capture), length, trim, classic, reverse, truncate, apostrophe (turkish), flatten_graph, standard (noop) https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html
    // TODO pattern_replace(replacement), word_delimiter, word_delimiter_graph, stemmer(_override), keyword_marker/repeat, synonym_graph, compound (german...), truncate (length=10), unique (only_on_same_position=false), hunspell(locale, dictionary, dedup, longest_only), common_grams, cjk_width/bigram, delimited_payload_filter, limit, keep(_types), min_hash(hash/bucket_count, hash_set_size, with_rotation), fingerprint(separator, max_output_size),
    // TODO normalization : arabic/german/hindi/indic/sorani/persian/scandinavian/serbian

@@ -35,6 +35,7 @@ import io.swagger.annotations.ApiParam;
  * - document query (composite)
  * 
  * unsupported :
+ * - auth, because belongs to ES commercial offering : X-Pack Security (formerly Shield) https://www.elastic.co/products/x-pack/security https://www.elastic.co/guide/en/shield/current/getting-started.html
  * - _cat (plain text output)
  * - common params : pretty, human, error_trace (TODO !), source, filter_path outside _search (TODO ?!) https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
  * - TODO bulk
@@ -42,7 +43,10 @@ import io.swagger.annotations.ApiParam;
  * - TODO requirements : MES (function_score, index mgmt ex. reindex ?), ekeller's list...
  * 
  * gotchas :
- * - doc id : slash not supported by ES, though JAXRS could ({id:.+}), but not be a good Lucene id anyway 
+ * - doc id : slash not supported by ES (though JAXRS could : {id:.+}), but file path is not a good Lucene id anyway.
+ * So rather use UUID v1 (the best Lucene id : http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html ),
+ * or hash id fields (like fscrawler does with file path https://github.com/shadiakiki1986/docker-fscrawler )
+ * which provides auto dedup.
  * 
  * ElasticSearch REST API reference source :
  * https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/
@@ -60,6 +64,7 @@ public interface ElasticSearchApi {
    // {__unencoded__id}") //  to accept even /
 
    // mapping conf API. Difficulty is being complex.
+   // TODO content in binary ?!
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html
    @Path("/{indexPattern}")
    @PUT
@@ -134,7 +139,7 @@ public interface ElasticSearchApi {
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
    @Path("/{index}/{type}/{id}")
    @DELETE
-   DeleteResult deleteDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
+   IndexResult deleteDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
          @ApiParam(value = "type", required = true) @PathParam("type") String type,
          @ApiParam(value = "id", required = true) @PathParam("id") String id,
          @ApiParam(value = "routing") String routing, @ApiParam(value = "ex. 5m, 1000") String timeout,
@@ -194,6 +199,16 @@ public interface ElasticSearchApi {
          @ApiParam(value = "preference") @QueryParam("preference") String preference, // or _primary, _local, or custom (session id, user name...)
          @ApiParam(value = "! comma separated fields or wildcards (or _source but not supporting)") @QueryParam("_source_include") String _source_include,
          @ApiParam(value = "! comma separated fields or wildcards") @QueryParam("_source_exclude") String _source_exclude) throws ESApiException;
+
+   // bulk API. Difficulty is "flat" top-level serialization.
+   // TODO TODO in open HTTP connection, which ES probably does like Solr https://cwiki.apache.org/confluence/display/solr/Using+SolrJ
+   // TODO also /{index}/{type}/_bulk ?
+   // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
+   @Path("/_bulk")
+   @POST
+   BulkResult bulk(@ApiParam(value = "document", required = true) BulkMessage doc,
+         @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
+         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException;
    
    // Query API. Difficulty is being composite.
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html

@@ -75,6 +75,15 @@ public class PcuElasticSearchClientConfiguration {
       
       return mapper;
    }
+   /* TODO LATER requires another client instance
+   @Bean
+   public ObjectMapper elasticSearchBulkMapper() {
+      ObjectMapper mapper = elasticSearchMapper();
+      // in ES _bulk, each object's metadata or data must be in a single line :
+      mapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+      return mapper;
+   }
+   */
    
    @Bean
    public JacksonJsonProvider elasticSearchJsonProvider(ObjectMapper elasticSearchMapper) {

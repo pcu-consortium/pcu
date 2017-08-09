@@ -15,10 +15,14 @@ import java.util.LinkedHashMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.search.elasticsearch.PcuElasticSearchClientApplication;
+import org.pcu.search.elasticsearch.api.BulkAction;
+import org.pcu.search.elasticsearch.api.BulkMessage;
+import org.pcu.search.elasticsearch.api.BulkResult;
 import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.GetResult;
+import org.pcu.search.elasticsearch.api.IndexAction;
 import org.pcu.search.elasticsearch.api.mapping.Analysis;
 import org.pcu.search.elasticsearch.api.mapping.Analyzer;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
@@ -315,6 +319,7 @@ public class PcuElasticSearchApiClientTest {
       assertEquals("cv_johndoe.doc", getRes.get_source().getProperties().get("name"));
       // BEWARE dates are returned as string
       // => TODO format them explicitly OR write a custom Jackson deserializer that recognizes formats OR knows mappings
+      @SuppressWarnings("unchecked")
       String foundDate = (String) ((LinkedHashMap<String, Object>)
             getRes.get_source().getProperties().get("content")).get("modified");
       assertEquals(docContentProps.get("modified").toString(), foundDate);
@@ -324,6 +329,38 @@ public class PcuElasticSearchApiClientTest {
       assertNotNull(foundDoc);
       assertEquals("slash should be supported in id even not at the end of the operation URL",
             "cv_johndoe.doc", foundDoc.getProperties().get("name"));
+      
+      // bulk :
+      // TODO define another client with mapper without indent, or extract in another test disabling the pcu.rest.enableIndenting prop
+      /*
+      BulkMessage bulkMessage = new BulkMessage();
+      bulkMessage.setActions(new ArrayList<>());
+      BulkAction bulkAction1 = new BulkAction();
+      bulkAction1.setKindToAction(new LinkedHashMap<>());
+      IndexAction indexAction1 = new IndexAction();
+      indexAction1.set_index("files");
+      indexAction1.set_type("file");
+      indexAction1.set_id(new UUID().toString());
+      bulkAction1.getKindToAction().put("index", indexAction1);
+      Document doc1 = new Document();
+      doc1.getProperties().put("name", "cv_janedoe.doc");
+      bulkAction1.setDoc(doc1);
+      bulkMessage.getActions().add(bulkAction1);
+      IndexAction indexAction2 = new IndexAction();
+      indexAction2.set_index("files");
+      indexAction2.set_type("file");
+      indexAction2.set_id(new UUID().toString());
+      BulkAction bulkAction2 = new BulkAction();
+      bulkAction2.setKindToAction(new LinkedHashMap<>());
+      bulkAction2.getKindToAction().put("index", indexAction2);
+      Document doc2 = new Document();
+      doc2.getProperties().put("name", "cv_janedoe.doc");
+      bulkAction2.setDoc(doc2);
+      bulkMessage.getActions().add(bulkAction2);
+      BulkResult bulkRes = es.bulk(bulkMessage, null, null);
+      assertEquals(2, bulkRes.getItems().size());
+      assertEquals(indexAction1.get_id(), bulkRes.getItems().get(0).get("index").get_id());
+      */
    }
    
    @Test

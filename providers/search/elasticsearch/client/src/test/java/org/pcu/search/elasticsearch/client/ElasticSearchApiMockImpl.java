@@ -9,8 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.pcu.search.elasticsearch.api.BulkMessage;
+import org.pcu.search.elasticsearch.api.BulkResult;
 import org.pcu.search.elasticsearch.api.DeleteByQueryResult;
-import org.pcu.search.elasticsearch.api.DeleteResult;
 import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.DocumentResult;
 import org.pcu.search.elasticsearch.api.ESApiException;
@@ -124,7 +125,7 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    }
 
    @Override
-   public DeleteResult deleteDocument(String index, String type, String id, String routing, String timeout,
+   public IndexResult deleteDocument(String index, String type, String id, String routing, String timeout,
          Long version, String parent, String wait_for_active_shards, String refresh) {
       // TODO Auto-generated method stub
       return null;
@@ -162,6 +163,12 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    public Document getDocumentSource(String index, String type, String id, String routing, Boolean refresh,
          Long version, Boolean realtime, String preference, String _source_include, String _source_exclude) {
       return docs.get(id).get_source();
+   }
+
+   @Override
+   public BulkResult bulk(BulkMessage doc, String wait_for_active_shards, String refresh) throws ESApiException {
+      // TODO Auto-generated method stub
+      return null;
    }
 
    @Override
