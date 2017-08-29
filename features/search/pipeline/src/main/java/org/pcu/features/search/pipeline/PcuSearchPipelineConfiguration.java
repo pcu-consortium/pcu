@@ -1,4 +1,4 @@
-package org.pcu.features.search.server;
+package org.pcu.features.search.pipeline;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,13 +11,9 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.pcu.features.search.api.PcuSearchApi;
-import org.pcu.features.search.engine.PcuSearchEngineConfiguration;
-import org.pcu.features.search.pipeline.PcuSearchPipelineConfiguration;
-import org.pcu.features.search.simple.PcuSearchSimpleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,16 +35,15 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * @author mdutoo
  */
 @Configuration
-@ComponentScan(basePackageClasses={PcuSearchServerConfiguration.class, PcuSearchSimpleConfiguration.class,
-      PcuSearchPipelineConfiguration.class, PcuSearchEngineConfiguration.class})
+@ComponentScan
 @EnableAutoConfiguration // else Unable to start EmbeddedWebApplicationContext due to missing EmbeddedServletContainerFactory bean see https://stackoverflow.com/questions/21783391/spring-boot-unable-to-start-embeddedwebapplicationcontext-due-to-missing-embedd
 @ConfigurationProperties
 @PropertySource("classpath:pcu-server-defaults.properties") // (NOT working in yml) fills env with props :
 // http.server.servlet-path (& default port), cxf.jaxrs.client.address (& default path), else with executable jar :
 // Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'cxf.jaxrs.client.address' in string value "${cxf.jaxrs.client.address}"
-public class PcuSearchServerConfiguration {
+public class PcuSearchPipelineConfiguration {
    
-    private static final Logger LOGGER = LoggerFactory.getLogger(PcuSearchServerConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PcuSearchPipelineConfiguration.class);
    
     /** for prop check purpose */
     @Autowired
@@ -99,10 +94,10 @@ public class PcuSearchServerConfiguration {
 
     }
 
-    /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */
+    /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */ 
     @Bean
-    public Server pcuSearchServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
-          PcuSearchApi pcuSearchApiServerImpl/*, PcuApiExceptionMapper pcuApiExceptionMapper,
+    public Server pcuSearchPipelineServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
+          PcuSearchApi pcuSearchApiPipelineImpl/*, PcuApiExceptionMapper pcuApiExceptionMapper,
           PcuApiSwagger2Feature pcuApiSwagger2Feature*/) {
         ArrayList<Object> providers = new ArrayList<Object>();
         providers.add(pcuSearchApiJsonProvider); // else web app ex Response.Status.UNSUPPORTED_MEDIA_TYPE
@@ -111,7 +106,7 @@ public class PcuSearchServerConfiguration {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
         endpoint.setBus(bus);
         endpoint.setAddress("/");
-        endpoint.setServiceBean(pcuSearchApiServerImpl);
+        endpoint.setServiceBean(pcuSearchApiPipelineImpl);
         endpoint.setProviders(providers);
 
         ///endpoint.getFeatures().add(pcuApiSwagger2Feature);

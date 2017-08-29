@@ -6,25 +6,23 @@
         <groupId>org.pcu-consortium.pcu</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent> 
-    <artifactId>pcu-features-search-server</artifactId>
-    <name>PCU Features Search Overall Server</name>
-    <description>PCU Features Search Overall Server</description>
+    <artifactId>pcu-features-search-engine</artifactId>
+    <name>PCU Features Search ML-powered Engine</name>
+    <description>PCU Features ML-powered Engine</description>
     
     <dependencies>
 
         <!-- PCU -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-simple</artifactId>
+            <artifactId>pcu-features-search-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-pipeline</artifactId>
+            <artifactId>pcu-features-search-simple</artifactId><!-- to test over actual ES (through SPI) -->
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-engine</artifactId>
-        </dependency>
+        <!-- TODO deps : to setup spark batch ML jobs, read results in ES (if not directly used by ES query)... -->
 
     </dependencies>
 </project>

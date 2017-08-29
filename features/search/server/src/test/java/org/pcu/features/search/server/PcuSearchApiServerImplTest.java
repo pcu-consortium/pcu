@@ -35,7 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //see https://docs.spring.io/spring-boot/docs/current/reference/html/howto-embedded-servlet-containers.html https://stackoverflow.com/questions/30312058/spring-boot-how-to-get-the-running-port
 //or with autoconf redefine cxf.jaxrs.client.address
 @ActiveProfiles("test")
-public class PcuSearchApiImplTest /*extends PcuSearchApiClientTest */{
+public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
    @LocalServerPort
    protected int serverPort;
    

@@ -1,4 +1,4 @@
-package org.pcu.features.search.server;
+package org.pcu.features.search.simple;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -20,7 +20,7 @@ import io.swagger.annotations.Api;
 @Produces({MediaType.APPLICATION_JSON})
 @Api("search api") // name of the api, merely a tag ; else not in swagger
 @Service // for what, or only @Component ?
-public class PcuSearchApiImpl implements PcuSearchApi {
+public class PcuSearchApiSimpleImpl implements PcuSearchApi {
 
    @Autowired
    private PcuSearchProviderApi esSearchProviderApi;

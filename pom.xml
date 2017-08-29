@@ -181,6 +181,21 @@
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-features-search-simple</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-features-search-pipeline</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-features-search-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-features-search-server</artifactId>
             <version>${project.version}</version>
         </dependency>

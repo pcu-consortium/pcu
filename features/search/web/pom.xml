@@ -13,7 +13,7 @@
     
     <dependencies>
 
-        <!-- PCU -->   
+        <!-- PCU -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-features-search-server</artifactId>
