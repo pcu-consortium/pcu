@@ -32,6 +32,7 @@ public class PcuSearchApiPipelineImpl implements PcuSearchApi {
    @Override
    public PcuIndexResult index(String index, PcuDocument pcuDoc) {
       // TODO send to Kafka
+      System.err.println("PcuSearchApiPipelineImpl not implemented yet");
       PcuIndexResult res = new PcuIndexResult();
       return res ;
    }

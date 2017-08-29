@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
@@ -101,7 +102,8 @@ public class PcuSearchServerConfiguration {
 
     /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */
     @Bean
-    public Server pcuSearchServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
+    @Primary // TODO HACK
+    public Server pcuJaxrsServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
           PcuSearchApi pcuSearchApiServerImpl/*, PcuApiExceptionMapper pcuApiExceptionMapper,
           PcuApiSwagger2Feature pcuApiSwagger2Feature*/) {
         ArrayList<Object> providers = new ArrayList<Object>();

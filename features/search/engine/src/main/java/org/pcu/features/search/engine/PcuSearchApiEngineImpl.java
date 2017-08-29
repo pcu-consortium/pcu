@@ -33,5 +33,6 @@ public class PcuSearchApiEngineImpl implements PcuSearchApi {
    }
    
    // TODO impl search operations, by calling one or more time pcuSearchApi.search()
+   // System.err.println("PcuSearchApiEngineImpl not implemented yet");
 
 }

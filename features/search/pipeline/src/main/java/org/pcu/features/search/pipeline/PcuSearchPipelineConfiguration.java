@@ -96,7 +96,7 @@ public class PcuSearchPipelineConfiguration {
 
     /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */ 
     @Bean
-    public Server pcuSearchPipelineServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
+    public Server pcuJaxrsServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
           PcuSearchApi pcuSearchApiPipelineImpl/*, PcuApiExceptionMapper pcuApiExceptionMapper,
           PcuApiSwagger2Feature pcuApiSwagger2Feature*/) {
         ArrayList<Object> providers = new ArrayList<Object>();
