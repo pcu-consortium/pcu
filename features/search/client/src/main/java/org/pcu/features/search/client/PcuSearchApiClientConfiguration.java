@@ -1,4 +1,4 @@
-package org.pcu.search.elasticsearch.client;
+package org.pcu.features.search.client;
 
 import java.io.File;
 
@@ -7,13 +7,16 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
-import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.apache.cxf.transport.servlet.CXFServlet;
+import org.pcu.features.search.api.PcuSearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -28,10 +31,10 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * @author mdutoo
  */
 @Configuration
-@ComponentScan // i.e. ("org.pcu.search.elasticsearch.client") ; not org.pcu else scans ex. ESSearchProviderApiImpl
+@ComponentScan // i.e. ("org.pcu.features.search.client") ; not org.pcu else scans ex. ESSearchProviderApiImpl
 // which can't find client, and in another project does not work (order ?)
 @Import(JaxRsConfig.class) // creates cxf bus (@EnableJaxRsProxyClient not conf'ble enough : address...)
-public class PcuElasticSearchClientConfiguration {
+public class PcuSearchApiClientConfiguration {
 
    ///public static final String PCU_ELASTICSEARCH_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
    ///public static final DateTimeFormatter PCU_ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ofPattern(PCU_ELASTICSEARCH_DATE_PATTERN);
@@ -43,16 +46,19 @@ public class PcuElasticSearchClientConfiguration {
    @Autowired
    private Environment env;
    
-   public PcuElasticSearchClientConfiguration() {
+   public PcuSearchApiClientConfiguration() {
       
    }
-
+   
    /**
-    * TODO does it override Spring's ???
+    * TODO move to PCU-wide common rest conf (but not common to spi clients)
+    * TODO also mutualize with elasticSearchMapper, in rest helper ?!?
     * @return
     */
    @Bean
-   public ObjectMapper elasticSearchMapper() {
+   @Primary // else NoUniqueBeanDefinitionException: No qualifying bean of type 'com.fasterxml.jackson.databind.ObjectMapper' available: expected single matching bean but found 2: pcuSearchApiMapper,elasticSearchMapper
+   // see https://github.com/spring-projects/spring-boot/issues/6529
+   public ObjectMapper pcuSearchApiMapper() {
       ObjectMapper mapper = new ObjectMapper();
       
       // date conf :
@@ -78,43 +84,35 @@ public class PcuElasticSearchClientConfiguration {
       
       return mapper;
    }
-   /* TODO LATER requires another client instance
-   @Bean
-   public ObjectMapper elasticSearchBulkMapper() {
-      ObjectMapper mapper = elasticSearchMapper();
-      // in ES _bulk, each object's metadata or data must be in a single line :
-      mapper.configure(SerializationFeature.INDENT_OUTPUT, false);
-      return mapper;
-   }
-   */
    
    @Bean
-   public JacksonJsonProvider elasticSearchJsonProvider(ObjectMapper elasticSearchMapper) {
-      return new JacksonJsonProvider(elasticSearchMapper);
+   public JacksonJsonProvider pcuSearchApiJsonProvider(ObjectMapper pcuSearchApiMapper) {
+      return new JacksonJsonProvider(pcuSearchApiMapper);
    }
 
    /** set it to empty or spaces to disable it */
-   @Value("${pcu.search.es.restLogFile:es-rest-mock.log}")
+   @Value("${pcu.search.api.restLogFile:es-rest-mock.log}")
    private String restLogFilePathProp;
    // inspired from 
-   @Value("${pcu.search.es.client.address:http://localhost:9200/}")
+   @Value("${pcu.search.api.client.address:http://localhost:${server.port:8080}/pcu}")
    private String address;
+   protected int serverPort;
    @Value("${cxf.jaxrs.client.thread-safe:false}")
    private Boolean threadSafe;
    @Bean
-   public Client elasticSearchRestClient(SpringBus bus,
-         JacksonJsonProvider elasticSearchJsonProvider,
+   public Client pcuSearchApiRestClient(SpringBus bus,
+         JacksonJsonProvider pcuSearchApiJsonProvider/*,
          ESApiExceptionMapper exceptionMapper,
-         ESApiResponseExceptionMapper responseExceptionMapper) {
+         ESApiResponseExceptionMapper responseExceptionMapper*/) {
       JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
       bean.setBus(bus);        
       bean.setThreadSafe(threadSafe);
       
       bean.setAddress(address);
-      bean.setServiceClass(ElasticSearchApi.class);
-      bean.setProvider(elasticSearchJsonProvider); // actually an addProvider
-      bean.setProvider(exceptionMapper);
-      bean.setProvider(responseExceptionMapper);
+      bean.setServiceClass(PcuSearchApi.class);
+      bean.setProvider(pcuSearchApiJsonProvider); // actually an addProvider
+      /*bean.setProvider(exceptionMapper);
+      bean.setProvider(responseExceptionMapper);*/
       
       if (restLogFilePathProp != null && !restLogFilePathProp.trim().isEmpty()) { // ex. not in prod
          //LOGGER.warn("Enabling logging of all REST exchanges including body to "

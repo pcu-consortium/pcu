@@ -7,7 +7,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent> 
     <artifactId>pcu-providers-search-elasticsearch-parent</artifactId>
-    <!-- version>1.0-SNAPSHOT</version -->
     <packaging>pom</packaging>
 
     <name>PCU Providers ElasticSearch Parent POM</name>
@@ -17,8 +16,8 @@
     <modules>
         <module>api</module>
         <module>client</module>
-        <!-- module>spi-impl</module -->
-        <!-- module>web</module -->
+        <module>spi-impl</module>
+        <!-- module>web</module --><!-- TODO swagger -->
     </modules>
     
 </project>

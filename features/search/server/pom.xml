@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>pcu-features-search-parent</artifactId>
+        <groupId>org.pcu-consortium.pcu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent> 
+    <artifactId>pcu-features-search-server</artifactId>
+    <name>PCU Features Search REST Server</name>
+    <description>PCU Features Search REST Server</description>
+    
+    <dependencies>
+
+        <!-- PCU -->
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-features-search-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- or only test yet ?! -->
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- TODO kafka (LATER rather messaging SPI) -->
+
+    </dependencies>
+</project>
+

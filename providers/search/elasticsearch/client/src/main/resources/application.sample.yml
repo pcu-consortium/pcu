@@ -1,0 +1,14 @@
+# (defaults are commented out)
+
+application:
+  entreprisesearch:
+
+pcu:
+  search:
+    es:
+      client:
+         # address: http://localhost:9200/
+      # restLogFile: es-rest-mock.log
+      restLogFile: 
+  rest:
+    # enableIndenting: true

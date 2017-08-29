@@ -16,6 +16,7 @@ import org.pcu.search.elasticsearch.PcuElasticSearchClientApplication;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.EmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,11 +36,15 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  *
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes={PcuElasticSearchClientApplication.class,MockElasticearchApiClientTest.MockConfiguration.class},
+@ContextConfiguration(classes={PcuElasticSearchClientApplication.class,MockElasticSearchApiClientTest.MockConfiguration.class},
    initializers = ConfigFileApplicationContextInitializer.class)
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT) // or with autoconf redefine cxf.jaxrs.client.address
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.DEFINED_PORT, properties="server_port=45665")
+// rather than @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties="server_port=45665")
+// which would require listening to an ApplicationEvent and therefore using a Provider pattern
+// see https://docs.spring.io/spring-boot/docs/current/reference/html/howto-embedded-servlet-containers.html https://stackoverflow.com/questions/30312058/spring-boot-how-to-get-the-running-port
+// or with autoconf redefine cxf.jaxrs.client.address
 @ActiveProfiles("test")
-public class MockElasticearchApiClientTest extends PcuElasticSearchApiClientTest {
+public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientTest {
    
    public static final String PCU_ES_API_MOCK_PATH = "/search/elasticsearch/";
    
@@ -47,14 +52,14 @@ public class MockElasticearchApiClientTest extends PcuElasticSearchApiClientTest
    public static class MockConfiguration {
       @Bean
       public ServletRegistrationBean dispatcherServlet() {
-          return new ServletRegistrationBean(new CXFServlet(), PCU_ES_API_MOCK_PATH + "*"); // same path as API
+          return new ServletRegistrationBean(new CXFServlet(), "/*");
       }
       // NB. reusing client bus 
       @Bean
       public Server mockRsServer(SpringBus bus, JacksonJsonProvider elasticSearchProvider) {
           JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
           endpoint.setBus(bus);
-          endpoint.setAddress("/");
+          endpoint.setAddress(PCU_ES_API_MOCK_PATH);
           endpoint.setServiceBean(new ElasticSearchApiMockImpl());
           endpoint.setProvider(elasticSearchProvider); // else web app ex Response.Status.UNSUPPORTED_MEDIA_TYPE
 
@@ -71,10 +76,10 @@ public class MockElasticearchApiClientTest extends PcuElasticSearchApiClientTest
    //@Autowired @Qualifier("mockRsClient") // client created NOT IN JAVA CONF else randomServerPort not inited
    ///private ElasticSearchApi es;
 
-   /** to build URL for client (not default 8080 client since random port) */
+   /** to build URL for client (in case not default 8080 ex. because random port) */
    @LocalServerPort
    protected int randomServerPort;
-   @Autowired
+   /*@Autowired
    protected SpringBus bus;
    @Autowired
    protected JacksonJsonProvider jacksonJsonProvider;
@@ -94,7 +99,7 @@ public class MockElasticearchApiClientTest extends PcuElasticSearchApiClientTest
       client.getFeatures().add(loggingFeature);
       
       es = client.create(ElasticSearchApi.class);
-   }
+   }*/
 
    @Override // disable, not mocked yet
    public void testFeatures() throws IOException, ESApiException {

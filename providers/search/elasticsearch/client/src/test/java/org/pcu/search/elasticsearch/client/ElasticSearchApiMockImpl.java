@@ -81,12 +81,12 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    public IndexResult indexDocument(String index, String type, String id, Document docSource, String routing,
          String timeout, Long version, String version_type, String op_type, String wait_for_active_shards,
          String refresh) {
-      DocumentResult doc = new DocumentResult();
-      doc.set_index(index);
-      doc.set_type(type);
-      doc.set_id(id);
-      doc.set_source(docSource);
-      docs.put(id, doc);
+      DocumentResult docRes = new DocumentResult();
+      docRes.set_index(index);
+      docRes.set_type(type);
+      docRes.set_id(id);
+      docRes.set_source(docSource);
+      docs.put(id, docRes);
       IndexResult res = new IndexResult();
       res.set_index(index);
       res.set_type(type);
