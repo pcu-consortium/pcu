@@ -1,12 +1,25 @@
 package org.pcu.features.search.server;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pcu.features.search.api.PcuDocument;
-import org.pcu.features.search.api.PcuIndexResult;
-import org.pcu.features.search.api.PcuSearchApi;
+import org.pcu.providers.file.api.PcuFileApi;
+import org.pcu.providers.file.api.PcuFileResult;
+import org.pcu.providers.search.api.PcuDocument;
+import org.pcu.providers.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuSearchApi;
 import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,9 +54,12 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
    
    @Autowired @Qualifier("pcuSearchApiRestClient") //@Qualifier("pcuSearchApiImpl")
    private PcuSearchApi searchApi;
+
+   @Autowired @Qualifier("pcuFileApiRestClient")
+   private PcuFileApi fileApi;
    
    @Test
-   public void test() {
+   public void testIndex() {
       String index = "files";
       PcuDocument pcuDoc = new PcuDocument();
       pcuDoc.setType("file");
@@ -54,6 +70,43 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // TODO check res
       
       // TODO more, from ES client API test
+   }
+
+   
+   @Test
+   public void testSimulateCrawl() throws Exception {
+      // prepare file to crawl :
+      String store = "mystore"; // TODO
+      //String path = "myfile.doc"; // TODO
+      String testContent = "My test content";
+      File testFile = File.createTempFile("pcu_test_", ".doc");
+      testFile.deleteOnExit();
+      try (FileOutputStream testFileOut = new FileOutputStream(testFile)) {
+         IOUtils.write(testContent, testFileOut, (Charset) null);
+      }
+      
+      // 1. upload crawled content :
+      PcuFileResult fileRes;
+      try (FileInputStream testFileIn = new FileInputStream(testFile)) {
+         fileRes = fileApi.storeContent(store,testFileIn);
+      }
+      // and check :
+      InputStream testFileInRes = fileApi.getContent(store, fileRes.getPath());
+      assertEquals(testContent, IOUtils.toString(testFileInRes, (Charset) null));
+      
+      // 2. index crawled metadata :
+      String index = "files";
+      PcuDocument pcuDoc = new PcuDocument();
+      pcuDoc.setType("file");
+      pcuDoc.setId("myid"); // TODO gen
+      LinkedHashMap<String, Object> content = new LinkedHashMap<>();
+      pcuDoc.setProperties(new LinkedHashMap<>());
+      pcuDoc.getProperties().put("name", "a.doc");
+      pcuDoc.getProperties().put("content", content); // TODO of type "file"
+      content.put("path", fileRes.getPath());
+      content.put("hash", fileRes.getPath()); // why not
+      content.put("fulltext", testContent); // parsed clist-side by tika in connector crawler
+      PcuIndexResult res = searchApi.index(index, pcuDoc);
    }
    
 }

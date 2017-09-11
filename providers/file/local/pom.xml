@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <artifactId>pcu-providers-file-parent</artifactId>
+      <groupId>org.pcu-consortium.pcu</groupId>
+      <version>1.0-SNAPSHOT</version>
+   </parent>
+   <artifactId>pcu-providers-file-local-spi-impl</artifactId>
+   <name>PCU Providers SPI File Local Implementation</name>
+   <description>PCU Providers SPI File Local Implementation</description>
+
+   <dependencies>
+
+      <!-- PCU -->
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-file-spi</artifactId>
+      </dependency>
+      <!-- already ?? dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-platform-rest-server</artifactId>
+      </dependency -->
+
+      <!-- deps -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter</artifactId><!-- actually only context ; else import a -client -->
+      </dependency>
+      <dependency>
+         <groupId>commons-io</groupId>
+         <artifactId>commons-io</artifactId>
+      </dependency>
+
+      <!-- tests -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+</project>
+

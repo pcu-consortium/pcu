@@ -7,8 +7,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent> 
     <artifactId>pcu-providers-search-elasticsearch-client</artifactId>
-    <name>PCU Providers ElasticSearch Spring CXF Client</name>
-    <description>PCU Providers ElasticSearch Spring CXF Client</description>
+    <name>PCU Providers Search ElasticSearch Spring CXF Client</name>
+    <description>PCU Providers Search ElasticSearch Spring CXF Client</description>
     
     <dependencies>
 

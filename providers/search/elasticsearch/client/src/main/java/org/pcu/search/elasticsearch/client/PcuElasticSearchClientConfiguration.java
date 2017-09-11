@@ -9,6 +9,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -89,7 +90,7 @@ public class PcuElasticSearchClientConfiguration {
    */
    
    @Bean
-   public JacksonJsonProvider elasticSearchJsonProvider(ObjectMapper elasticSearchMapper) {
+   public JacksonJsonProvider elasticSearchJsonProvider(@Qualifier("elasticSearchMapper") ObjectMapper elasticSearchMapper) {
       return new JacksonJsonProvider(elasticSearchMapper);
    }
 
@@ -103,7 +104,7 @@ public class PcuElasticSearchClientConfiguration {
    private Boolean threadSafe;
    @Bean
    public Client elasticSearchRestClient(SpringBus bus,
-         JacksonJsonProvider elasticSearchJsonProvider,
+         @Qualifier("elasticSearchJsonProvider") JacksonJsonProvider elasticSearchJsonProvider,
          ESApiExceptionMapper exceptionMapper,
          ESApiResponseExceptionMapper responseExceptionMapper) {
       JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();

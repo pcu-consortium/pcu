@@ -5,9 +5,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.pcu.features.search.api.PcuDocument;
-import org.pcu.features.search.api.PcuIndexResult;
-import org.pcu.features.search.api.PcuSearchApi;
+import org.pcu.platform.rest.server.PcuJaxrsServerBase;
+import org.pcu.providers.search.api.PcuDocument;
+import org.pcu.providers.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuSearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,11 @@ import io.swagger.annotations.Api;
 @Produces({MediaType.APPLICATION_JSON})
 @Api("search api") // name of the api, merely a tag ; else not in swagger
 @Service // for what, or only @Component ?
-public class PcuSearchApiServerImpl implements PcuSearchApi {
+public class PcuSearchApiServerImpl extends PcuJaxrsServerBase implements PcuSearchApi {
 
    @Autowired @Qualifier("pcuSearchApiPipelineImpl")
    private PcuSearchApi delegateSearchIndexApi;
-   @Autowired @Qualifier("pcuSearchApiSimpleImpl")
+   @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiSimpleImpl
    private PcuSearchApi delegateSearchCrudApi;
    @Autowired @Qualifier("pcuSearchApiEngineImpl")
    private PcuSearchApi delegateSearchEngineApi;
@@ -33,6 +34,12 @@ public class PcuSearchApiServerImpl implements PcuSearchApi {
    @Override
    public PcuIndexResult index(String index, PcuDocument pcuDoc) {
       return delegateSearchIndexApi.index(index, pcuDoc) ;
+   }
+
+   @Override
+   public PcuDocument get(String index, String docId) {
+      // TODO Auto-generated method stub
+      return null;
    }
 
 }

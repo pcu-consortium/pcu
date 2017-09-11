@@ -7,8 +7,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent> 
     <artifactId>pcu-providers-search-elasticsearch-api</artifactId>
-    <name>PCU Providers ElasticSearch REST API</name>
-    <description>PCU Providers ElasticSearch REST API</description>
+    <name>PCU Providers Search ElasticSearch REST API</name>
+    <description>PCU Providers Search ElasticSearch REST API</description>
     
     <dependencies>
 

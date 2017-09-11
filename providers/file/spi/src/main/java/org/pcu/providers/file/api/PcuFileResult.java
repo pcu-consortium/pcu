@@ -1,0 +1,16 @@
+package org.pcu.providers.file.api;
+
+// TODO share among providers apis
+public class PcuFileResult { // TODO extend PcuResult ?
+   
+   private String path;
+
+   public String getPath() {
+      return path;
+   }
+
+   public void setPath(String path) {
+      this.path = path;
+   }
+
+}

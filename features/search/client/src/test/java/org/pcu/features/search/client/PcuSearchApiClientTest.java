@@ -1,18 +1,12 @@
 package org.pcu.features.search.client;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.pcu.features.search.api.PcuDocument;
-import org.pcu.features.search.api.PcuSearchApi;
-import org.pcu.features.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuDocument;
+import org.pcu.providers.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuSearchApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 
 /**

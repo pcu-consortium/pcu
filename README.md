@@ -20,9 +20,15 @@ It is bundled with a default application : the PCU Entreprise Search engine.
 
 
 Features
-   * ElasticSearch client API. It is built on built on Apache CXF, Jackson, Spring Boot. See https://github.com/pcu-consortium/pcu/blob/master/providers/search/elasticsearch & its README.
-   * upcoming : search provider SPI, other providers (Spark compute, storage, Kafka messaging),
-text mining / NLP, core Manager, search and ecommerce ML algorithms...
+   * Big Data components : integrated in a pluggable, decoupled manner by Service Provider Interfaces (SPI) for **search, compute, messaging, fs**
+      * search : ElasticSearch client API (& search SPI impl). It is built on built on Apache CXF, Jackson, Spring Boot. See
+https://github.com/pcu-consortium/pcu/blob/master/providers/search/elasticsearch & its README.
+      * file storage : local file storage REST server. Uses implicit hash or explicit name as id, direct-to-disk HTTP streaming upload.
+Upcoming : auto cleanup, quotas.
+   * search API (PcuSearchApiServerImpl) : on top of search SPI (PcuSearchApiSimpleImpl), with
+      * async indexing through Kafka + Spark Streaming YAML-configured pipeline (PcuSearchApiPipelineImpl)
+      * ML-powered and value-added search query engine (PcuSearchApiEngineImpl)
+   * upcoming : other providers (Spark compute, Kafka messaging), text mining / NLP, core Manager, search and ecommerce ML algorithms...
 
 Tools
    * upcoming : Swagger online API developer documentation and further playground
@@ -47,7 +53,7 @@ git clone TODO
 mvn clean install
 
 
-# PCU project file tree :
+# PCU project file tree draft :
 
 pcu/
 

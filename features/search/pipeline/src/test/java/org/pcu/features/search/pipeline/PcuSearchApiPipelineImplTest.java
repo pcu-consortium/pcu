@@ -4,9 +4,9 @@ import java.util.LinkedHashMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pcu.features.search.api.PcuDocument;
-import org.pcu.features.search.api.PcuIndexResult;
-import org.pcu.features.search.api.PcuSearchApi;
+import org.pcu.providers.search.api.PcuDocument;
+import org.pcu.providers.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuSearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -38,8 +38,8 @@ public class PcuSearchApiPipelineImplTest /*extends PcuSearchApiClientTest */{
    @LocalServerPort
    protected int serverPort;
    
-   @Autowired @Qualifier("pcuSearchApiRestClient") //@Qualifier("pcuSearchApiImpl")
-   private PcuSearchApi searchApi;
+   @Autowired @Qualifier("pcuSearchIndexPipelineApiRestClient") //@Qualifier("pcuSearchApiRestClient") //@Qualifier("pcuSearchApiPipelineImpl")
+   private PcuSearchIndexPipelineApi searchApi;
    
    @Test
    public void test() {

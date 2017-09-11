@@ -15,7 +15,7 @@
 
     <modules>
         <module>search</module>
-        <!-- module>compute</module -->
+        <module>file</module>
         <!-- module>storage</module -->
         <!-- module>messaging</module -->
     </modules>

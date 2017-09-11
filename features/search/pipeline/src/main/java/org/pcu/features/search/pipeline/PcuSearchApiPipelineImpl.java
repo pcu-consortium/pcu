@@ -6,9 +6,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.pcu.features.search.api.PcuDocument;
-import org.pcu.features.search.api.PcuIndexResult;
-import org.pcu.features.search.api.PcuSearchApi;
+import org.pcu.platform.rest.server.PcuJaxrsServerBase;
+import org.pcu.providers.search.api.PcuDocument;
+import org.pcu.providers.search.api.PcuIndexResult;
+import org.pcu.providers.search.api.PcuSearchApi;
 import org.springframework.stereotype.Service;
 
 import io.swagger.annotations.Api;
@@ -22,12 +23,12 @@ import io.swagger.annotations.Api;
  * @author mardut
  *
  */
-@Path("/search/pipeline") // TODO Q or /searchcpt, /data, /nosql ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
+@Path("/pipeline") // TODO Q or /searchcpt, /data, /nosql ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
-@Api("search pipeline") // name of the api, merely a tag ; else not in swagger
+@Api("search index pipeline") // name of the api, merely a tag ; else not in swagger
 @Service // for what, or only @Component ?
-public class PcuSearchApiPipelineImpl implements PcuSearchApi {
+public class PcuSearchApiPipelineImpl extends PcuJaxrsServerBase implements PcuSearchIndexPipelineApi, PcuSearchApi {
 
    @Override
    public PcuIndexResult index(String index, PcuDocument pcuDoc) {
@@ -40,6 +41,12 @@ public class PcuSearchApiPipelineImpl implements PcuSearchApi {
    @PostConstruct
    protected void init() {
       // TODO setup Spark Streaming job
+   }
+
+   @Override
+   public PcuDocument get(String index, String docId) {
+      // NOO meaningless
+      return null;
    }
 
 }

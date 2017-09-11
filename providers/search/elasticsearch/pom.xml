@@ -9,8 +9,8 @@
     <artifactId>pcu-providers-search-elasticsearch-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>PCU Providers ElasticSearch Parent POM</name>
-    <description>PCU Providers ElasticSearch Parent POM</description>
+    <name>PCU Providers Search ElasticSearch Parent POM</name>
+    <description>PCU Providers Search ElasticSearch Parent POM</description>
    
 
     <modules>

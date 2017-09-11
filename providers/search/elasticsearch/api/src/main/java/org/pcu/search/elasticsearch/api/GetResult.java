@@ -11,7 +11,7 @@ public class GetResult extends DocumentResult {
    
    private boolean found;
    private String _routing; // in GET only if asked for as param
-   private LinkedHashMap<String,Object[]> fields; // rather than _source, if stored_fields
+   private LinkedHashMap<String,Object[]> fields; // rather than _source !, if stored_fields
    
    public boolean isFound() {
       return found;

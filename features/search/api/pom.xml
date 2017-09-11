@@ -11,6 +11,16 @@
     <description>PCU Features Search REST API</description>
     
     <dependencies>
+    
+            <!-- TODO rm project instead -->
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-file-spi</artifactId>
+        </dependency>
 
            <!-- JAX-RS (elsewhere brought by cxf) -->
             <dependency>

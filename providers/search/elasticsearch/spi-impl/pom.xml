@@ -7,8 +7,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent> 
     <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId>
-    <name>PCU Providers SPI ElasticSearch Implementation</name>
-    <description>PCU Providers SPI ElasticSearch Implementation</description>
+    <name>PCU Providers Search SPI ElasticSearch Implementation</name>
+    <description>PCU Providers Search SPI ElasticSearch Implementation</description>
     
     <dependencies>
 

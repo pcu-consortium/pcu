@@ -14,6 +14,8 @@
    
 
     <modules>
+        <module>rest-server</module>
+        <module>rest-client</module>
         <!-- module>core</module --><!-- metadata / configuration... -->
         <!-- module>pipeline</module -->
         <!-- module>connector</module --><!-- or top level ? -->
