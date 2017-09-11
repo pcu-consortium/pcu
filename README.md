@@ -52,6 +52,11 @@ git clone TODO
 ## Build
 mvn clean install
 
+## Test
+The easiest way to test the PCU platform is to use it as an Entreprise Search server.
+Go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
+Or (upcoming) start a file connector and use the web search UI.
+
 
 # PCU project file tree draft :
 
