@@ -30,7 +30,7 @@ public interface PcuSearchApi {
    PcuIndexResult index(@PathParam("index") String index, PcuDocument doc);
    
    // CRUD :
-   @Path("/index/{docId}")
+   @Path("/index/{index}/{docId}")
    @GET
    PcuDocument get(@PathParam("index") String index, @PathParam("docId") String docId);
    // TODO more

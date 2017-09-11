@@ -20,7 +20,7 @@ import io.swagger.annotations.Api;
 @Produces({MediaType.APPLICATION_JSON})
 @Api("search api") // name of the api, merely a tag ; else not in swagger
 @Service // for what, or only @Component ?
-public class PcuSearchApiEngineImpl extends PcuJaxrsServerBase implements PcuSearchApi {
+public class PcuSearchApiEngineImpl /*extends PcuJaxrsServerBase */implements PcuSearchApi {
 
    /** or PcuSearchProviderApi ?? */
    //@Autowired @Qualifier("defaultSearchProviderApiImpl")
