@@ -1,8 +1,6 @@
 package org.pcu.features.search.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -10,11 +8,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.pcu.features.search.server.meta.PcuField;
+import org.pcu.features.search.server.meta.PcuIndex;
+import org.pcu.features.search.server.meta.PcuIndexField;
+import org.pcu.features.search.server.meta.PcuType;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.file.api.PcuFileResult;
 import org.pcu.providers.search.api.PcuDocument;
@@ -73,6 +80,10 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
    }
 
    
+   /**
+    * The client connector's crawler should work this way :
+    * @throws Exception
+    */
    @Test
    public void testSimulateCrawl() throws Exception {
       // prepare file to crawl :
@@ -106,7 +117,21 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       content.put("path", fileRes.getPath());
       content.put("hash", fileRes.getPath()); // why not
       content.put("fulltext", testContent); // parsed clist-side by tika in connector crawler
-      PcuIndexResult res = searchApi.index(index, pcuDoc);
+      PcuIndexResult indexRes = searchApi.index(index, pcuDoc);
+      
+      PcuDocument res = searchApi.get(index, pcuDoc.getId());
+      assertEquals(pcuDoc.getId(), res.getId());
+      //assertEquals(pcuDoc.getVersion(), res.getVersion());
+      
+      // X. simulate tailing a file :
+      String testAppendContent = "\nand another test content";
+      String testFullContent = testContent + testAppendContent;
+      try (FileInputStream testFileIn = new FileInputStream(testFile)) {
+         fileRes = fileApi.appendContent(store, testFile.getAbsolutePath(), null, testFileIn); // create (random access)
+      }
+      assertEquals(testContent, IOUtils.toString(fileApi.getContent(store, fileRes.getPath()), (Charset) null));
+      fileRes = fileApi.appendContent(store, testFile.getAbsolutePath(), testFile.length(), new ByteArrayInputStream(testAppendContent.getBytes())); // append (using random access)
+      assertEquals(testContent + testAppendContent, IOUtils.toString(fileApi.getContent(store, fileRes.getPath()), (Charset) null));
    }
    
 }

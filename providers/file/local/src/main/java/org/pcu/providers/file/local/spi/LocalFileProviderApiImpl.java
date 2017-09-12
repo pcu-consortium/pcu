@@ -1,11 +1,13 @@
 package org.pcu.providers.file.local.spi;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,7 +106,7 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
 
    @Override
    public PcuFileResult putContent(String store, String path, InputStream streamedContent) {
-      saveContent(store, path, streamedContent, false);
+      saveContent(store, path, streamedContent, 0l);
 
       PcuFileResult res = new PcuFileResult();
       res.setPath(path);
@@ -112,8 +114,25 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
    }
 
    @Override
-   public PcuFileResult appendContent(String store, String path, InputStream streamedContent) {
-      saveContent(store, path, streamedContent, true);
+   public PcuFileResult appendContent(String store, String path, Long position, InputStream streamedContent) {
+      if (position == null) {
+         saveContent(store, path, streamedContent, null);
+         
+      } else {
+         try (ByteArrayOutputStream contentBos = new ByteArrayOutputStream()) { // auto creates and append
+            IOUtils.copy(streamedContent, contentBos); // TODO buffer size
+            RandomAccessFile raf = new RandomAccessFile(getContentFile(store, path), "rw");
+            raf.seek(position);
+            raf.write(contentBos.toByteArray());
+            raf.close();
+         } catch (IOException ioex) {
+            throw new RuntimeException("Can't store content, IO error streaming HTTP to file", ioex); // TODO better
+         } finally { // (try with resource would not allow silent log)
+            try { streamedContent.close(); } catch (IOException e) {
+               LOGGER.info("error closing streamedContent AFTER reading it", e);
+            }
+         }
+      }
 
       PcuFileResult res = new PcuFileResult();
       res.setPath(path);
@@ -142,16 +161,37 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
       }
    }
    
-   private void saveContent(String store, String path, InputStream streamedContent, boolean append) {
+   private void saveContent(String store, String path, InputStream streamedContent, Long position) {
       File contentFile = getContentFile(store, path);
-      
-      try (FileOutputStream contentFileOs = new FileOutputStream(contentFile, append)) { // auto creates and append
-         IOUtils.copy(streamedContent, contentFileOs); // TODO apache commons (same), buffer size
-      } catch (IOException ioex) {
-         throw new RuntimeException("Can't store content, IO error streaming HTTP to temp file", ioex); // TODO better
-      } finally { // (try with resource would not allow silent log)
-         try { streamedContent.close(); } catch (IOException e) {
-            LOGGER.info("error closing streamedContent AFTER reading it", e);
+      contentFile.getParentFile().mkdirs(); // else FileNotFoundExeption
+
+      if (position != null && position > 0) {
+         // append using random access :
+         try (ByteArrayOutputStream contentBos = new ByteArrayOutputStream()) {
+            IOUtils.copy(streamedContent, contentBos); // TODO buffer size
+            RandomAccessFile raf = new RandomAccessFile(getContentFile(store, path), "rw"); // creates file
+            raf.seek(position);
+            raf.write(contentBos.toByteArray());
+            raf.close();
+         } catch (IOException ioex) {
+            throw new RuntimeException("Can't store content, IO error streaming HTTP to file", ioex); // TODO better
+         } finally { // (try with resource would not allow silent log)
+            try { streamedContent.close(); } catch (IOException e) {
+               LOGGER.info("error closing streamedContent AFTER reading it", e);
+            }
+         }
+         
+      } else {
+         // create or append at the end :
+         boolean append = position == null; // else 0
+         try (FileOutputStream contentFileOs = new FileOutputStream(contentFile, append)) { // auto creates file and append
+            IOUtils.copy(streamedContent, contentFileOs); // TODO buffer size
+         } catch (IOException ioex) {
+            throw new RuntimeException("Can't store content, IO error streaming HTTP to file", ioex); // TODO better
+         } finally { // (try with resource would not allow silent log)
+            try { streamedContent.close(); } catch (IOException e) {
+               LOGGER.info("error closing streamedContent AFTER reading it", e);
+            }
          }
       }
    }

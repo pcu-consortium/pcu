@@ -10,6 +10,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.annotations.Api;
@@ -50,15 +51,18 @@ public interface PcuFileApi {
    @PUT
    PcuFileResult putContent(@PathParam("store") String store, @PathParam("path") String path, InputStream streamedContent);
    /**
-    * Modifiable content store - append (suffices on its own)
+    * Modifiable content store - append at end or at client-known position using random access (suffices on its own),
+    * which allows to build file tailing clients that remember the size already read and themselves
+    * read tailed files using random access
     * TODO update content entity if any (front API) ? and / or rather (using) event (for further processing ex. trigger job run if it is time)
     * @param store
+    * @param position where to append if any, else at end
     * @param streamedContent
     * @return file name = hash
     */
    @Path("/content/{store}/{path:.+}")
    @POST
-   PcuFileResult appendContent(@PathParam("store") String store, @PathParam("path") String path, InputStream streamedContent);
+   PcuFileResult appendContent(@PathParam("store") String store, @PathParam("path") String path, @QueryParam("path") Long position, InputStream streamedContent);
    
    @GET
    @Path("/content/{store}/{pathOrHash:.+}")
