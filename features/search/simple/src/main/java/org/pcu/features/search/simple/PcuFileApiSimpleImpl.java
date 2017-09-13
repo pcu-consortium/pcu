@@ -59,8 +59,8 @@ public class PcuFileApiSimpleImpl extends PcuJaxrsServerBase implements PcuFileA
    }
 
    @Override
-   public PcuFileResult appendContent(String store, String path, InputStream streamedContent) {
-      PcuFileResult res = localFileProviderApi.appendContent(store, path, streamedContent);
+   public PcuFileResult appendContent(String store, String path, Long position, InputStream streamedContent) {
+      PcuFileResult res = localFileProviderApi.appendContent(store, path, position, streamedContent);
 
       // TODO update content entity and / using event :
       String index = "files";

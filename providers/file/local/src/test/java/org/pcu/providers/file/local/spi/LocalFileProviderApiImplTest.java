@@ -20,7 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 
+ * TODO extend it to inject REST client proxy and test also REST API
  * @author mardut
  *
  */
@@ -41,7 +41,7 @@ public class LocalFileProviderApiImplTest  {
    private PcuFileApi localFileProviderApi;
 
    String store = "mystore"; // TODO
-   String path = "myfile.doc"; // TODO
+   String path = "mydir/myfile.doc"; // TODO
    String testContent = "My test content";
    
    @Test
@@ -67,6 +67,7 @@ public class LocalFileProviderApiImplTest  {
    @Test
    public void testNameAsId() throws Exception {
       String testAppendContent = "\nand another test content";
+      String testFullContent = testContent + testAppendContent;
 
       localFileProviderApi.deleteContent(store, path);
       
@@ -79,19 +80,25 @@ public class LocalFileProviderApiImplTest  {
       }
       
       // create using append :
-      PcuFileResult res = localFileProviderApi.appendContent(store, path, new ByteArrayInputStream(testContent.getBytes()));
+      PcuFileResult res = localFileProviderApi.appendContent(store, path, null, new ByteArrayInputStream(testContent.getBytes()));
       InputStream testFileInRes = localFileProviderApi.getContent(store, path);
       assertEquals(testContent, IOUtils.toString(testFileInRes, (Charset) null));
       
       // append :
-      res = localFileProviderApi.appendContent(store, path, new ByteArrayInputStream(testAppendContent.getBytes()));
+      res = localFileProviderApi.appendContent(store, path, null, new ByteArrayInputStream(testAppendContent.getBytes()));
       testFileInRes = localFileProviderApi.getContent(store, path);
-      assertEquals(testContent + testAppendContent, IOUtils.toString(testFileInRes, (Charset) null));
+      assertEquals(testFullContent, IOUtils.toString(testFileInRes, (Charset) null));
       
       // replace :
       res = localFileProviderApi.putContent(store, path, new ByteArrayInputStream(testContent.getBytes()));
       testFileInRes = localFileProviderApi.getContent(store, path);
       assertEquals(testContent, IOUtils.toString(testFileInRes, (Charset) null));
+      
+      // append using random access :
+      long previousLength = testContent.getBytes().length;
+      res = localFileProviderApi.appendContent(store, path, previousLength, new ByteArrayInputStream(testAppendContent.getBytes()));
+      testFileInRes = localFileProviderApi.getContent(store, path);
+      assertEquals(testFullContent, IOUtils.toString(testFileInRes, (Charset) null));
       
       // TODO list, delete ?!
 

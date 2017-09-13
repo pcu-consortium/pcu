@@ -12,6 +12,7 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.pcu.features.search.client.PcuPlatformRestClientConfiguration;
+import org.pcu.platform.rest.server.swagger.PcuApiSwagger2Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,8 +99,8 @@ public class PcuPlatformRestServerConfiguration {
     /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */ 
     @Bean
     public Server pcuJaxrsServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
-          List<PcuJaxrsServerBase> pcuJaxrsServers/*, PcuApiExceptionMapper pcuApiExceptionMapper,
-          PcuApiSwagger2Feature pcuApiSwagger2Feature*/) {
+          List<PcuJaxrsServerBase> pcuJaxrsServers,/* PcuApiExceptionMapper pcuApiExceptionMapper,*/
+          PcuApiSwagger2Feature pcuApiSwagger2Feature) {
        //pcuSearchApiSimpleImpls = pcuSearchApiSimpleImpls.stream()
        //      .filter(apiImpl -> !(apiImpl instanceof Proxy)).collect(Collectors.toList()); // else WARN  | OperationResourceInfoComparator:126 - Both org.pcu.features.search.simple.PcuSearchApiSimpleImpl#index and com.sun.proxy.$Proxy102#index are equal candidates for handling the current request which can lead to unpredictable results
         ArrayList<Object> providers = new ArrayList<Object>();
@@ -112,7 +113,7 @@ public class PcuPlatformRestServerConfiguration {
         endpoint.setServiceBeanObjects(pcuJaxrsServers);
         endpoint.setProviders(providers);
 
-        ///endpoint.getFeatures().add(pcuApiSwagger2Feature);
+        endpoint.getFeatures().add(pcuApiSwagger2Feature);
         
         String restLogFilePathProp = env.getProperty("pcu.search.es.restLogFile"); // es-rest-mock.log
         if (restLogFilePathProp != null && !restLogFilePathProp.trim().isEmpty()) { // ex. not in prod
