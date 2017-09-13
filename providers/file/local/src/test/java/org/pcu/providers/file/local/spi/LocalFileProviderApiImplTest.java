@@ -1,10 +1,9 @@
 package org.pcu.providers.file.local.spi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -39,6 +38,9 @@ public class LocalFileProviderApiImplTest  {
 
    @Autowired
    private PcuFileApi localFileProviderApi;
+   /** for tests */
+   @Autowired
+   private LocalFileProviderApiImpl localFileProviderApiImpl;
 
    String store = "mystore"; // TODO
    String path = "mydir/myfile.doc"; // TODO
@@ -53,12 +55,48 @@ public class LocalFileProviderApiImplTest  {
       
       // TODO check that can't be appended
 
-      localFileProviderApi.deleteContent(store, path);
+      // check that not written again in same store :
+      long firstWriteTime = localFileProviderApiImpl.getContentFile(store, path).lastModified();
+      Thread.sleep(1);
+      localFileProviderApi.storeContent(store, new ByteArrayInputStream(testContent.getBytes()));
+      long secondWriteTime = localFileProviderApiImpl.getContentFile(store, path).lastModified();
+      assertEquals(firstWriteTime, secondWriteTime);
       
-      // check none anymore :
+      // check that can still be written in another store :
+      String anotherStore = "anotherStore";
+      Thread.sleep(1);
+      res = localFileProviderApi.storeContent(anotherStore, new ByteArrayInputStream(testContent.getBytes()));
+      try {
+         localFileProviderApi.getContent(anotherStore, path);
+         assertTrue(true);
+      } catch (RuntimeException e) {
+         fail("content should exist");
+      }
+      File anotherStoredFile = localFileProviderApiImpl.getContentFile(anotherStore, path);
+      secondWriteTime = anotherStoredFile.lastModified();
+      assertNotEquals(firstWriteTime, secondWriteTime);
+
+      // test delete :
+      localFileProviderApi.deleteContent(store, path);
       try {
          localFileProviderApi.getContent(store, path);
-         fail("content should not exist yet");
+         fail("content should not exist anymore");
+      } catch (RuntimeException e) {
+         assertTrue(true);
+      }
+      
+      // check still there in another store :
+      try {
+         localFileProviderApi.getContent(anotherStore, path);
+         assertTrue(true);
+      } catch (RuntimeException e) {
+         fail("content should still exist");
+      }
+
+      localFileProviderApi.deleteContent(anotherStore, path);
+      try {
+         localFileProviderApi.getContent(anotherStore, path);
+         fail("content should not exist anymore");
       } catch (RuntimeException e) {
          assertTrue(true);
       }

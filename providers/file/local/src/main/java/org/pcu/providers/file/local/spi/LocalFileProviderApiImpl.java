@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * TODO move hash store as another store impl ON TOP of trivial impl (else can append to hashed file !!)
+ * TODO manage stores
  * @author mardut
  *
  */
@@ -96,6 +97,7 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
       // rename to business id i.e. hash / digest :
       File contentFile = getContentFile(store, digestHexString);
       if (!contentFile.exists()) {
+         contentFile.getParentFile().mkdirs(); // else renameTo() fails silently (returns false)
          tmpFile.renameTo(contentFile);
       }
       
@@ -196,11 +198,15 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
       }
    }
    
-   private File getContentFile(String store, String pathOrHash) {
-      return new File(storeRootDir, pathOrHash);
+   /** public for tests */
+   public File getContentFile(String store, String pathOrHash) {
+      return new File(getStorePath(store), pathOrHash);
    }
    private Path getContentPath(String store, String pathOrHash) {
-      return Paths.get(storeRootPath, pathOrHash);
+      return Paths.get(getStorePath(store), pathOrHash);
+   }
+   private String getStorePath(String store) {
+      return storeRootPath + File.separatorChar + store;
    }
    
 }
