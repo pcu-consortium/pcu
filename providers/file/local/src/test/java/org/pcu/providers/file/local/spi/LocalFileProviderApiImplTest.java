@@ -48,6 +48,12 @@ public class LocalFileProviderApiImplTest  {
    
    @Test
    public void testHashAsId() throws Exception {
+      String anotherStore = "anotherStore";
+      
+      // cleanup :
+      localFileProviderApi.deleteContent(store, path);
+      localFileProviderApi.deleteContent(anotherStore, path);
+      
       PcuFileResult res = localFileProviderApi.storeContent(store, new ByteArrayInputStream(testContent.getBytes()));
       String path = res.getPath();
       InputStream testInRes = localFileProviderApi.getContent(store, path);
@@ -57,14 +63,13 @@ public class LocalFileProviderApiImplTest  {
 
       // check that not written again in same store :
       long firstWriteTime = localFileProviderApiImpl.getContentFile(store, path).lastModified();
-      Thread.sleep(1);
+      Thread.sleep(1000);
       localFileProviderApi.storeContent(store, new ByteArrayInputStream(testContent.getBytes()));
       long secondWriteTime = localFileProviderApiImpl.getContentFile(store, path).lastModified();
       assertEquals(firstWriteTime, secondWriteTime);
       
       // check that can still be written in another store :
-      String anotherStore = "anotherStore";
-      Thread.sleep(1);
+      Thread.sleep(1000);
       res = localFileProviderApi.storeContent(anotherStore, new ByteArrayInputStream(testContent.getBytes()));
       try {
          localFileProviderApi.getContent(anotherStore, path);
@@ -106,7 +111,8 @@ public class LocalFileProviderApiImplTest  {
    public void testNameAsId() throws Exception {
       String testAppendContent = "\nand another test content";
       String testFullContent = testContent + testAppendContent;
-
+      
+      // cleanup :
       localFileProviderApi.deleteContent(store, path);
       
       // check none yet :
@@ -139,10 +145,9 @@ public class LocalFileProviderApiImplTest  {
       assertEquals(testFullContent, IOUtils.toString(testFileInRes, (Charset) null));
       
       // TODO list, delete ?!
-
-      localFileProviderApi.deleteContent(store, path);
       
-      // check none anymore :
+      // test delete :
+      localFileProviderApi.deleteContent(store, path);
       try {
          localFileProviderApi.getContent(store, path);
          fail("content should not exist anymore");
