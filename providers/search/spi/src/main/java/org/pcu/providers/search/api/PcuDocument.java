@@ -88,6 +88,27 @@ public class PcuDocument {
    public void setProperty(String name, Object value) {
       this.properties.put(name, value);
    }
+   /** get by JSON path (dotted), doesn't work with List */
+   @JsonIgnore
+   public Object getByPath(String path) {
+      String[] pathNames = path.split("\\."); // TODO better using indexOf()
+      return getMapByPath(pathNames, pathNames.length - 1).get(pathNames[pathNames.length - 1]);
+   }
+   /** set by JSON path (dotted), doesn't work with List */
+   @JsonIgnore
+   public void setByPath(String path,  Object value) {
+      String[] pathNames = path.split("\\."); // TODO better using indexOf()
+      getMapByPath(pathNames, pathNames.length - 1).put(pathNames[pathNames.length - 1], value);
+   }
+   @SuppressWarnings("unchecked")
+   @JsonIgnore
+   public LinkedHashMap<String,Object> getMapByPath(String[] pathNames, int depth) {
+      LinkedHashMap<String, Object> map = properties;
+      for (int i = 0; i < depth; i++) {
+         map = (LinkedHashMap<String, Object>) map.get(pathNames[i]);
+      }
+      return map;
+   }
    /*public String getRaw() {
       return raw;
    }
