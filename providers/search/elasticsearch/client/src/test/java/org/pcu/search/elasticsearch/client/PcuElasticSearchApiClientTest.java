@@ -38,7 +38,7 @@ import org.pcu.search.elasticsearch.api.query.Highlight;
 import org.pcu.search.elasticsearch.api.query.HighlightParameters;
 import org.pcu.search.elasticsearch.api.query.Hit;
 import org.pcu.search.elasticsearch.api.query.SearchResult;
-import org.pcu.search.elasticsearch.api.query.clause.DecayFunctionScoreField;
+import org.pcu.search.elasticsearch.api.query.clause.DecayFunctionScoreFieldParameters;
 import org.pcu.search.elasticsearch.api.query.clause.ESScript;
 import org.pcu.search.elasticsearch.api.query.clause.ESScriptScript;
 import org.pcu.search.elasticsearch.api.query.clause.FieldValueFactorFunctionScore;
@@ -535,7 +535,7 @@ public class PcuElasticSearchApiClientTest {
       FunctionScoreFilter gaussian_decay_filter = new FunctionScoreFilter();
       function_score.getFunctions().add(gaussian_decay_filter);
       gaussian_decay_filter.setGauss(new LinkedHashMap<>());
-      DecayFunctionScoreField decayFunctionScoreField = new DecayFunctionScoreField();
+      DecayFunctionScoreFieldParameters decayFunctionScoreField = new DecayFunctionScoreFieldParameters();
       gaussian_decay_filter.getGauss().put("content.length", decayFunctionScoreField);
       decayFunctionScoreField.setOrigin("0");
       decayFunctionScoreField.setScale("20");

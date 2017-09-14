@@ -51,6 +51,15 @@ import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
+import org.pcu.search.elasticsearch.api.query.ESQuery;
+import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
+import org.pcu.search.elasticsearch.api.query.Hit;
+import org.pcu.search.elasticsearch.api.query.SearchResult;
+import org.pcu.search.elasticsearch.api.query.clause.PrefixFieldParameters;
+import org.pcu.search.elasticsearch.api.query.clause.RangeFieldParameters;
+import org.pcu.search.elasticsearch.api.query.clause.multi_match;
+import org.pcu.search.elasticsearch.api.query.clause.prefix;
+import org.pcu.search.elasticsearch.api.query.clause.range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -202,7 +211,11 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       pcuDoc.setId(new UUID().toString()); // id - best lucene id http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html
       // or use it to dedup identity resolution ? then with configurable policy : using or not connectorComputerId, url protocol / host / port, even scan root dir
       //String id = "file://server1/a/b/file.doc"; // NOO ES doesn't support slash, and not a good Lucene id anyway
-      String globalFilePath = connectorComputerId + "/" + /*url != null ? host/protocol/ : file/*/ testFile.getAbsolutePath();
+      String testFileAbsoluteSlashedPath = testFile.getAbsolutePath();
+      if (File.pathSeparatorChar == '\\') {
+         testFileAbsoluteSlashedPath = testFileAbsoluteSlashedPath.replace('\\', '/');
+      }
+      String globalFilePath = "/" + connectorComputerId + /*url != null ? /host/protocol : /file*/ testFileAbsoluteSlashedPath;
       pcuDoc.setId(globalFilePath); // id - (connector) app's - (url or) server + path (fscrawler : local path only), allows dedup / identity resolution NOO no slash in ES id
       pcuDoc.setId(md5(globalFilePath)); // id - (connector) app's - (url or) server + path MD5 (fscrawler : local path only), allows dedup / identity resolution
       //pcuDoc.setId(ecmDoc.getId()); // id - (ECM) app's, allows dedup / identity resolution
@@ -223,7 +236,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       pcuDoc.getProperties().put("file", file); // TODO of type "file"
       file.put("last_modified", ZonedDateTime.ofInstant(Instant.ofEpochMilli(testFile.lastModified()), ZoneId.systemDefault())); // TODO Q or globally ?! or annotated as global prop @modified ? or LocalDateTime ?
       file.put("name", testFile.getName());
-      file.put("path", testFile.getAbsolutePath()); // TODO analyze as a tree structure ?
+      file.put("path", testFileAbsoluteSlashedPath); // TODO analyze as a tree structure ?
       // TODO group, owner (fscrawler : in attributes/)
       // TODO Q also file url, "virtual" path, extension, indexed_chars ? content_type (or in content) ??
       
@@ -252,13 +265,14 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       meta.put("language", "en"); // TODO Q meta or detected ??
       // TODO format, identifier, contributor, coverage, modifier, creator_tool, publisher, relation, rights, source, type,
       // description, created, print_date, metadata_date, latitude, longitude, altitude, rating, comments ?!
+      // TODO dynamic field mappings for ex. "xmpDM:audioCompressor" : "MP3"
 
       pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ??
       // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ?
       
       // file treeS in ES :
       pcuDoc.getProperties().put("path", globalFilePath); // most exact tree
-      pcuDoc.getProperties().put("readable_path", host + testFile.getAbsolutePath()); // readable tree
+      pcuDoc.getProperties().put("readable_path", host + testFileAbsoluteSlashedPath); // readable tree
       
       PcuIndexResult indexRes = searchApi.index(index, pcuDoc);
       
@@ -271,7 +285,44 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       InputStream foundContent = fileApi.getContent(storePath[0], storePath[1]);
       assertEquals(testContent, IOUtils.toString(foundContent, (Charset) null));
       
-      // TODO test versionS & optimistic locking, query on path & date range
+      // TODO test versionS & optimistic locking
+      
+      // query - on date range :
+      ESQueryMessage dateRangeMsg = new ESQueryMessage();
+      range dateRange = new range();
+      dateRangeMsg.setQuery(dateRange);
+      RangeFieldParameters rangeParams = new RangeFieldParameters();
+      dateRange.setRangeParameters("file.last_modified", rangeParams);
+      rangeParams.setGt(ZonedDateTime.parse("2017-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
+      rangeParams.setLte(ZonedDateTime.ofInstant(Instant.ofEpochMilli(testFile.lastModified()), ZoneId.systemDefault()));
+      List<Hit> hits = elasticSearchRestClient.search(dateRangeMsg, null, null).getHits().getHits();
+      assertTrue(!hits.isEmpty());
+      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+      rangeParams.setLt(ZonedDateTime.parse("2016-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
+      rangeParams.setGt(null);
+      hits = elasticSearchRestClient.search(dateRangeMsg, null, null).getHits().getHits();
+      assertTrue(hits.isEmpty());
+
+      // query - on mimetype :
+      ESQueryMessage mimetypeMsg = new ESQueryMessage();
+      multi_match mimetypeMultiMatch = new multi_match();
+      mimetypeMultiMatch.setFields(Arrays.asList(new String[] {"http.mimetype"}));
+      mimetypeMultiMatch.setQuery((String) http.get("mimetype"));
+      mimetypeMsg.setQuery(mimetypeMultiMatch);
+      hits = elasticSearchRestClient.search(mimetypeMsg , null, null).getHits().getHits();
+      assertTrue(!hits.isEmpty());
+      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+
+      // query - on path :
+      ESQueryMessage pathMsg = new ESQueryMessage();
+      prefix pathPrefix = new prefix();
+      PrefixFieldParameters prefixParameters = new PrefixFieldParameters();
+      prefixParameters.setValue(testFileAbsoluteSlashedPath.substring(0, testFileAbsoluteSlashedPath.lastIndexOf('/')));
+      pathPrefix.setPrefixParameters("file.path", prefixParameters );
+      pathMsg.setQuery(pathPrefix);
+      hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
+      assertTrue(!hits.isEmpty());
+      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       
       // X. simulate tailing a file :
       String testAppendContent = "\nand another test content";
