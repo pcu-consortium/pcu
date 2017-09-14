@@ -19,11 +19,11 @@ public abstract class FunctionScoreFunctions {
    
    // decay functions :
    /** map of the SINGLE field name to its DecayFunctionScoreField, in case of gauss decay function */
-   private LinkedHashMap<String,DecayFunctionScoreField> gauss; // TODO SingleFieldLinkedHashMap
+   private LinkedHashMap<String,DecayFunctionScoreFieldParameters> gauss; // TODO SingleFieldLinkedHashMap
    /** map of the SINGLE field name to its DecayFunctionScoreField, in case of exp decay function */
-   private LinkedHashMap<String,DecayFunctionScoreField> exp; // TODO SingleFieldLinkedHashMap
+   private LinkedHashMap<String,DecayFunctionScoreFieldParameters> exp; // TODO SingleFieldLinkedHashMap
    /** map of the SINGLE field name to its DecayFunctionScoreField, in case of linear decay function */
-   private LinkedHashMap<String,DecayFunctionScoreField> linear; // TODO SingleFieldLinkedHashMap
+   private LinkedHashMap<String,DecayFunctionScoreFieldParameters> linear; // TODO SingleFieldLinkedHashMap
    
    public ESScript getScript_score() {
       return script_score;
@@ -43,22 +43,22 @@ public abstract class FunctionScoreFunctions {
    public void setField_value_factor(FieldValueFactorFunctionScore field_value_factor) {
       this.field_value_factor = field_value_factor;
    }
-   public LinkedHashMap<String, DecayFunctionScoreField> getGauss() {
+   public LinkedHashMap<String, DecayFunctionScoreFieldParameters> getGauss() {
       return gauss;
    }
-   public void setGauss(LinkedHashMap<String, DecayFunctionScoreField> gauss) {
+   public void setGauss(LinkedHashMap<String, DecayFunctionScoreFieldParameters> gauss) {
       this.gauss = gauss;
    }
-   public LinkedHashMap<String, DecayFunctionScoreField> getExp() {
+   public LinkedHashMap<String, DecayFunctionScoreFieldParameters> getExp() {
       return exp;
    }
-   public void setExp(LinkedHashMap<String, DecayFunctionScoreField> exp) {
+   public void setExp(LinkedHashMap<String, DecayFunctionScoreFieldParameters> exp) {
       this.exp = exp;
    }
-   public LinkedHashMap<String, DecayFunctionScoreField> getLinear() {
+   public LinkedHashMap<String, DecayFunctionScoreFieldParameters> getLinear() {
       return linear;
    }
-   public void setLinear(LinkedHashMap<String, DecayFunctionScoreField> linear) {
+   public void setLinear(LinkedHashMap<String, DecayFunctionScoreFieldParameters> linear) {
       this.linear = linear;
    }
    

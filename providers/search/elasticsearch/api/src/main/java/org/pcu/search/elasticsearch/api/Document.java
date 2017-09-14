@@ -1,6 +1,6 @@
 package org.pcu.search.elasticsearch.api;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class Document {
    // TODO to unmarshall embedded documents as (Sub)Documents rather than maps ??
    // (and if possible same for embedded maps ???) BUT can't know when is embedded resource or map
    @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
-      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(ZonedDateTime.class),
       @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
    ///   @JsonSubTypes.Type(DCSubResource(Map).class), @JsonSubTypes.Type(DCList.class) })
    @JsonAnyGetter
@@ -44,7 +44,7 @@ public class Document {
       return this.properties;
    }
    @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
-      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(ZonedDateTime.class),
       @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
    ///   @JsonSubTypes.Type(DCSubResource(Map).class), @JsonSubTypes.Type(DCList.class) })
    @JsonAnySetter

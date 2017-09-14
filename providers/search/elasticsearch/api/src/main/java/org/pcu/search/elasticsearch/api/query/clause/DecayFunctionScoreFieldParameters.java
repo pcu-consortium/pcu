@@ -6,7 +6,7 @@ package org.pcu.search.elasticsearch.api.query.clause;
  * @author mardut
  *
  */
-public class DecayFunctionScoreField {
+public class DecayFunctionScoreFieldParameters {
    /** numeric : any number, geo : geo point, date : formatted date */
    private String origin;
    /** numeric : any number, geo : 1km, 12m..., date : 10d, 1h... */

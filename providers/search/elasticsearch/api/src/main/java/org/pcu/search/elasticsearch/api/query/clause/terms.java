@@ -1,6 +1,6 @@
 package org.pcu.search.elasticsearch.api.query.clause;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,19 +40,17 @@ public class terms implements ESQuery { // ESTermsQuery
     * String, Boolean, Double, Map, List
     * see http://en.wikipedia.org/wiki/JSON#Data_types.2C_syntax_and_example */
    //@JsonIgnore // NO error 204 no content, rather not visible and explicitly @JsonProperty actual fields
-   private LinkedHashMap<String,Object> fieldToTermListOrLookupMap; // Map ???
+   private LinkedHashMap<String,Object> fieldToTermListOrLookupMap = new LinkedHashMap<String,Object>(3); // Map ???
    @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
-      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(ZonedDateTime.class),
       @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
-   ///   @JsonSubTypes.Type(DCSubResource(Map).class), @JsonSubTypes.Type(DCList.class) })
    @JsonAnyGetter
    public LinkedHashMap<String, Object> getFieldToTermListOrLookupMap() {
       return fieldToTermListOrLookupMap;
    }
    @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
-      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(ZonedDateTime.class),
       @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
-   ///   @JsonSubTypes.Type(DCSubResource(Map).class), @JsonSubTypes.Type(DCList.class) })
    @JsonAnySetter
    public void setTermListOrLookupMap(String name, Object value) {
       this.fieldToTermListOrLookupMap.put(name, value);

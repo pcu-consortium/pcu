@@ -1,5 +1,6 @@
 package org.pcu.search.elasticsearch.api.query.clause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.pcu.search.elasticsearch.api.query.ESQuery;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class multi_match implements ESQuery { // ESMultiMatchQuery
 
    private String query;
-   private List<String> fields;
+   private List<String> fields = new ArrayList<String>(3);
    private String type; // best_fields (default), most_fields (multi fields), cross_fields (dedup), phrase, phrase_prefix
    private Float tie_breaker;
    
