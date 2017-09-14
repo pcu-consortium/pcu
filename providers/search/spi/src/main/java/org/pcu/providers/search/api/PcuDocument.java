@@ -1,6 +1,16 @@
 package org.pcu.providers.search.api;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * TODO better : pcu id, version (and / or global increasing id / lamport timestamp), other metadata (?) ...
@@ -9,6 +19,8 @@ import java.util.LinkedHashMap;
  * @author mardut
  *
  */
+@ApiModel(value = "A PCU data document")
+//@JsonAutoDetect(fieldVisibility = Visibility.NONE) // , getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE
 public class PcuDocument {
 
    /** mandatory in PCU */
@@ -20,7 +32,8 @@ public class PcuDocument {
    // TODO or all are optional / meta ??
    private Long global_version;
    /** content as props if JSON, XML, props... */
-   private LinkedHashMap<String,Object> properties; // or props, fields ?
+   @JsonIgnore
+   private LinkedHashMap<String,Object> properties = new LinkedHashMap<String,Object>(); // or props, fields ?
    
    // crawler case :
    /*
@@ -57,11 +70,23 @@ public class PcuDocument {
    public void setGlobal_version(Long global_version) {
       this.global_version = global_version;
    }
+   @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
+   @JsonAnyGetter
    public LinkedHashMap<String,Object> getProperties() {
       return properties;
    }
+   @JsonIgnore
    public void setProperties(LinkedHashMap<String,Object> properties) {
       this.properties = properties;
+   }
+   @JsonSubTypes({ @JsonSubTypes.Type(String.class), @JsonSubTypes.Type(Boolean.class),
+      @JsonSubTypes.Type(Double.class), @JsonSubTypes.Type(LocalDateTime.class),
+      @JsonSubTypes.Type(Map.class), @JsonSubTypes.Type(List.class) })
+   @JsonAnySetter
+   public void setProperty(String name, Object value) {
+      this.properties.put(name, value);
    }
    /*public String getRaw() {
       return raw;
@@ -76,4 +101,39 @@ public class PcuDocument {
       this.metadataGroups = metadataGroups;
    }*/
 
+   /**
+    * Helper for building Document lists
+    * ex. doc.listBuilder().add("1").add("2").build()
+    * @return
+    */
+   /*public static ImmutableList.Builder<Object> listBuilder() {
+      return new ImmutableList.Builder<Object>();
+   }*/
+   
+   /** mutable map, to help update / enrich props
+    * TODO outside in utils */
+   public static class MapBuilder<K,V> {
+      private LinkedHashMap<K,V> map;
+      public MapBuilder(LinkedHashMap<K,V> map) {
+         this.map = map;
+      }
+      public MapBuilder() {
+         this.map = new LinkedHashMap<K,V>();
+      }
+      public MapBuilder(int initialCapacity) {
+         this.map = new LinkedHashMap<K,V>(initialCapacity);
+      }
+      public MapBuilder<K, V> put(K key, V value) {
+         this.map.put(key, value);
+         return this;
+      }
+      public MapBuilder<K, V> putAll(LinkedHashMap<K,V> map) {
+         this.map.putAll(map);
+         return this;
+      }
+      public Map<K, V> build() {
+         return map;
+      }
+   }
+   
 }

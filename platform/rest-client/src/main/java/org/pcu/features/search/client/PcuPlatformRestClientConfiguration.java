@@ -8,6 +8,7 @@ import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,8 +49,7 @@ public class PcuPlatformRestClientConfiguration {
    }
    
    /**
-    * TODO move to PCU-wide common rest conf (but not common to spi clients)
-    * TODO also mutualize with elasticSearchMapper, in rest helper ?!?
+    * TODO different but also mutualize with elasticSearchMapper, in rest helper ?!?
     * @return
     */
    @Bean
@@ -80,6 +80,11 @@ public class PcuPlatformRestClientConfiguration {
       mapper.configure(SerializationFeature.INDENT_OUTPUT, enableIndenting);
       
       return mapper;
+   }
+
+   @Bean
+   public ObjectMapper pcuApiPrettyMapper(@Qualifier("pcuApiMapper") ObjectMapper pcuApiMapper) {
+      return pcuApiMapper.copy().configure(SerializationFeature.INDENT_OUTPUT, true);
    }
    
    @Bean
