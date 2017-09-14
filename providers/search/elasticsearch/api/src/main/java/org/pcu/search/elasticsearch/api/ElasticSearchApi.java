@@ -64,8 +64,10 @@ public interface ElasticSearchApi {
    // {__unencoded__id}") //  to accept even /
 
    // mapping conf API. Difficulty is being complex.
-   // TODO content in binary ?!
-   // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html
+   @ApiOperation(value = "Adding new types (to the index) or new fields (to types).",
+         notes = "https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html\n" + 
+               "NB. can't update a type mapping in an index, must delete whole index"/*,
+               response = PutMappingResult.class*/)
    @Path("/{indexPattern}")
    @PUT
    PutMappingResult putMapping(@PathParam("indexPattern") String indexPattern, IndexMapping indexMapping) throws ESApiException;
@@ -86,8 +88,10 @@ public interface ElasticSearchApi {
    @Path("{indexPattern}/_settings")
    @GET
    LinkedHashMap<String,IndexSettings> getSettings(@ApiParam(value = "index", defaultValue = "_all") @PathParam("index") String index) throws ESApiException;
-   // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html
-   // TODO https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html
+   @ApiOperation(value = "Deletes an index.",
+         notes = "https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html\n" + 
+               "NB. can't delete a type mapping in an index, must delete whole index https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-mapping.html"/*,
+               response = DeleteMappingResult.class*/)
    @Path("/{indexPattern}")
    @DELETE
    DeleteMappingResult deleteMapping(@PathParam("indexPattern") String indexPattern) throws ESApiException;
@@ -97,7 +101,7 @@ public interface ElasticSearchApi {
    
    // index API. Difficulty is being meta.
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-   @Path("/{index}/{type}/{id}")
+   @Path("/{index}/{type}/{id}") // NOT id:.+ else No handler found for uri, URL encode it instead
    @PUT
    IndexResult indexDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
          @ApiParam(value = "type") @PathParam("type") String type, @ApiParam(value = "id") @PathParam("id") String id,
@@ -158,7 +162,7 @@ public interface ElasticSearchApi {
          @ApiParam(value = "", defaultValue = "false") Boolean wait_for_completion) throws ESApiException;
    // LATER tasks, rethrottle, slice
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
-   @Path("/{index}/{type}/{id}")
+   @Path("/{index}/{type}/{id}") // NOT id:.+ else No handler found for uri, URL encode it instead
    @GET
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#get-source-filtering
    GetResult getDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,

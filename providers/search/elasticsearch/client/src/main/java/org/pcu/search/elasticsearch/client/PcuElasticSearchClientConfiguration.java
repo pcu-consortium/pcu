@@ -1,6 +1,8 @@
 package org.pcu.search.elasticsearch.client;
 
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.feature.LoggingFeature;
@@ -18,10 +20,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /**
@@ -34,8 +38,11 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 @Import(JaxRsConfig.class) // creates cxf bus (@EnableJaxRsProxyClient not conf'ble enough : address...)
 public class PcuElasticSearchClientConfiguration {
 
-   ///public static final String PCU_ELASTICSEARCH_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
-   ///public static final DateTimeFormatter PCU_ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ofPattern(PCU_ELASTICSEARCH_DATE_PATTERN);
+   public static final String ELASTICSEARCH_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"; // ex. 2017-09-14T16:09:35.990+0200 ; ZZZZ would be 2017-09-14T16:08:48.067GMT+02:00
+   public static final DateTimeFormatter ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ofPattern(ELASTICSEARCH_DATE_PATTERN);
+   ///public static final DateTimeFormatter ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+   //       i.e. Jackson default for ZonedDateTime, see ZonedDateTimeSerializer.java, BUT NO MILLIS https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
+   // ES supports Z or ZZ (+0000 having millis) but not ZZZZ (GMT+02:00) https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
    
    @Value("${pcu.rest.enableIndenting:false}")
    private boolean enableIndenting;
@@ -48,6 +55,11 @@ public class PcuElasticSearchClientConfiguration {
       
    }
 
+   @Bean
+   public DateTimeFormatter elasticSearchDateTimeFormatter() {
+      return ELASTICSEARCH_DATE_FORMATTER;
+   }
+
    /**
     * TODO does it override Spring's ???
     * @return
@@ -57,11 +69,13 @@ public class PcuElasticSearchClientConfiguration {
       ObjectMapper mapper = new ObjectMapper();
       
       // date conf :
-      // default 2016-09-30T16:53:40.255Z is ES'
-      // see https://github.com/FasterXML/jackson-datatype-jsr310/issues/39
+      // default 2016-09-30T16:53:40.255Z is ES' default date format "datetime", see :
+      // https://github.com/FasterXML/jackson-datatype-jsr310/issues/39 4
+      // https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
       JavaTimeModule javaTimeModule = new JavaTimeModule();
-      ///javaTimeModule.addSerializer(ZonedDateTime.class, // else 2016-09-30T16:53:40.255Z
-      ///      new ZonedDateTimeSerializer(PCU_ELASTICSEARCH_DATE_FORMATTER)); // else 2016-09-30T16:53:40.255
+      // default conf : (so could be removed)
+      javaTimeModule.addSerializer(ZonedDateTime.class, // else 2016-09-30T16:53:40.255Z
+            new ZonedDateTimeSerializer(ELASTICSEARCH_DATE_FORMATTER)); // else 2016-09-30T16:53:40.255
       mapper.registerModule(javaTimeModule);
       mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // else 1501857549.048000000 http://www.baeldung.com/jackson-serialize-dates
       
@@ -76,6 +90,7 @@ public class PcuElasticSearchClientConfiguration {
       //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       
       mapper.configure(SerializationFeature.INDENT_OUTPUT, enableIndenting);
+      mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true); // to load from default bootstrap file conf
       
       return mapper;
    }

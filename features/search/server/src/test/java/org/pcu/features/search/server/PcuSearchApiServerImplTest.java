@@ -15,7 +15,10 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -45,12 +48,17 @@ import org.pcu.providers.search.api.PcuDocument;
 import org.pcu.providers.search.api.PcuIndexResult;
 import org.pcu.providers.search.api.PcuSearchApi;
 import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
+import org.pcu.search.elasticsearch.api.ESApiException;
+import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -86,10 +94,18 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
    @Autowired @Qualifier("pcuFileApiRestClient")
    private PcuFileApi fileApi;
 
+   @Autowired @Qualifier("pcuApiDateTimeFormatter")
+   private DateTimeFormatter pcuApiDateTimeFormatter;
    @Autowired @Qualifier("pcuApiMapper")
    private ObjectMapper pcuApiMapper;
    @Autowired @Qualifier("pcuApiPrettyMapper")
    private ObjectMapper pcuApiPrettyMapper;
+
+   /** for tests */
+   @Autowired @Qualifier("elasticSearchRestClient")
+   private ElasticSearchApi elasticSearchRestClient;
+   @Autowired @Qualifier("elasticSearchMapper")
+   private ObjectMapper elasticSearchMapper;
    
    @Test
    public void testIndex() throws Exception {
@@ -119,6 +135,25 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
     */
    @Test
    public void testSimulateCrawl() throws Exception {
+      // init ES :
+      for (Resource esIndexMappingResource : resourceLoader.getResources("classpath*:bootstrap/es/index/mapping/*.json")) {
+         IndexMapping indexMapping = elasticSearchMapper.readValue(esIndexMappingResource.getInputStream(), IndexMapping.class);
+         String index = esIndexMappingResource.getFilename();
+         index = index.substring(0, index.lastIndexOf('.'));
+
+         try {
+            LinkedHashMap<String, IndexMapping> existing = elasticSearchRestClient.getMapping(index);
+            // BEWARE ES can't update mapping, only add new types or fields
+            // TODO check if backward compatible, and :
+            // - if it is (and only new types or fields), update, save if identical
+            // - else in production mode fail
+            elasticSearchRestClient.deleteMapping(index);
+         } catch (ESApiException esex) {
+            assertTrue(esex.getAsJson().contains("index_not_found_exception"));
+         }
+         elasticSearchRestClient.putMapping(index, indexMapping);
+      }
+      
       // prepare file to crawl :
       String testContent = "My test content";
       File testFile = File.createTempFile("pcu_test_", ".doc");
@@ -178,18 +213,19 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       pcuDoc.getProperties().put("version_global", nextLamport(/*impactingExternalProcessLamports*/)); // global ordering (lamport timestamp) as version (else global_version)
       
       // crawl :
-      pcuDoc.getProperties().put("synced", LocalDateTime.now()); // fscrawler : file.indexing_date
-      // TODO Q scan (connectorComputerId (binary), host, root path, start/end date, crawl job id, crawl conf...) ?
+      pcuDoc.getProperties().put("synced", ZonedDateTime.now()); // fscrawler : file.indexing_date ; or LocalDateTime.now() ?
+      pcuDoc.getProperties().put("connector_computer_id", connectorComputerId); // ?? (binary)
+      // TODO Q scan host, root path, start/end date, crawl job id, crawl conf... ?
       // or as a mixin only on root dir ?
       
       // file :
       LinkedHashMap<String, Object> file = new LinkedHashMap<>();
       pcuDoc.getProperties().put("file", file); // TODO of type "file"
-      file.put("last_modified", testFile.lastModified()); // TODO Q or globally ?! or annotated as global prop @modified ?
+      file.put("last_modified", ZonedDateTime.ofInstant(Instant.ofEpochMilli(testFile.lastModified()), ZoneId.systemDefault())); // TODO Q or globally ?! or annotated as global prop @modified ? or LocalDateTime ?
       file.put("name", testFile.getName());
       file.put("path", testFile.getAbsolutePath()); // TODO analyze as a tree structure ?
-      // TODO Q also file url, "virtual" path, extension, indexed_chars ? content_type (or in content) ??
       // TODO group, owner (fscrawler : in attributes/)
+      // TODO Q also file url, "virtual" path, extension, indexed_chars ? content_type (or in content) ??
       
       // http : (gotten from HTTP request if any)
       LinkedHashMap<String, Object> http = new LinkedHashMap<>();
@@ -198,17 +234,6 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       http.put("mimetype", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"); // fscrawler : rather in file ?!?
       // TODO Q also other headers : size, expire... ??
       
-      // meta : (or tika, pdfbox... ?)
-      LinkedHashMap<String, Object> meta = new LinkedHashMap<>();
-      pcuDoc.getProperties().put("meta", meta); // TODO of type "meta"
-      meta.put("author", "Jane Dee");
-      meta.put("title", "CV of John Doe");
-      meta.put("date", "20161001T15:29:45.042");
-      meta.put("keywords", Arrays.asList(new Object[] { "cv" }));
-      meta.put("language", "en"); // TODO Q meta or detected ??
-      // TODO format, identifier, contributor, coverage, modifier, creator_tool, publisher, relation, rights, source, type,
-      // description, created, print_date, metadata_date, latitude, longitude, altitude, rating, comments ?!
-      
       // content :
       LinkedHashMap<String, Object> content = new LinkedHashMap<>();
       pcuDoc.getProperties().put("content", content); // TODO of type "content"
@@ -216,6 +241,17 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       content.put("hash", fileRes.getPath()); // why not ; hash, md5, digest (nuxeo), checksum (fscrawler) ? below content, file or store ?
       content.put("store_path", store + "/" + fileRes.getPath()); // or 2 props ? store_path, store_id, id_in_store ? below top, file or content ?
       // TODO Q also detected language ??
+      
+      // meta : (or tika, pdfbox... ?)
+      LinkedHashMap<String, Object> meta = new LinkedHashMap<>();
+      pcuDoc.getProperties().put("meta", meta); // TODO of type "meta"
+      meta.put("author", "Jane Dee");
+      meta.put("title", "CV of John Doe");
+      meta.put("date", ZonedDateTime.parse("2016-10-01T15:29:45.000+0000", pcuApiDateTimeFormatter)); // ES supports Z or ZZ (+0000 having millis) but not ZZZZ (GMT+02:00)
+      meta.put("keywords", Arrays.asList(new Object[] { "cv" }));
+      meta.put("language", "en"); // TODO Q meta or detected ??
+      // TODO format, identifier, contributor, coverage, modifier, creator_tool, publisher, relation, rights, source, type,
+      // description, created, print_date, metadata_date, latitude, longitude, altitude, rating, comments ?!
 
       pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ??
       // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ?
@@ -235,7 +271,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       InputStream foundContent = fileApi.getContent(storePath[0], storePath[1]);
       assertEquals(testContent, IOUtils.toString(foundContent, (Charset) null));
       
-      // TODO test versionS & optimistic locking
+      // TODO test versionS & optimistic locking, query on path & date range
       
       // X. simulate tailing a file :
       String testAppendContent = "\nand another test content";
@@ -258,19 +294,41 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
 
    @Test
    public void testSimulateDocumentMetamodelCheck() throws Exception {*/
-      // build meta :
+      // init meta :
+      // TODO check backward compatible, else replace or in production mode fail
+      HashMap<String,Schema> fileSchemaMap = new HashMap<String,Schema>();
+      HashMap<String,Schema> typeSchemaMap = new HashMap<String,Schema>();
+      for (Resource avroSchemaResource : resourceLoader.getResources("classpath*:bootstrap/avro/*.avsc")) {
+         try (InputStream avroSchemaResourceIs = avroSchemaResource.getInputStream()) {
+            Schema schema = new Schema.Parser().parse(avroSchemaResourceIs);
+            fileSchemaMap.put(schema.getFullName(), schema);
+            for (Schema typeSchema : schema.getTypes()) {
+               typeSchemaMap.put(typeSchema.getName(), typeSchema); // TODO fullName
+            }
+         }
+      }
+      /*
       Schema schemas = new Schema.Parser().parse(resourceLoader // TODO getResources("classpath*:"avro/*.avsc")
             .getResource("classpath:" + "file.avsc").getInputStream()); // TODO close()
       assertEquals(1, schemas.getTypes().size());
       Schema schema = schemas.getTypes().get(0);
+      */
+      assertEquals(1, typeSchemaMap.size());
+      Schema schema = typeSchemaMap.get(pcuDoc.getType());
+      assertNotNull(schema);
+
+      System.out.println("validating\n" + pcuApiPrettyMapper.writeValueAsString(pcuDoc));
       
       // convert instance to JSON : (TODO skip this step...)
-      String pcuDocumentJson = pcuApiMapper.writeValueAsString(pcuDoc);
+      // custom JSON conversion because of dates :
+      ObjectMapper pcuApiAvroMapper = pcuApiMapper.copy().enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+      // and timestamp-millis avro annotation (optional) https://avro.apache.org/docs/1.8.0/spec.html#Timestamp+%28millisecond+precision%29
+      // else AvroTypeException: Expected long. Got VALUE_STRING
+      String pcuDocumentAvroJson = pcuApiAvroMapper.writeValueAsString(pcuDoc);
       // validate instance :
       //GenericRecord testFileAvroRec = new GenericData.Record(fileSchema);
       DatumReader<GenericRecord> genericDatumReader = new GenericDatumReader<GenericRecord>(schema);
-      System.out.println("validating\n" + pcuApiPrettyMapper.writeValueAsString(pcuDoc));
-      Decoder decoder = DecoderFactory.get().jsonDecoder(schema, new ByteArrayInputStream(pcuDocumentJson.getBytes()));
+      Decoder decoder = DecoderFactory.get().jsonDecoder(schema, new ByteArrayInputStream(pcuDocumentAvroJson.getBytes()));
       GenericRecord pcuDocRec = genericDatumReader.read(null, decoder); // AvroTypeException
       assertEquals(pcuDocRec.get("name"), pcuDoc.getProperties().get("name"));
       
@@ -322,8 +380,9 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       }
    }
 
-   @Autowired
-   private ResourceLoader resourceLoader; // TODO PathMatchingResourcePatternResolver
+   //@Autowired
+   //private ResourceLoader resourceLoader;
+   private PathMatchingResourcePatternResolver resourceLoader = new PathMatchingResourcePatternResolver(); // TODO @Bean
    
 
    private HashMap<String,PcuIndex> indexConfs = new HashMap<String,PcuIndex>();

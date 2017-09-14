@@ -6,4 +6,19 @@ public class Tokenizer {
 
    // standard
    private int max_token_length;
+
+   public String getType() {
+      return type;
+   }
+   public void setType(String type) {
+      this.type = type;
+   }
+   public int getMax_token_length() {
+      return max_token_length;
+   }
+   public void setMax_token_length(int max_token_length) {
+      this.max_token_length = max_token_length;
+   }
+   
+   
 }
