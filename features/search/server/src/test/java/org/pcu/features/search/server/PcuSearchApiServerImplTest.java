@@ -159,7 +159,6 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // 2. index crawled metadata :
       
       PcuDocument pcuDoc = new PcuDocument();
-      pcuDoc.setProperties(new LinkedHashMap<>());
       pcuDoc.setType("file");
       
       // TODO Q date as long timestamp (pcu) or formatted (fscrawler) ?
@@ -175,10 +174,8 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       
       // version & ordering :
       //pcuDoc.getProperties().put("version", esApi.getDocument("file", pcuDoc.getId())).getVersion(); // version if optimistic locking (not if pipeline)
-      pcuDoc.getProperties().put(/*local_*/"version", nextLocalOrder()); // local ordering as version (else local_version)
-      pcuDoc.getProperties().put("global_version", nextLamport(/*impactingExternalProcessLamports*/)); // global ordering (lamport timestamp) as version (else global_version)
-      
-      pcuDoc.getProperties().put("store_path", store + "/" + fileRes.getPath()); // or 2 props ? or in content.store_path ? or store_id, id_in_store ?
+      pcuDoc.getProperties().put("version"/*_local*/, nextLocalOrder()); // local ordering as version (else local_version)
+      pcuDoc.getProperties().put("version_global", nextLamport(/*impactingExternalProcessLamports*/)); // global ordering (lamport timestamp) as version (else global_version)
       
       // crawl :
       pcuDoc.getProperties().put("synced", LocalDateTime.now()); // fscrawler : file.indexing_date
@@ -188,7 +185,6 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // file :
       LinkedHashMap<String, Object> file = new LinkedHashMap<>();
       pcuDoc.getProperties().put("file", file); // TODO of type "file"
-      file.put("length", testFile.length()); // fscrawler : filesize
       file.put("last_modified", testFile.lastModified()); // TODO Q or globally ?! or annotated as global prop @modified ?
       file.put("name", testFile.getName());
       file.put("path", testFile.getAbsolutePath()); // TODO analyze as a tree structure ?
@@ -216,9 +212,12 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // content :
       LinkedHashMap<String, Object> content = new LinkedHashMap<>();
       pcuDoc.getProperties().put("content", content); // TODO of type "content"
-      content.put("hash", fileRes.getPath()); // why not ; or rather in store/, file/ ? or md5, digest (nuxeo), checksum (fscrawler) ?
-      content.put("fulltext", testContent); // parsed client-side by tika in connector crawler
+      content.put("length", testFile.length()); // fscrawler : filesize ; below file or content ?
+      content.put("hash", fileRes.getPath()); // why not ; hash, md5, digest (nuxeo), checksum (fscrawler) ? below content, file or store ?
+      content.put("store_path", store + "/" + fileRes.getPath()); // or 2 props ? store_path, store_id, id_in_store ? below top, file or content ?
       // TODO Q also detected language ??
+
+      pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ??
       // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ?
       
       // file treeS in ES :
@@ -232,7 +231,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       assertEquals(pcuDoc.getId(), res.getId());
       //assertEquals(pcuDoc.getVersion(), res.getVersion());
       // get content :
-      String[] storePath = ((String) pcuDoc.getProperties().get("store_path")).split("/", 2);
+      String[] storePath = ((String) pcuDoc.getByPath("content.store_path")).split("/", 2);
       InputStream foundContent = fileApi.getContent(storePath[0], storePath[1]);
       assertEquals(testContent, IOUtils.toString(foundContent, (Charset) null));
       
@@ -246,7 +245,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       }
       assertEquals(testContent, IOUtils.toString(fileApi.getContent(store, fileRes.getPath()), (Charset) null));
       // and index meta :
-      content.put("path", fileRes.getPath());
+      content.put("store_path", fileRes.getPath());
       indexRes = searchApi.index(index, pcuDoc);
       // then, actual append (using random access) :
       fileRes = fileApi.appendContent(store, fileRes.getPath(), testFile.length(), new ByteArrayInputStream(testAppendContent.getBytes()));

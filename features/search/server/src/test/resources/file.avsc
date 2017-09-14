@@ -8,50 +8,49 @@
 			{"name":"id", "type":"string", "doc":""},
 			{"name":"version", "type":"long", "doc":""},
 			{"name":"version_global", "type":"long", "doc":""},
-			{"name":"store_path", "type":"string", "doc":""},
 			{"name":"synced", "type":"string", "doc":""},
-			{"name":"file", "type":"map", "doc":"", "values":{
-				"type": "record",
-				"name": "file_file",
+			{"name":"file", "type":{
+			   "type": "record",
+				"name": "file.file",
 				"doc": "",
 				"fields": [
-					{"name":"length", "type":"long", "doc":""},
 					{"name":"last_modified", "type":"long", "doc":""},
 					{"name":"name", "type":"string", "doc":""},
 					{"name":"path", "type":"string", "doc":""}
 				]
 			}},
-			{"name":"http", "type":"map", "doc":"", "values":{
+			{"name":"http", "type":{
 				"type": "record",
-				"name": "file_http",
+				"name": "file.http",
 				"doc": "",
 				"fields": [
 					{"name":"url", "type":"string", "doc":""},
 					{"name":"mimetype", "type":"string", "doc":""}
 				]
 			}},
-			{"name":"meta", "type":"map", "doc":"", "values":{
+			{"name":"meta", "type":{
 				"type": "record",
-				"name": "file_meta",
+				"name": "file.meta",
 				"doc": "",
 				"fields": [
 					{"name":"author", "type":"string", "doc":""},
 					{"name":"title", "type":"string", "doc":""},
 					{"name":"date", "type":"string", "doc":""},
-					{"name":"keywords", "type":"array", "items":"string" "doc":""},
+					{"name":"keywords", "type":{"type":"array", "items":"string", "doc":""}},
 					{"name":"language", "type":"string", "doc":""}
 				]
 			}},
-			{"name":"content", "type":"map", "doc":"", "values":{
+			{"name":"content", "type":{
 				"type": "record",
-				"name": "file_content",
+				"name": "file.content",
 				"doc": "",
 				"fields": [
-					{"name":"hash", "type":"long", "doc":""},
-					{"name":"fulltext", "type":"long", "doc":""},
-					{"name":"path", "type":"string", "doc":""}
+					{"name":"length", "type":"long", "doc":""},
+					{"name":"hash", "type":"string", "doc":""},
+					{"name":"store_path", "type":"string", "doc":""}
 				]
 			}},
+			{"name":"fulltext", "type":"string", "doc":""},
 			{"name":"path", "type":"string", "doc":""},
 			{"name":"readable_path", "type":"string", "doc":""}
 		]
