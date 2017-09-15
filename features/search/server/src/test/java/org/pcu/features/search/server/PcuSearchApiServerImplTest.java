@@ -60,6 +60,7 @@ import org.pcu.search.elasticsearch.api.query.clause.RangeFieldParameters;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
 import org.pcu.search.elasticsearch.api.query.clause.prefix;
 import org.pcu.search.elasticsearch.api.query.clause.range;
+import org.pcu.search.elasticsearch.api.query.clause.terms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -313,13 +314,25 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
 
-      // query - on path :
+      // query - on path (prefix) :
       ESQueryMessage pathMsg = new ESQueryMessage();
       prefix pathPrefix = new prefix();
       PrefixFieldParameters prefixParameters = new PrefixFieldParameters();
-      prefixParameters.setValue(testFileAbsoluteSlashedPath.substring(0, testFileAbsoluteSlashedPath.lastIndexOf('/')));
+      String testFileParentPath = testFileAbsoluteSlashedPath.substring(0, testFileAbsoluteSlashedPath.lastIndexOf('/')); 
+      prefixParameters.setValue(testFileParentPath);
       pathPrefix.setPrefixParameters("file.path", prefixParameters );
       pathMsg.setQuery(pathPrefix);
+      hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
+      assertTrue(!hits.isEmpty());
+      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+      
+      // query - on path (keyword) :
+      terms pathTerms = new terms();
+      //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "tmp", "pcu_test_5114232402156243118.doc" })); // KO
+      //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(testFileParentPath.split("/")).stream().filter(pElt -> pElt.length() != 0).collect(Collectors.toList())); // KO
+      //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "/tmp/pcu_test_5114232402156243118.doc" })); // also OK
+      pathTerms.setTermListOrLookupMap("file.path.tree", Arrays.asList(new Object[] { "/tmp" })); // .tree !! https://www.elastic.co/guide/en/elasticsearch/guide/current/denormalization-concurrency.html
+      pathMsg.setQuery(pathTerms);
       hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));

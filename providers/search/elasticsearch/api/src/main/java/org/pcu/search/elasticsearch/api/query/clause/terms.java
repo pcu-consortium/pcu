@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 /**
- * not analyzed
+ * exact value (analyzed if "text", not analyzed if "keyword")
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
  * NB. use this instead of ESTermQuery
  * ex.

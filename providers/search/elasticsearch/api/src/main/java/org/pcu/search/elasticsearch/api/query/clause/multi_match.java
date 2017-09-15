@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 /**
  * multi_match
+ * analyzes
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
  * @author mdutoo
