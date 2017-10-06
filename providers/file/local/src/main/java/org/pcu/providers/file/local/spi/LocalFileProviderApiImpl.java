@@ -37,6 +37,10 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
 
    private String storeRootPath = "/tmp/pcu_store";
    private File storeRootDir = new File(storeRootPath);
+   // temp file dir. NB. set it to the same fs as the final file
+   // (so its bytes won't be copied, even with glusterfs http://blog.vorona.ca/the-way-gluster-fs-handles-renaming-the-file.html )
+   // or accept temp place (make it big enough) and bandwidth costs of moving it
+   private File customTempDir = null; // TODO on same FS ex. gluster
    
    public LocalFileProviderApiImpl() {
       
@@ -59,10 +63,6 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
       */
 
       // create temp file : (since name = business id i.e. hash not yet known)
-      // NB. set its customTempDir to the same fs as the final file
-      // (so its bytes won't be copied, even with glusterfs http://blog.vorona.ca/the-way-gluster-fs-handles-renaming-the-file.html )
-      // or accept temp place (make it big enough) and bandwidth costs of moving it
-      File customTempDir = null; // TODO on same FS ex. gluster
       File tmpFile;
       try {
          tmpFile = File.createTempFile("pcu_store_tmp_", ".bin", customTempDir);
@@ -99,6 +99,8 @@ public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements 
       if (!contentFile.exists()) {
          contentFile.getParentFile().mkdirs(); // else renameTo() fails silently (returns false)
          tmpFile.renameTo(contentFile);
+      } else {
+         tmpFile.delete();
       }
       
       PcuFileResult res = new PcuFileResult();
