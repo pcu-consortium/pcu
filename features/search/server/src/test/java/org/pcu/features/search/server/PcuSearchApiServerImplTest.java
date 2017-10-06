@@ -1,11 +1,14 @@
 package org.pcu.features.search.server;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -29,6 +32,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.ws.rs.BeanParam;
+
+import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -51,29 +58,32 @@ import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
-import org.pcu.search.elasticsearch.api.query.ESQuery;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
 import org.pcu.search.elasticsearch.api.query.Hit;
-import org.pcu.search.elasticsearch.api.query.SearchResult;
 import org.pcu.search.elasticsearch.api.query.clause.PrefixFieldParameters;
 import org.pcu.search.elasticsearch.api.query.clause.RangeFieldParameters;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
 import org.pcu.search.elasticsearch.api.query.clause.prefix;
 import org.pcu.search.elasticsearch.api.query.clause.range;
 import org.pcu.search.elasticsearch.api.query.clause.terms;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -87,7 +97,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={PcuSearchServerConfiguration.class,ESSearchProviderConfiguration.class},
+@ContextConfiguration(classes={PcuSearchServerConfiguration.class,ESSearchProviderConfiguration.class,PcuSearchApiServerImplTest.Conf.class},
    initializers = ConfigFileApplicationContextInitializer.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.DEFINED_PORT, properties="server.port=45665")
 //rather than @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties="server_port=45665")
@@ -138,6 +148,28 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // TODO more, from ES client API test
    }
 
+   @Test
+   public void testSimulateCrawlHome() {
+      simulateCrawlFolder(new File(System.getProperty("user.home"))); // + File.separator + "Documents"
+   }
+   public void simulateCrawlFolder(File folder) {
+      for (File file : folder.listFiles()) {
+         if (file.isFile()) {
+            if (file.canRead() && file.getName().endsWith(".txt")) {
+               try {
+                  System.err.println("crawling " + file.getAbsolutePath());
+                  simulateCrawl(file, IOUtils.toString(new FileInputStream(file), (Charset) null)); // null
+               } catch (AssertionError e) {
+                  // test fails but it still works
+               } catch (Exception e) {
+                  // test fails but it still works
+               }
+            }
+         } else if (file.canRead()) {
+            simulateCrawlFolder(file);
+         }
+      }
+   }
    
    /**
     * The client connector's crawler should work this way :
@@ -145,25 +177,6 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
     */
    @Test
    public void testSimulateCrawl() throws Exception {
-      // init ES :
-      for (Resource esIndexMappingResource : resourceLoader.getResources("classpath*:bootstrap/es/index/mapping/*.json")) {
-         IndexMapping indexMapping = elasticSearchMapper.readValue(esIndexMappingResource.getInputStream(), IndexMapping.class);
-         String index = esIndexMappingResource.getFilename();
-         index = index.substring(0, index.lastIndexOf('.'));
-
-         try {
-            LinkedHashMap<String, IndexMapping> existing = elasticSearchRestClient.getMapping(index);
-            // BEWARE ES can't update mapping, only add new types or fields
-            // TODO check if backward compatible, and :
-            // - if it is (and only new types or fields), update, save if identical
-            // - else in production mode fail
-            elasticSearchRestClient.deleteMapping(index);
-         } catch (ESApiException esex) {
-            assertTrue(esex.getAsJson().contains("index_not_found_exception"));
-         }
-         elasticSearchRestClient.putMapping(index, indexMapping);
-      }
-      
       // prepare file to crawl :
       String testContent = "My test content";
       File testFile = File.createTempFile("pcu_test_", ".doc");
@@ -171,7 +184,9 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       try (FileOutputStream testFileOut = new FileOutputStream(testFile)) {
          IOUtils.write(testContent, testFileOut, (Charset) null);
       }
-      
+      simulateCrawl(testFile, testContent);
+   }
+   public void simulateCrawl(File testFile, String testContent) throws Exception {
       // init crawler :
       String store = "fileCrawlerStore"; // TODO manage
       String index = "files";
@@ -209,7 +224,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // TODO Q date as long timestamp (pcu) or formatted (fscrawler) ?
       
       // id :
-      pcuDoc.setId(new UUID().toString()); // id - best lucene id http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html
+      pcuDoc.setId(new UUID().toString()); // id - best lucene id http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html => NOT unique on 2 machines, rather https://github.com/cowtowncoder/java-uuid-generator TimeBasedGenerator gen = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
       // or use it to dedup identity resolution ? then with configurable policy : using or not connectorComputerId, url protocol / host / port, even scan root dir
       //String id = "file://server1/a/b/file.doc"; // NOO ES doesn't support slash, and not a good Lucene id anyway
       String testFileAbsoluteSlashedPath = testFile.getAbsolutePath();
@@ -217,19 +232,19 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
          testFileAbsoluteSlashedPath = testFileAbsoluteSlashedPath.replace('\\', '/');
       }
       String globalFilePath = "/" + connectorComputerId + /*url != null ? /host/protocol : /file*/ testFileAbsoluteSlashedPath;
-      pcuDoc.setId(globalFilePath); // id - (connector) app's - (url or) server + path (fscrawler : local path only), allows dedup / identity resolution NOO no slash in ES id
-      pcuDoc.setId(md5(globalFilePath)); // id - (connector) app's - (url or) server + path MD5 (fscrawler : local path only), allows dedup / identity resolution
+      pcuDoc.setId(globalFilePath); // id - (connector) app's - (url or) server + path (fscrawler : local path only), allows dedup / identity resolution NOO no slash in ES id => 2 logical URLs file://host/path with host being MAC address or hostname
+      pcuDoc.setId(md5(globalFilePath)); // id - (connector) app's - (url or) server + path MD5 (fscrawler : local path only), allows dedup / identity resolution => NO MD5 2000 chars length id is acceptable, small collision risk ; qwazr link will have local db of (crawled docs) stable ids ; have both technical (uuid smaller better for processing) & business id (MAC+path)
       //pcuDoc.setId(ecmDoc.getId()); // id - (ECM) app's, allows dedup / identity resolution
       
       // version & ordering :
       //pcuDoc.getProperties().put("version", esApi.getDocument("file", pcuDoc.getId())).getVersion(); // version if optimistic locking (not if pipeline)
-      pcuDoc.getProperties().put("version"/*_local*/, nextLocalOrder()); // local ordering as version (else local_version)
+      pcuDoc.getProperties().put("version"/*_local*/, nextLocalOrder()); // local ordering as version (else local_version) => JUG TimeBasedGenerator by cowtowncoder ensures this and is ordered so is enough !
       pcuDoc.getProperties().put("version_global", nextLamport(/*impactingExternalProcessLamports*/)); // global ordering (lamport timestamp) as version (else global_version)
       
       // crawl :
       pcuDoc.getProperties().put("synced", ZonedDateTime.now()); // fscrawler : file.indexing_date ; or LocalDateTime.now() ?
       pcuDoc.getProperties().put("connector_computer_id", connectorComputerId); // ?? (binary)
-      // TODO Q scan host, root path, start/end date, crawl job id, crawl conf... ?
+      // TODO Q scan host, root path, start/end date, crawl job id, crawl conf... ? => only crawl session id, and all infos in the crawl job manager
       // or as a mixin only on root dir ?
       
       // file :
@@ -266,10 +281,10 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       meta.put("language", "en"); // TODO Q meta or detected ??
       // TODO format, identifier, contributor, coverage, modifier, creator_tool, publisher, relation, rights, source, type,
       // description, created, print_date, metadata_date, latitude, longitude, altitude, rating, comments ?!
-      // TODO dynamic field mappings for ex. "xmpDM:audioCompressor" : "MP3"
+      // TODO dynamic field mappings for ex. "xmpDM:audioCompressor" : "MP3" => or could be enabled by Link scripts called by a top script or yaml gotten from server : zookeeper (tree nodes & listen, but small), ES, git (but no ACL) ?! for now mere content tree API
 
-      pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ??
-      // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ?
+      pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ?? => could be too big ex. dictionary, which lucene can handle but probably not ES
+      // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ? => OR fulltext for each page in order to known which one, or for each successive language, or one fulltext_fr/en field by language, in addition to mere ascii fulltext
       
       // file treeS in ES :
       pcuDoc.getProperties().put("path", globalFilePath); // most exact tree
@@ -330,6 +345,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       terms pathTerms = new terms();
       //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "tmp", "pcu_test_5114232402156243118.doc" })); // KO
       //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(testFileParentPath.split("/")).stream().filter(pElt -> pElt.length() != 0).collect(Collectors.toList())); // KO
+      //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "tmp" })); // KO
       //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "/tmp/pcu_test_5114232402156243118.doc" })); // also OK
       pathTerms.setTermListOrLookupMap("file.path.tree", Arrays.asList(new Object[] { "/tmp" })); // .tree !! https://www.elastic.co/guide/en/elasticsearch/guide/current/denormalization-concurrency.html
       pathMsg.setQuery(pathTerms);
@@ -358,43 +374,45 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
 
    @Test
    public void testSimulateDocumentMetamodelCheck() throws Exception {*/
-      // init meta :
-      // TODO check backward compatible, else replace or in production mode fail
-      HashMap<String,Schema> fileSchemaMap = new HashMap<String,Schema>();
-      HashMap<String,Schema> typeSchemaMap = new HashMap<String,Schema>();
-      for (Resource avroSchemaResource : resourceLoader.getResources("classpath*:bootstrap/avro/*.avsc")) {
-         try (InputStream avroSchemaResourceIs = avroSchemaResource.getInputStream()) {
-            Schema schema = new Schema.Parser().parse(avroSchemaResourceIs);
-            fileSchemaMap.put(schema.getFullName(), schema);
-            for (Schema typeSchema : schema.getTypes()) {
-               typeSchemaMap.put(typeSchema.getName(), typeSchema); // TODO fullName
-            }
-         }
-      }
-      /*
-      Schema schemas = new Schema.Parser().parse(resourceLoader // TODO getResources("classpath*:"avro/*.avsc")
-            .getResource("classpath:" + "file.avsc").getInputStream()); // TODO close()
-      assertEquals(1, schemas.getTypes().size());
-      Schema schema = schemas.getTypes().get(0);
-      */
+      
+      // check indexed data :
       assertEquals(1, typeSchemaMap.size());
       Schema schema = typeSchemaMap.get(pcuDoc.getType());
       assertNotNull(schema);
 
       System.out.println("validating\n" + pcuApiPrettyMapper.writeValueAsString(pcuDoc));
       
-      // convert instance to JSON : (TODO skip this step...)
-      // custom JSON conversion because of dates :
-      ObjectMapper pcuApiAvroMapper = pcuApiMapper.copy().enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-      // and timestamp-millis avro annotation (optional) https://avro.apache.org/docs/1.8.0/spec.html#Timestamp+%28millisecond+precision%29
-      // else AvroTypeException: Expected long. Got VALUE_STRING
-      String pcuDocumentAvroJson = pcuApiAvroMapper.writeValueAsString(pcuDoc);
-      // validate instance :
-      //GenericRecord testFileAvroRec = new GenericData.Record(fileSchema);
-      DatumReader<GenericRecord> genericDatumReader = new GenericDatumReader<GenericRecord>(schema);
-      Decoder decoder = DecoderFactory.get().jsonDecoder(schema, new ByteArrayInputStream(pcuDocumentAvroJson.getBytes()));
-      GenericRecord pcuDocRec = genericDatumReader.read(null, decoder); // AvroTypeException
+      GenericRecord pcuDocRec = validatePcuEntityAgainstAvroSchema(pcuDoc);
       assertEquals(pcuDocRec.get("name"), pcuDoc.getProperties().get("name"));
+      
+      // check missing field :
+      Object oldValue = pcuDoc.getProperties().remove("path");
+      try {
+         validatePcuEntityAgainstAvroSchema(pcuDoc);
+         fail("removing a field should be incompatible with schema");
+      } catch (AvroTypeException atex) {
+         pcuDoc.getProperties().put("path", oldValue);
+      }
+      
+      // check retrocompatibillity :
+      // add a field :
+      pcuDoc.getProperties().put("newfield", "value");
+      try {
+         validatePcuEntityAgainstAvroSchema(pcuDoc);
+      } catch (AvroTypeException atex) {
+         fail("should be able to read new value using old schema");
+      }
+      // change a field :
+      oldValue = pcuDoc.setByPath("file.name", 123);
+      try {
+         validatePcuEntityAgainstAvroSchema(pcuDoc);
+         fail("removing a field should be incompatible with schema");
+      } catch (AvroTypeException atex) {
+         pcuDoc.setByPath("file.name", oldValue);
+      }
+      
+      // TODO check avro oldSchema.compat(newSchema) : add, remove, change
+      ///typeSchemaMap.get("file").setFields(fields);
       
       /////////////////////////////////////
       
@@ -435,6 +453,93 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       }
       // TODO also check missing required fields
    }
+   
+   protected static final Logger log = LoggerFactory.getLogger(PcuSearchApiServerImplTest.class);
+   private HashMap<String,Schema> fileSchemaMap = new HashMap<String,Schema>();
+   private HashMap<String,Schema> typeSchemaMap = new HashMap<String,Schema>();
+   @PostConstruct
+   public void initMeta() throws JsonParseException, JsonMappingException, IOException {
+      // init ES :
+      for (Resource esIndexMappingResource : resourceLoader.getResources("classpath*:bootstrap/es/index/mapping/*.json")) {
+         IndexMapping indexMapping = elasticSearchMapper.readValue(esIndexMappingResource.getInputStream(), IndexMapping.class);
+         String index = esIndexMappingResource.getFilename();
+         index = index.substring(0, index.lastIndexOf('.'));
+
+         try {
+            LinkedHashMap<String, IndexMapping> existing = elasticSearchRestClient.getMapping(index);
+            // BEWARE ES can't update mapping, only add new types or fields
+            // TODO check if backward compatible, and :
+            // - if it is (and only new types or fields), update, save if identical
+            // - else in production mode fail
+            elasticSearchRestClient.deleteMapping(index);
+         } catch (ESApiException esex) {
+            assertTrue(esex.getAsJson().contains("index_not_found_exception"));
+         }
+         try {
+            elasticSearchRestClient.putMapping(index, indexMapping);
+         } catch (ESApiException esex) {
+            log.error("Failed to update conf of index " + index, esex);
+         }
+      }
+      
+      // init meta :
+      // TODO check backward compatible, else replace or in production mode fail
+      for (Resource avroSchemaResource : resourceLoader.getResources("classpath*:bootstrap/avro/*.avsc")) {
+         try (InputStream avroSchemaResourceIs = avroSchemaResource.getInputStream()) {
+            Schema schema = new Schema.Parser().parse(avroSchemaResourceIs);
+            fileSchemaMap.put(schema.getFullName(), schema);
+            for (Schema typeSchema : schema.getTypes()) {
+               typeSchemaMap.put(typeSchema.getName(), typeSchema); // TODO fullName
+            }
+         } catch (IOException ioex) {
+            log.error("Failed to load avro schema " + avroSchemaResource.getFilename(), ioex);
+         }
+      }
+      
+      // check metamodel vs ES conf consistency :
+      // TODO
+   }
+   
+   /**
+    * For now writes pcuDoc to JSON and reads this as avro.
+    * LATER don't write to JSON, using custom Jackson Deserializer ?
+    * @param pcuDoc
+    * @return
+    * @throws AvroTypeException
+    */
+   public GenericRecord validatePcuEntityAgainstAvroSchema(PcuDocument pcuDoc) throws AvroTypeException {
+      Schema schema = typeSchemaMap.get(pcuDoc.getType());
+      if (schema == null) {
+         throw new RuntimeException("Unknown schema type " + pcuDoc.getType());
+      }
+      try {
+         // convert instance to JSON : (TODO skip this step...)
+         String pcuDocumentAvroJson = pcuApiAvroMapper.writeValueAsString(pcuDoc); // Jackson should not fail since comes from REST API
+         // validate instance :
+         DatumReader<GenericRecord> genericDatumReader = new GenericDatumReader<GenericRecord>(schema); // TODO cache
+         Decoder decoder = DecoderFactory.get().jsonDecoder(schema, new ByteArrayInputStream(pcuDocumentAvroJson.getBytes()));
+         GenericRecord pcuDocRec = genericDatumReader.read(null, decoder); // AvroTypeException
+         return pcuDocRec;
+      } catch (IOException ioex) {
+         // shouldn't happen since everything is written in memory
+         throw new RuntimeException("IO error validating schema type " + schema.getType()
+               + " of PCU document " + pcuDoc.getId(), ioex);
+      }
+   }
+
+   @Autowired @Qualifier("pcuApiAvroMapper")
+   private ObjectMapper pcuApiAvroMapper;
+   @Configuration
+   static class Conf {
+      @Bean
+      public ObjectMapper pcuApiAvroMapper(@Qualifier("pcuApiMapper") ObjectMapper pcuApiMapper) {
+         // custom JSON conversion because of dates :
+         return pcuApiMapper.copy().enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+         // and timestamp-millis avro annotation (optional) https://avro.apache.org/docs/1.8.0/spec.html#Timestamp+%28millisecond+precision%29
+         // else AvroTypeException: Expected long. Got VALUE_STRING
+      }
+   }
+   
 
    private String md5(String s) {
       try {

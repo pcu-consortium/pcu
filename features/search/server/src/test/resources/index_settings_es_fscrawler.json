@@ -3,90 +3,69 @@
     "index.mapping.total_fields.limit": 2000,
     "analysis": {
       "analyzer": {
-        "pcu_file_path": {
-          "tokenizer": "pcu_file_path"
+        "fscrawler_path": {
+          "tokenizer": "fscrawler_path"
         }
       },
       "tokenizer": {
-        "pcu_file_path": {
+        "fscrawler_path": {
           "type": "path_hierarchy"
         }
       }
     }
   },
   "mappings": {
-    "file": {
+    "doc": {
       "properties" : {
-         /* NOT type, id, version */
-         "version_global" : {
-           "type" : "long"
-         },
-         /*"version_local" : {
-           "type" : "long"
-         },*/
-         "synced" : {
-           "type" : "date",
-           "format" : "date_time"/* yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-         },
-        "connector_computer_id" : {
+        "attachment" : {
           "type" : "binary",
           "doc_values": false
         },
-        "file" : {
+        "attributes" : {
           "properties" : {
-            "last_modified" : {
-              "type" : "date",
-              "format" : "date_time"/* yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-            },
-            "name" : {
-              "type" : "keyword"/* ?? */
-            },
-            "path" : {
-              "type" : "keyword",
-              "fields": {
-                "tree": {
-                  "type" : "text",
-                  "analyzer": "pcu_file_path", /* or not this one ? */
-                  "fielddata": true
-                }
-              }
-            }/*,
-            "extension" : {
-              "type" : "keyword"
-            },
             "group" : {
               "type" : "keyword"
             },
             "owner" : {
               "type" : "keyword"
-            }*/
-          }
-        },
-        "http" : {
-          "properties" : {
-            "url" : {
-              "type" : "keyword",
-              "index" : false
-            },
-            "mimetype" : {
-              "type" : "keyword"
             }
           }
         },
         "content" : {
+          "type" : "text"
+        },
+        "file" : {
           "properties" : {
-            "length" : {
+            "content_type" : {
+              "type" : "keyword"
+            },
+            "filename" : {
+              "type" : "keyword"
+            },
+            "extension" : {
+              "type" : "keyword"
+            },
+            "filesize" : {
               "type" : "long"
             },
-            "hash": {
-              "type": "keyword"
-            },
-            "stored_path" : {
-              "type" : "keyword" /* or pcu_file_path analyzer, or stored_path analyzer ?? */
-            }/*,
             "indexed_chars" : {
               "type" : "long"
-            }*/
+            },
+            "indexing_date" : {
+              "type" : "date",
+              "format" : "dateOptionalTime"
+            },
+            "last_modified" : {
+              "type" : "date",
+              "format" : "dateOptionalTime"
+            },
+            "checksum": {
+              "type": "keyword"
+            },
+            "url" : {
+              "type" : "keyword",
+              "index" : false
+            }
           }
         },
         "meta" : {
@@ -96,7 +75,7 @@
             },
             "date" : {
               "type" : "date",
-              "format" : "date_time"
+              "format" : "dateOptionalTime"
             },
             "keywords" : {
               "type" : "text"
@@ -145,15 +124,15 @@
             },
             "created" : {
               "type" : "date",
-              "format" : "date_time"
+              "format" : "dateOptionalTime"
             },
             "print_date" : {
               "type" : "date",
-              "format" : "date_time"
+              "format" : "dateOptionalTime"
             },
             "metadata_date" : {
               "type" : "date",
-              "format" : "date_time"
+              "format" : "dateOptionalTime"
             },
             "latitude" : {
               "type" : "text"
@@ -172,29 +151,33 @@
             }
           }
         },
-        "fulltext" : {
-          "type" : "text"
-        },
-	     "path" : {
-	       "type" : "keyword",
-	       "fields": {
-	         "tree": {
-	           "type" : "text",
-	           "analyzer": "pcu_file_path",
-            "fielddata": true
-	         }
-	       }
-	     },
-	     "readable_path" : {
-	       "type" : "keyword",
-	       "fields": {
-	         "tree": {
-	           "type" : "text",
-	           "analyzer": "pcu_file_path",
-	           "fielddata": true
-	         }
-	       }
-	     }
+        "path" : {
+          "properties" : {
+            "real" : {
+              "type" : "keyword",
+              "fields": {
+                "tree": {
+                  "type" : "text",
+                  "analyzer": "fscrawler_path",
+                  "fielddata": true
+                }
+              }
+            },
+            "root" : {
+              "type" : "keyword"
+            },
+            "virtual" : {
+              "type" : "keyword",
+              "fields": {
+                "tree": {
+                  "type" : "text",
+                  "analyzer": "fscrawler_path",
+                  "fielddata": true
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

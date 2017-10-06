@@ -22,7 +22,7 @@ import io.swagger.annotations.Api;
 @Service // for what, or only @Component ?
 public class PcuSearchApiServerImpl extends PcuJaxrsServerBase implements PcuSearchApi {
 
-   @Autowired @Qualifier("pcuSearchApiPipelineImpl")
+   @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiPipelineImpl
    private PcuSearchApi delegateSearchIndexApi;
    @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiSimpleImpl
    private PcuSearchApi delegateSearchCrudApi;
@@ -38,8 +38,7 @@ public class PcuSearchApiServerImpl extends PcuJaxrsServerBase implements PcuSea
 
    @Override
    public PcuDocument get(String index, String docId) {
-      // TODO Auto-generated method stub
-      return null;
+      return delegateSearchIndexApi.get(index, docId);
    }
 
 }

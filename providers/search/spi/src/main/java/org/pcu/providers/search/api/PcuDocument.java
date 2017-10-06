@@ -96,9 +96,9 @@ public class PcuDocument {
    }
    /** set by JSON path (dotted), doesn't work with List */
    @JsonIgnore
-   public void setByPath(String path,  Object value) {
+   public Object setByPath(String path,  Object value) {
       String[] pathNames = path.split("\\."); // TODO better using indexOf()
-      getMapByPath(pathNames, pathNames.length - 1).put(pathNames[pathNames.length - 1], value);
+      return getMapByPath(pathNames, pathNames.length - 1).put(pathNames[pathNames.length - 1], value);
    }
    @SuppressWarnings("unchecked")
    @JsonIgnore
