@@ -1,4 +1,4 @@
-package org.pcu.features.search.kafka;
+package org.pcu.features.search.pipeline.kafka;
 
 import java.util.Properties;
 
@@ -15,7 +15,7 @@ public class KafkaProducerFactory {
 	private final static String BOOTSTRAP_SERVERS = "localhost:9092";
 	// ,localhost:9093,localhost:9094";
 
-	public static Producer<Long, String> createProducer() {
+	public static Producer<String, String> createProducer() {
 
 		Properties props = new Properties();
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
@@ -26,7 +26,7 @@ public class KafkaProducerFactory {
 		return new KafkaProducer<>(props);
 	}
 
-	public static Producer<Long, String> createProducer(String urlServers) {
+	public static Producer<String, String> createProducer(String urlServers) {
 
 		Properties props = new Properties();
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, urlServers);

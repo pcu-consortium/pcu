@@ -16,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 
 /**
  * Test of PCU search API and features
@@ -50,6 +52,7 @@ public class PcuSearchApiPipelineImplTest /*extends PcuSearchApiClientTest */{
       pcuDoc.setProperties(new LinkedHashMap<>());
       pcuDoc.getProperties().put("name", "a.doc");
       PcuIndexResult res = searchApi.index(index, pcuDoc);
+      assertNotNull(res);
       // TODO check res
       
       // TODO more, from ES client API test
