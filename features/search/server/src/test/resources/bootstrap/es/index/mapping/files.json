@@ -24,6 +24,9 @@
          /*"version_local" : {
            "type" : "long"
          },*/
+         "crawl_id" : {
+           "type" : "keyword"
+         },
          "synced" : {
            "type" : "date",
            "format" : "date_time"/* yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
@@ -194,7 +197,23 @@
 	           "fielddata": true
 	         }
 	       }
-	     }
+	     },
+        "rights" : {
+          "properties" : {
+            "r" : {
+              "type" : "keyword"
+            },
+            "w" : {
+              "type" : "keyword"
+            },
+            "o" : {
+              "type" : "keyword"
+            },
+            "ar" : {
+              "type" : "keyword"
+            }
+          }
+        }
       }
     }
   }

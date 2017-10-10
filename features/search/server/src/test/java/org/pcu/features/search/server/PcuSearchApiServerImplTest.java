@@ -28,9 +28,11 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.BeanParam;
@@ -58,10 +60,12 @@ import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
+import org.pcu.search.elasticsearch.api.query.ESQuery;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
 import org.pcu.search.elasticsearch.api.query.Hit;
 import org.pcu.search.elasticsearch.api.query.clause.PrefixFieldParameters;
 import org.pcu.search.elasticsearch.api.query.clause.RangeFieldParameters;
+import org.pcu.search.elasticsearch.api.query.clause.bool;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
 import org.pcu.search.elasticsearch.api.query.clause.prefix;
 import org.pcu.search.elasticsearch.api.query.clause.range;
@@ -165,9 +169,11 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
                   // test fails but it still works
                }
             }
-         } else if (file.canRead()) {
-            simulateCrawlFolder(file);
-         }
+         } else if (file.isDirectory()) {
+            if (file.canRead()) {
+               simulateCrawlFolder(file);
+            }
+         } // else non-regular files : symlinks (TODO resolve), devices, pipes, sockets https://stackoverflow.com/a/21224032
       }
    }
    
@@ -241,7 +247,8 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       pcuDoc.getProperties().put("version"/*_local*/, nextLocalOrder()); // local ordering as version (else local_version) => JUG TimeBasedGenerator by cowtowncoder ensures this and is ordered so is enough !
       pcuDoc.getProperties().put("version_global", nextLamport(/*impactingExternalProcessLamports*/)); // global ordering (lamport timestamp) as version (else global_version)
       
-      // crawl :
+      // crawl : (or crawl.id, crawl.synced ?)
+      pcuDoc.getProperties().put("crawl_id", "myCrawlSessionOrJobTaskId"); // allows to get more info about crawl session or wrapping crawl job task conf
       pcuDoc.getProperties().put("synced", ZonedDateTime.now()); // fscrawler : file.indexing_date ; or LocalDateTime.now() ?
       pcuDoc.getProperties().put("connector_computer_id", connectorComputerId); // ?? (binary)
       // TODO Q scan host, root path, start/end date, crawl job id, crawl conf... ? => only crawl session id, and all infos in the crawl job manager
@@ -289,6 +296,16 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // file treeS in ES :
       pcuDoc.getProperties().put("path", globalFilePath); // most exact tree
       pcuDoc.getProperties().put("readable_path", host + testFileAbsoluteSlashedPath); // readable tree
+
+      // rights : (TODO optional, guest/admin)
+      LinkedHashMap<String, LinkedHashSet<String>> rights = new LinkedHashMap<>();
+      pcuDoc.getProperties().put("rights", rights);
+      rights.put("r", new LinkedHashSet<>(Arrays.asList(new String[] { "myproject_group" })));
+      rights.put("w", new LinkedHashSet<String>()); // allows to modify entity (not in entreprise search, but in ecommerce would be nice to have)
+      rights.put("o", new LinkedHashSet<String>());
+      rights.put("ar", new LinkedHashSet<>(Stream.concat(rights.get("r").stream(), new LinkedHashSet<String>(/*writers*/).stream())
+            .collect(Collectors.toSet()))); // done auto in indexing pipeline, allows to inject in query a criteria that restricts to allowed readers
+      
       
       PcuIndexResult indexRes = searchApi.index(index, pcuDoc);
       
@@ -350,6 +367,25 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       pathTerms.setTermListOrLookupMap("file.path.tree", Arrays.asList(new Object[] { "/tmp" })); // .tree !! https://www.elastic.co/guide/en/elasticsearch/guide/current/denormalization-concurrency.html
       pathMsg.setQuery(pathTerms);
       hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
+      assertTrue(!hits.isEmpty());
+      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+      
+      // query without being admin, not having right :
+      ESQueryMessage rightsFilteredMsg = new ESQueryMessage();
+      bool rightsFilteredBool = new bool();
+      terms rightsTerms = new terms();
+      List<String> userAuthorities = new ArrayList<String>();
+      userAuthorities.add("guest");
+      userAuthorities.add("myuserid");
+      rightsTerms.setTermListOrLookupMap("rights.ar", userAuthorities);
+      rightsFilteredBool.setFilter(Arrays.asList(new ESQuery[] { rightsTerms }));
+      rightsFilteredMsg.setQuery(rightsFilteredBool);
+      hits = elasticSearchRestClient.search(rightsFilteredMsg , null, null).getHits().getHits();
+      assertTrue(hits.isEmpty());
+      
+      // query without being admin, having right :
+      userAuthorities.add("myproject_group");
+      hits = elasticSearchRestClient.search(rightsFilteredMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       
