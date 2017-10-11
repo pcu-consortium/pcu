@@ -250,7 +250,8 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // crawl : (or crawl.id, crawl.synced ?)
       pcuDoc.getProperties().put("crawl_id", "myCrawlSessionOrJobTaskId"); // allows to get more info about crawl session or wrapping crawl job task conf
       pcuDoc.getProperties().put("synced", ZonedDateTime.now()); // fscrawler : file.indexing_date ; or LocalDateTime.now() ?
-      pcuDoc.getProperties().put("connector_computer_id", connectorComputerId); // ?? (binary)
+      pcuDoc.getProperties().put("host_id", connectorComputerId); // ?? (binary)
+      pcuDoc.getProperties().put("readable_host", host);
       // TODO Q scan host, root path, start/end date, crawl job id, crawl conf... ? => only crawl session id, and all infos in the crawl job manager
       // or as a mixin only on root dir ?
       
@@ -295,7 +296,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       
       // file treeS in ES :
       pcuDoc.getProperties().put("path", globalFilePath); // most exact tree
-      pcuDoc.getProperties().put("readable_path", host + testFileAbsoluteSlashedPath); // readable tree
+      // NB. is used to browse files. It's root / first path element is the connector computer / host's id, which can be displayed in a prettier way using "readadble_host".
 
       // rights : (TODO optional, guest/admin)
       LinkedHashMap<String, LinkedHashSet<String>> rights = new LinkedHashMap<>();

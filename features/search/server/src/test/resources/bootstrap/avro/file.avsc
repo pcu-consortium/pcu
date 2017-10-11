@@ -10,6 +10,8 @@
          {"name":"version_global", "type":"long", "doc":""},
          {"name":"crawl_id", "type":"string", "doc":""},
          {"name":"synced", "type":"long", "logicalType": "timestamp-millis", "doc":""},
+         {"name":"host_id", "type":"string", "doc":""},
+         {"name":"readable_host", "type":"string", "doc":""},/* NOT "bytes" : in JSON would be strings, but where Unicode code points 0-255 are mapped to unsigned 8-bit byte values 0-255, ex. \u00FF */
          {"name":"file", "type":{
             "type": "record",
             "name": "file.file",
@@ -53,7 +55,6 @@
          }},
          {"name":"fulltext", "type":"string", "doc":""},
          {"name":"path", "type":"string", "doc":""},
-         {"name":"readable_path", "type":"string", "doc":""},
          {"name":"rights", "type":{
             "type": "record",
             "name": "file.rights",

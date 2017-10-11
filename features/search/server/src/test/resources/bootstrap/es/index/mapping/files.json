@@ -31,9 +31,12 @@
            "type" : "date",
            "format" : "date_time"/* yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
          },
-        "connector_computer_id" : {
+        "host_id" : {
           "type" : "binary",
           "doc_values": false
+        },
+        "readable_host" : {
+          "type" : "text"
         },
         "file" : {
           "properties" : {
@@ -185,16 +188,6 @@
 	           "type" : "text",
 	           "analyzer": "pcu_file_path",
             "fielddata": true
-	         }
-	       }
-	     },
-	     "readable_path" : {
-	       "type" : "keyword",
-	       "fields": {
-	         "tree": {
-	           "type" : "text",
-	           "analyzer": "pcu_file_path",
-	           "fielddata": true
 	         }
 	       }
 	     },
