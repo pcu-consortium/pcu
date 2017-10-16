@@ -2,23 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>pcu-parent</artifactId>
+        <artifactId>pcu-providers-metadata-parent</artifactId>
         <groupId>org.pcu-consortium.pcu</groupId>
         <version>1.0-SNAPSHOT</version>
-    </parent>
-    <artifactId>pcu-providers-parent</artifactId>
+    </parent> 
+    <artifactId>pcu-providers-metadata-extractor-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>PCU Providers Parent POM</name>
-    <description>PCU Providers Parent POM</description>
+    <name>PCU Providers Metadata Extractor Parent POM</name>
+    <description>PCU Providers Metadata Extractor Parent POM</description>
    
 
     <modules>
-        <module>search</module>
-        <module>file</module>
-        <module>metadata</module>
-        <!-- module>storage</module -->
-        <!-- module>messaging</module -->
+        <module>spi-impl</module>
     </modules>
     
 </project>
