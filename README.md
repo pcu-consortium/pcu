@@ -35,7 +35,7 @@ Tools
 
 Team
    * Specifications : the PCU Consortium
-   * REST foundations & ElasticSearch API : Marc Dutoo
+   * REST foundations & ElasticSearch API : Marc Dutoo, Smile
 
 License : Apache License 2.0
 
@@ -53,12 +53,19 @@ git clone TODO
 mvn clean install
 
 ## Test
-The easiest way to test the PCU platform is to use it as an Entreprise Search server.
-Go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
-Or (upcoming) start a file connector and use the web search UI.
+The easiest way to test the PCU platform is to use it as an Entreprise Search server : (upcoming) start a file connector and use the web search UI.
+
+You can also only start its backend :
+````bash
+cd features/search/server
+mvn -Pheadless spring-boot:run
+````
+then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
 
 
-# PCU project file tree draft :
+# Developers
+
+## PCU project file tree draft :
 
 pcu/
 

@@ -35,7 +35,7 @@
       <dependency>
          <groupId>commons-io</groupId>
          <artifactId>commons-io</artifactId>
-         <scope>test</scope>
+         <!-- not only test scope -->
       </dependency>
 
       <!-- metamodel TODO move -->
@@ -59,11 +59,173 @@
    <build>
       <plugins>
          <!-- metamodel - business bean gen for ex. client TODO move -->
-         <!-- plugin> <groupId>org.apache.avro</groupId> <artifactId>avro-maven-plugin</artifactId> <version>1.8.2</version> <executions> <execution> 
-            <phase>generate-sources</phase> <goals> <goal>schema</goal> </goals> <configuration> <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory> 
-            <outputDirectory>${project.basedir}/src/main/java/</outputDirectory> </configuration> </execution> </executions> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-            <artifactId>maven-compiler-plugin</artifactId> <configuration> <source>1.8</source> <target>1.8</target> </configuration> </plugin -->
+         <!-- plugin>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+            <version>1.8.2</version>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>schema</goal>
+                  </goals>
+                  <configuration>
+                     <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                     <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin -->
       </plugins>
    </build>
+         
+
+   <profiles>
+   
+      <!-- Shortcut for running PCU backend server only (with added config), use it with :
+      mvn -Pserver -->
+      <profile>
+         <id>server</id>
+         <build>
+            <defaultGoal>spring-boot:run</defaultGoal>
+            <plugins>
+               <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+               </plugin>
+            </plugins>
+            <resources>
+               <resource>
+                  <directory>${basedir}/config</directory>
+               </resource>
+            </resources>
+         </build>
+      </profile>
+      
+      <!-- Package PCU backend server only (with added config) as an executable jar, run it with :
+      mvn -Pjar (DOESN'T WORK YET) -->
+      <profile>
+         <id>jar</id>
+        
+   <build>
+      <finalName>${project.artifactId}</finalName><!-- without -${project.version}-r${buildNumber} else cumbersome for .conf when full executable -->
+      <plugins>
+         <!-- metamodel - business bean gen for ex. client TODO move -->
+         <!-- plugin>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+            <version>1.8.2</version>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>schema</goal>
+                  </goals>
+                  <configuration>
+                     <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                     <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+               <execution>
+                  <phase>validate</phase>
+                  <goals>
+                     <goal>create</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <doCheck>false</doCheck><!-- true = fail if modified files -->
+               <doUpdate>false</doUpdate><!-- true = pull first -->
+               <!-- shortRevisionLength>8</shortRevisionLength -->
+            </configuration>
+         </plugin>
+         <!-- plugin>
+            <groupId>nl.geodienstencentrum.maven</groupId>
+            <artifactId>sass-maven-plugin</artifactId>
+            <version>2.2</version>
+            <executions>
+               <execution>
+                  <id>generate-css</id>
+                  <phase>generate-resources</phase>
+                  <goals>
+                     <goal>update-stylesheets</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <resources>
+                  <resource>
+                     <source>
+                        <directory>${basedir}/src/main/sass/</directory>
+                     </source>
+                     <destination>${basedir}/src/main/resources/static/css</destination>
+                  </resource>
+               </resources>
+               <useBourbon>false</useBourbon>
+            </configuration>
+         </plugin -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.2</version>
+            <configuration>
+               <archive>
+                  <manifestEntries>
+                     <Implementation-Build>${buildNumber}</Implementation-Build>
+                  </manifestEntries>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+               <!-- jvmArguments> NOO only works when starting using mvn,
+               (and both args don't work together because of quoting problems)
+               rather set env props in jarfilename.conf :
+               see https://github.com/spring-projects/spring-boot/issues/5505#issuecomment-202239406
+                  -Dloader.path=".,BOOT-INF/lib/" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002
+               </jvmArguments -->
+               <!-- embeddedLaunchScriptProperties> alas can't conf JAVA_OPTS, see
+               http://mrhaki.blogspot.fr/2016/06/grails-goodness-creating-fully.html
+                  <initInfoDescription>myDesc</initInfoDescription>
+               </embeddedLaunchScriptProperties -->
+               <!-- profiles>
+                  <profile>default</profile>
+               </profiles -->
+               <executable>true</executable><!-- creates a "fully executable" jar
+               http://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html -->
+               <layout>ZIP</layout><!-- similar to the JAR layout using PropertiesLauncher
+               http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html
+               PropertiesLauncher behaves the same as JarLauncher when no additional configuration is provided
+               http://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html -->
+            </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>repackage</goal><!-- create a jar or war file that is auto-executable
+                     The plugin rewrites your manifest, and in particular it manages the Main-Class and Start-Class entries
+                     http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html -->
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+      <resources>
+         <resource>
+            <directory>${basedir}/config</directory>
+         </resource>
+      </resources>
+   </build>
+   
+      </profile>
+   </profiles>
 </project>
 
