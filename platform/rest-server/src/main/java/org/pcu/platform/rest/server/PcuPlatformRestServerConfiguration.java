@@ -18,13 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -34,15 +32,17 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * 
  * Jackson XML provider is configured and set up by client module's configuration.
  * 
+ * IMPORTANT : The final application-defaults.properties must contain the appropriate defaults for HTTP & CXF:
+ * http.server.servlet-path (& default port), cxf.jaxrs.client.address (& default path), else with executable jar :
+ * Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'cxf.jaxrs.client.address' in string value "${cxf.jaxrs.client.address}"
+ * see application-defaults.template.properties (Spring Boot auto includes it, no need
+ * for @ConfigurationProperties @PropertySource("classpath:application-defaults.properties")
+ * 
  * @author mdutoo
  */
 @Configuration
 @ComponentScan(basePackageClasses={PcuPlatformRestServerConfiguration.class, PcuPlatformRestClientConfiguration.class})
 @EnableAutoConfiguration // else Unable to start EmbeddedWebApplicationContext due to missing EmbeddedServletContainerFactory bean see https://stackoverflow.com/questions/21783391/spring-boot-unable-to-start-embeddedwebapplicationcontext-due-to-missing-embedd
-@ConfigurationProperties
-@PropertySource("classpath:pcu-server-defaults.properties") // (NOT working in yml) fills env with props :
-// http.server.servlet-path (& default port), cxf.jaxrs.client.address (& default path), else with executable jar :
-// Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'cxf.jaxrs.client.address' in string value "${cxf.jaxrs.client.address}"
 public class PcuPlatformRestServerConfiguration {
    
     private static final Logger LOGGER = LoggerFactory.getLogger(PcuPlatformRestServerConfiguration.class);

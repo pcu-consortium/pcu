@@ -55,7 +55,7 @@
       </dependency>
       <dependency>
          <groupId>commons-io</groupId>
-         <artifactId>commons-io</artifactId><!-- ?!? -->
+         <artifactId>commons-io</artifactId><!-- for custom PcuApiSwagger2Feature setup -->
       </dependency>
 
    </dependencies>
