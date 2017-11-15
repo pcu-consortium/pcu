@@ -15,6 +15,10 @@
 
    <dependencies>
 
+     <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-api</artifactId><!-- to define PCU ElasticSearch-like API -->
+     </dependency>
       <!-- TODO common PCU SPI deps (utils... ?) -->
 
 

@@ -35,6 +35,8 @@ import org.pcu.search.elasticsearch.api.query.SearchResult;
 public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    
    public static final String TEST_ = "test_username";
+   public static final int took_search = 1000;
+   public static final int took_searchInType = 2000;
 
    public final LinkedHashMap<String,IndexMapping> indexMappings = new LinkedHashMap<String,IndexMapping>();
    /** DocumentResult rather than Document in order to know about index & type */
@@ -172,7 +174,8 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    }
 
    @Override
-   public SearchResult search(ESQueryMessage queryMessage, String search_type, Boolean request_cache) {
+   public SearchResult search(ESQueryMessage queryMessage, String search_type, Boolean request_cache,
+         String filter_path) throws ESApiException {
       SearchResult res = new SearchResult();
       Hits hits = new Hits();
       if (!docs.isEmpty()) {
@@ -190,13 +193,16 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
          hits.setTotal(0);
       }
       res.setHits(hits);
+      res.setTook(took_search);
       return res ;
    }
 
    @Override
-   public SearchResult search(ESQueryMessage queryMessage, String search_type, Boolean request_cache,
-         String filter_path) throws ESApiException {
-      return null;
+   public SearchResult searchInType(String index, String type, ESQueryMessage queryMessage, String search_type,
+         Boolean request_cache, String filter_path) throws ESApiException {
+      SearchResult res = new SearchResult();
+      res.setTook(took_searchInType);
+      return res;
    }
 
 }

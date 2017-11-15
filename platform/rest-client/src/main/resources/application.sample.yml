@@ -1,14 +1,16 @@
 # (defaults are commented out)
 
 application:
+  #devmode: true
   entreprisesearch:
 
 pcu:
   search:
-    api:
+    es:
       client:
-         # address: http://localhost:8080/
-      # restLogFile: es-rest-mock.log
+         #address: http://localhost:9200/
+      #restLogFile: es-rest-mock.log
       restLogFile: 
   rest:
-    # enableIndenting: true
+    #failOnUnknownProperties: true
+    #enableIndenting: false

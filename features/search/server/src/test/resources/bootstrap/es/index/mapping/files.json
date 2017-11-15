@@ -95,6 +95,7 @@
             }*/
           }
         },
+        /* TODO rename meta to dc http://dublincore.org/documents/dcmi-terms/ */
         "meta" : {
           "properties" : {
             "author" : {

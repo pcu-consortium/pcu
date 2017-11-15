@@ -1,8 +1,9 @@
 package org.pcu.features.search.server;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,7 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.BeanParam;
 
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
@@ -56,9 +56,10 @@ import org.pcu.providers.file.api.PcuFileResult;
 import org.pcu.providers.search.api.PcuDocument;
 import org.pcu.providers.search.api.PcuIndexResult;
 import org.pcu.providers.search.api.PcuSearchApi;
+import org.pcu.providers.search.api.PcuSearchEsClientApi;
 import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
 import org.pcu.search.elasticsearch.api.ESApiException;
-import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
 import org.pcu.search.elasticsearch.api.query.ESQuery;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
@@ -101,8 +102,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={PcuSearchServerConfiguration.class,ESSearchProviderConfiguration.class,PcuSearchApiServerImplTest.Conf.class},
-   initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes={PcuSearchServerConfiguration.class,
+      ESSearchProviderConfiguration.class, PcuSearchApiServerImplTest.Conf.class},
+      initializers = ConfigFileApplicationContextInitializer.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.DEFINED_PORT, properties="server.port=45665")
 //rather than @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties="server_port=45665")
 //which would require listening to an ApplicationEvent and therefore using a Provider pattern
@@ -112,10 +114,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
    @LocalServerPort
    protected int serverPort;
-   
-   @Autowired @Qualifier("pcuSearchApiRestClient") //@Qualifier("pcuSearchApiImpl")
+
+   @Autowired @Qualifier("pcuSearchEsApiRestClient") //@Qualifier("pcuSearchEsApiImpl") //pcuSearchEsApiRestClient
+   private PcuSearchEsClientApi searchEsApi;
+   @Autowired @Qualifier("pcuSearchApiRestClient") //@Qualifier("pcuSearchApiImpl") //pcuSearchApiRestClient
    private PcuSearchApi searchApi;
-   @Autowired @Qualifier("pcuFileApiRestClient")
+   @Autowired @Qualifier("defaultFileProviderApiImpl") //defaultFileProviderApiImpl LocalFileProviderApiImpl pcuFileApiRestClient
    private PcuFileApi fileApi;
 
    @Autowired @Qualifier("pcuApiDateTimeFormatter")
@@ -127,7 +131,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
 
    /** for tests */
    @Autowired @Qualifier("elasticSearchRestClient")
-   private ElasticSearchApi elasticSearchRestClient;
+   private ElasticSearchClientApi elasticSearchRestClient;
    @Autowired @Qualifier("elasticSearchMapper")
    private ObjectMapper elasticSearchMapper;
    
@@ -154,7 +158,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
 
    @Test
    public void testSimulateCrawlHome() {
-      simulateCrawlFolder(new File(System.getProperty("user.home"))); // + File.separator + "Documents"
+      simulateCrawlFolder(new File(System.getProperty("user.home"))); // + File.separator + "Documents" // "/home/mardut/dev/pcu/workspace"
    }
    public void simulateCrawlFolder(File folder) {
       for (File file : folder.listFiles()) {
@@ -329,12 +333,12 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       dateRange.setRangeParameters("file.last_modified", rangeParams);
       rangeParams.setGt(ZonedDateTime.parse("2017-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
       rangeParams.setLte(ZonedDateTime.ofInstant(Instant.ofEpochMilli(testFile.lastModified()), ZoneId.systemDefault()));
-      List<Hit> hits = elasticSearchRestClient.search(dateRangeMsg, null, null).getHits().getHits();
+      List<Hit> hits = searchEsApi.search(dateRangeMsg, null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       rangeParams.setLt(ZonedDateTime.parse("2016-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
       rangeParams.setGt(null);
-      hits = elasticSearchRestClient.search(dateRangeMsg, null, null).getHits().getHits();
+      hits = searchEsApi.search(dateRangeMsg, null, null).getHits().getHits();
       assertTrue(hits.isEmpty());
 
       // query - on mimetype :
@@ -343,7 +347,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       mimetypeMultiMatch.setFields(Arrays.asList(new String[] {"http.mimetype"}));
       mimetypeMultiMatch.setQuery((String) http.get("mimetype"));
       mimetypeMsg.setQuery(mimetypeMultiMatch);
-      hits = elasticSearchRestClient.search(mimetypeMsg , null, null).getHits().getHits();
+      hits = searchEsApi.search(mimetypeMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
 
@@ -355,7 +359,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       prefixParameters.setValue(testFileParentPath);
       pathPrefix.setPrefixParameters("file.path", prefixParameters );
       pathMsg.setQuery(pathPrefix);
-      hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
+      hits = searchEsApi.search(pathMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       
@@ -367,7 +371,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       //pathTerms.setTermListOrLookupMap("file.path", Arrays.asList(new Object[] { "/tmp/pcu_test_5114232402156243118.doc" })); // also OK
       pathTerms.setTermListOrLookupMap("file.path.tree", Arrays.asList(new Object[] { "/tmp" })); // .tree !! https://www.elastic.co/guide/en/elasticsearch/guide/current/denormalization-concurrency.html
       pathMsg.setQuery(pathTerms);
-      hits = elasticSearchRestClient.search(pathMsg , null, null).getHits().getHits();
+      hits = searchEsApi.search(pathMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       
@@ -381,12 +385,12 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       rightsTerms.setTermListOrLookupMap("rights.ar", userAuthorities);
       rightsFilteredBool.setFilter(Arrays.asList(new ESQuery[] { rightsTerms }));
       rightsFilteredMsg.setQuery(rightsFilteredBool);
-      hits = elasticSearchRestClient.search(rightsFilteredMsg , null, null).getHits().getHits();
+      hits = searchEsApi.search(rightsFilteredMsg , null, null).getHits().getHits();
       assertTrue(hits.isEmpty());
       
       // query without being admin, having right :
       userAuthorities.add("myproject_group");
-      hits = elasticSearchRestClient.search(rightsFilteredMsg , null, null).getHits().getHits();
+      hits = searchEsApi.search(rightsFilteredMsg , null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       
@@ -503,17 +507,17 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
          index = index.substring(0, index.lastIndexOf('.'));
 
          try {
-            LinkedHashMap<String, IndexMapping> existing = elasticSearchRestClient.getMapping(index);
+            LinkedHashMap<String, IndexMapping> existing = searchEsApi.getMapping(index);
             // BEWARE ES can't update mapping, only add new types or fields
             // TODO check if backward compatible, and :
             // - if it is (and only new types or fields), update, save if identical
             // - else in production mode fail
-            elasticSearchRestClient.deleteMapping(index);
+            searchEsApi.deleteMapping(index);
          } catch (ESApiException esex) {
             assertTrue(esex.getAsJson().contains("index_not_found_exception"));
          }
          try {
-            elasticSearchRestClient.putMapping(index, indexMapping);
+            searchEsApi.putMapping(index, indexMapping);
          } catch (ESApiException esex) {
             log.error("Failed to update conf of index " + index, esex);
          }

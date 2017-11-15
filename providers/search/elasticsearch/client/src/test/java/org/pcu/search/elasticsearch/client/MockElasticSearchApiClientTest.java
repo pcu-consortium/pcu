@@ -1,5 +1,7 @@
 package org.pcu.search.elasticsearch.client;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -11,12 +13,14 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.search.elasticsearch.PcuElasticSearchClientApplication;
 import org.pcu.search.elasticsearch.api.ESApiException;
-import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
+import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
+import org.pcu.search.elasticsearch.api.query.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.EmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -79,7 +83,7 @@ public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientTes
    /** to build URL for client (in case not default 8080 ex. because random port) */
    @LocalServerPort
    protected int randomServerPort;
-   /*@Autowired
+   @Autowired
    protected SpringBus bus;
    @Autowired
    protected JacksonJsonProvider jacksonJsonProvider;
@@ -90,7 +94,7 @@ public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientTes
       JAXRSClientFactoryBean client = new JAXRSClientFactoryBean();
       client.setBus(bus);
       client.setAddress("http://localhost:" + randomServerPort + PCU_ES_API_MOCK_PATH); // not default 8080 client since random port
-      client.setServiceClass(ElasticSearchApi.class);
+      client.setServiceClass(ElasticSearchClientApi.class);
       client.setProvider(jacksonJsonProvider); // else web app ex Response.Status.UNSUPPORTED_MEDIA_TYPE
 
       String messagesFilePath = new File("es-rest-mock.log").toURI().toString(); // if local in dev, is in /server
@@ -98,12 +102,25 @@ public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientTes
       loggingFeature.setPrettyLogging(true);
       client.getFeatures().add(loggingFeature);
       
-      es = client.create(ElasticSearchApi.class);
-   }*/
+      es = client.create(ElasticSearchClientApi.class);
+   }
 
    @Override // disable, not mocked yet
    public void testFeatures() throws IOException, ESApiException {
       
+   }
+
+   /**
+    * Tests on API that is SERVED by mock :
+    */
+   @Test
+   public void testMockServerApi() throws IOException, ESApiException {
+      // /_search vs in index/type :
+      SearchResult searchRes = this.es.search(new ESQueryMessage(), null, null);
+      assertEquals(ElasticSearchApiMockImpl.took_search, searchRes.getTook());
+      
+      searchRes = this.es.searchInType("files", "file", new ESQueryMessage(), null, null);
+      assertEquals(ElasticSearchApiMockImpl.took_searchInType, searchRes.getTook());
    }
    
 }

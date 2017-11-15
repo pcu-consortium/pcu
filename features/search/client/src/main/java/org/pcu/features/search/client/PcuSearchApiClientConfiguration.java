@@ -4,6 +4,7 @@ import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxrs.client.Client;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.search.api.PcuSearchApi;
+import org.pcu.providers.search.api.PcuSearchEsClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,7 +17,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * @author mdutoo
  */
 @Configuration
-@ComponentScan(basePackageClasses={PcuSearchApiClientConfiguration.class, PcuPlatformRestClientConfiguration.class}) // i.e. ("org.pcu.features.search.client") ; not org.pcu else scans ex. ESSearchProviderApiImpl
+@ComponentScan(basePackageClasses={PcuSearchApiClientConfiguration.class, // i.e. ("org.pcu.features.search.client") ; not org.pcu else scans ex. ESSearchProviderApiImpl
+      PcuPlatformRestClientConfiguration.class})
 // which can't find client, and in another project does not work (order ?)
 public class PcuSearchApiClientConfiguration {
 
@@ -24,12 +26,20 @@ public class PcuSearchApiClientConfiguration {
    private PcuPlatformRestClientConfiguration clientConf;
    
    @Bean
+   public Client pcuSearchEsApiRestClient(SpringBus bus,
+         JacksonJsonProvider pcuApiJsonProvider/*,
+         ESApiExceptionMapper exceptionMapper,
+         ESApiResponseExceptionMapper responseExceptionMapper*/) {
+      return clientConf.pcuApiRestClientForClass(PcuSearchEsClientApi.class, bus, pcuApiJsonProvider);
+   }
+   @Bean
    public Client pcuSearchApiRestClient(SpringBus bus,
          JacksonJsonProvider pcuApiJsonProvider/*,
          ESApiExceptionMapper exceptionMapper,
          ESApiResponseExceptionMapper responseExceptionMapper*/) {
       return clientConf.pcuApiRestClientForClass(PcuSearchApi.class, bus, pcuApiJsonProvider);
    }
+   
    @Bean
    public Client pcuFileApiRestClient(SpringBus bus,
          JacksonJsonProvider pcuApiJsonProvider/*,

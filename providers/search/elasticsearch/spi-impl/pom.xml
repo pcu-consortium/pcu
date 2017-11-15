@@ -15,11 +15,15 @@
         <!-- PCU -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-providers-search-spi</artifactId>
+            <artifactId>pcu-providers-search-spi</artifactId><!-- Default integrated component cloned API + PCU specific API -->
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-providers-search-elasticsearch-client</artifactId><!-- or only test ? -->
+            <artifactId>pcu-providers-search-elasticsearch-client</artifactId><!-- used in spi-impl ! -->
+        </dependency>
+        <dependency>
+           <groupId>org.pcu-consortium.pcu</groupId>
+           <artifactId>pcu-platform-rest-server</artifactId><!-- to deploy "proxy" impl REST servers as a bonus / default -->
         </dependency>
 
         <!-- tests -->

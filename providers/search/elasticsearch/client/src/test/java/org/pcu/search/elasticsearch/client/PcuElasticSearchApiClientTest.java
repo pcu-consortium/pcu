@@ -15,14 +15,10 @@ import java.util.LinkedHashMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.search.elasticsearch.PcuElasticSearchClientApplication;
-import org.pcu.search.elasticsearch.api.BulkAction;
-import org.pcu.search.elasticsearch.api.BulkMessage;
-import org.pcu.search.elasticsearch.api.BulkResult;
 import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.ESApiException;
-import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.GetResult;
-import org.pcu.search.elasticsearch.api.IndexAction;
 import org.pcu.search.elasticsearch.api.mapping.Analysis;
 import org.pcu.search.elasticsearch.api.mapping.Analyzer;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
@@ -85,7 +81,7 @@ public class PcuElasticSearchApiClientTest {
 
    // should be magical proxy (no impl in -client)
    @Autowired
-   protected ElasticSearchApi es;
+   protected ElasticSearchClientApi es;
 
    protected String index = "files";
    protected String docId;
@@ -482,6 +478,8 @@ public class PcuElasticSearchApiClientTest {
       //bool.setBoost(boost);
       searchRes = es.search(queryMessage , null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
+      
+      // TODO on path (prefix & keyword), see PcuSearchApiServerImplTest
       
       // native Lucene query :
       query_string nativeQuery = new query_string();

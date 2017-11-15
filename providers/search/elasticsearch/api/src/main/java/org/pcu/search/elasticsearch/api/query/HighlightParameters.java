@@ -6,7 +6,7 @@ package org.pcu.search.elasticsearch.api.query;
  *
  */
 public class HighlightParameters {
-   // TODO Q type ? fvh, postings, plain (Lucene's), unified (experimental). If term_vector=with_positions_offsets (but bigger index), the fast vector highlighter will be used instead by default.
+   // TODO type : not supported because default is unified (best), else fvh, postings, plain (Lucene's). If term_vector=with_positions_offsets (but bigger index), the fast vector highlighter will be used instead by default.
    
    /** ex. to highlight against rescore query */
    private ESQuery highlight_query;

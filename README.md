@@ -35,7 +35,9 @@ Tools
 
 Team
    * Specifications : the PCU Consortium
-   * REST foundations & ElasticSearch API : Marc Dutoo, Smile
+   * foundations (Spring, REST), ElasticSearch API, file indexer & Avro data model prototype, File content API & impl, server : Marc Dutoo, Smile
+   * File content Metadata Extractor : Emmanuel Keller, Wallix / Qwazr
+   * Entreprise Search UI : Jennifer Aouizerat (design), Romain Gilles (integration), Marc Dutoo (v0), Smile
 
 License : Apache License 2.0
 
@@ -47,13 +49,18 @@ Roadmap : TODO
 # Quickstart
 
 ## Clone sources
-git clone TODO
+git clone git@github.com:pcu-consortium/pcu.git
 
 ## Build
 mvn clean install
 
 ## Test
-The easiest way to test the PCU platform is to use it as an Entreprise Search server : (upcoming) start a file connector and use the web search UI.
+The easiest way to test the PCU platform is to use it as an Entreprise Search server :
+````bash
+cd application/search
+mvn spring-boot:run
+````
+then start a file connector (upcoming) and browse to its web search UI at [http://localhost:8080](http://localhost:8080).
 
 You can also only start its backend :
 ````bash
@@ -64,6 +71,44 @@ then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=ht
 
 
 # Developers
+
+## REST  & JAXRS best practices
+
+- no 2 operations with same path, rather provide suppl helper operations in ElasticSearchClientApi,
+else JAXRS can't differentiate them :
+nov. 15, 2017 1:33:22 PM org.apache.cxf.jaxrs.model.OperationResourceInfoComparator compare
+AVERTISSEMENT: Both org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType
+and org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType are equal candidates
+for handling the current request which can lead to unpredictable results
+
+## frontend
+
+Hot deploy (of js changes) should work out of the box. Otherwise, rather use the proxy :
+````bash
+cd src/main/frontend
+../../../target/node/npm start
+````
+and browse to the proxied web UI at [http://localhost:9090](http://localhost:9090).
+
+If compilation fails overall, recheck compilation without restarting with :
+````bash
+cd src/main/frontend
+./node_modules/webpack/bin/webpack.js
+````
+
+### React.js best practices
+- built using babel (provides jsx compilation, latest ES2015, polyfill)
+
+- no redux, overblown for a simple application like Entreprise Search (at least the front), makes it harder to understand how it works (dispatches over more files). And if the need appears, it can still be easily refactored in.
+
+- Axios for REST, the best 
+
+- extends React.Component rather than createClass(), which will at somepoint be removed, see https://toddmotto.com/react-create-class-versus-component/
+
+- bind using anonymous function : ````handleClick = () => { ...```` It is terser than in the constructor, faster than in render() which new fct each time. See https://stackoverflow.com/documentation/reactjs/6371/react-createclass-vs-extends-react-component#t=20171002141935868464
+
+- setState() good practice : ````this.setState(state => ({...state, results: [] }));````. See https://engineering.musefind.com/our-best-practices-for-writing-react-components-dec3eb5c3fc8 with spread operator and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+
 
 ## PCU project file tree draft :
 

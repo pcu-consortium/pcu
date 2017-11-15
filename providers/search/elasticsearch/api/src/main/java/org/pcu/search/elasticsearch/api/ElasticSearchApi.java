@@ -40,6 +40,9 @@ import io.swagger.annotations.ApiParam;
  * - common params : pretty, human, error_trace (TODO !), source, filter_path outside _search (TODO ?!) https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
  * - TODO bulk
  * - ? mget/search/...
+ * - unsupported search alternatives : (not mandatory for developers)
+ * term (use terms), match (use multi_match), sort field array (use field to direction map), highlight type (only default unified)...
+ * TODO but required to replace ES in an existing app
  * - TODO requirements : MES (function_score, index mgmt ex. reindex ?), ekeller's list...
  * 
  * gotchas :
@@ -52,6 +55,14 @@ import io.swagger.annotations.ApiParam;
  * https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/
  * 
  * TODO swagger defaultValue to jaxrs @DefaultValue (?)
+ * 
+ * REST & JAXRS best practices : (TODO move)
+ * - no 2 operations with same path, rather provide suppl helper operations in ElasticSearchClientApi,
+ * else JAXRS can't differentiate them :
+nov. 15, 2017 1:33:22 PM org.apache.cxf.jaxrs.model.OperationResourceInfoComparator compare
+AVERTISSEMENT: Both org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType
+and org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType are equal candidates
+for handling the current request which can lead to unpredictable results
  * 
  * @author mdutoo
  *
@@ -216,12 +227,6 @@ public interface ElasticSearchApi {
    
    // Query API. Difficulty is being composite.
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
-   @Path("/_search")
-   @POST
-   @GET
-   SearchResult search(ESQueryMessage queryMessage,
-         @ApiParam(value = "or dfs_query_then_fetch", defaultValue = "query_then_fetch") @QueryParam("search_type") String search_type,
-         @ApiParam(value = "overrides index conf whose default is true") @QueryParam("request_cache") Boolean request_cache) throws ESApiException;
    // with common options :
    // filter_path pattern https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
    // TODO transversal for all operations
@@ -229,6 +234,21 @@ public interface ElasticSearchApi {
    @POST
    @GET
    SearchResult search(ESQueryMessage queryMessage,
+         @ApiParam(value = "or dfs_query_then_fetch", defaultValue = "query_then_fetch") @QueryParam("search_type") String search_type,
+         @ApiParam(value = "overrides index conf whose default is true") @QueryParam("request_cache") Boolean request_cache,
+         @ApiParam(value = "ex. took,hits.hits._id,hits.hits.name*") @QueryParam("filter_path") String filter_path) throws ESApiException;
+   
+   // Query API. Difficulty is being composite.
+   // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
+   // with common options :
+   // filter_path pattern https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
+   // TODO transversal for all operations
+   @Path("/{index}/{type}/_search")
+   @POST
+   @GET
+   SearchResult searchInType(@ApiParam(value = "index", required = true) @PathParam("index") String index,
+         @ApiParam(value = "type", defaultValue = "_all") @PathParam("type") String type,
+         ESQueryMessage queryMessage,
          @ApiParam(value = "or dfs_query_then_fetch", defaultValue = "query_then_fetch") @QueryParam("search_type") String search_type,
          @ApiParam(value = "overrides index conf whose default is true") @QueryParam("request_cache") Boolean request_cache,
          @ApiParam(value = "ex. took,hits.hits._id,hits.hits.name*") @QueryParam("filter_path") String filter_path) throws ESApiException;

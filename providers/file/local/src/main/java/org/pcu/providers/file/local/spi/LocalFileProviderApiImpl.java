@@ -16,22 +16,36 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.pcu.platform.rest.server.PcuJaxrsServerBase;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.file.api.PcuFileResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import io.swagger.annotations.Api;
 
 /**
+ * PCU File content API.
+ * 
+ * TODO REST : return mimetype & name (...)
+ * 
  * TODO move hash store as another store impl ON TOP of trivial impl (else can append to hashed file !!)
  * TODO manage stores
  * @author mardut
  *
  */
-@Component // (@Service rather at application level)
-public class LocalFileProviderApiImpl /*extends PcuJaxrsServerBase */implements PcuFileApi {
+@javax.ws.rs.Path("/file/api") // extend to override it for alt impl ; TODO Q or /filecpt, /filestore, /blob ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
+@Consumes({MediaType.APPLICATION_OCTET_STREAM})
+@Produces({MediaType.APPLICATION_OCTET_STREAM}) // TODO LATER return mimetype & name
+@Api(value = "file api") // name of the api, merely a tag ; not required (only required on impl) 
+@Service // @Component // (@Service rather at application level)
+public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuFileApi {
    
    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileProviderApiImpl.class);
 

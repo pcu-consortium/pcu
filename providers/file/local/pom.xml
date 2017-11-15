@@ -16,12 +16,12 @@
       <!-- PCU -->
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-         <artifactId>pcu-providers-file-spi</artifactId>
+         <artifactId>pcu-providers-file-spi</artifactId><!-- PCU file API is the one of its own impl -->
       </dependency>
-      <!-- already ?? dependency>
+      <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-         <artifactId>pcu-platform-rest-server</artifactId>
-      </dependency -->
+         <artifactId>pcu-platform-rest-server</artifactId><!-- to deploy "proxy" impl REST servers as a bonus / default -->
+      </dependency>
 
       <!-- deps -->
       <dependency>

@@ -24,9 +24,9 @@ public class PcuSearchApiServerImpl extends PcuJaxrsServerBase implements PcuSea
 
    @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiPipelineImpl
    private PcuSearchApi delegateSearchIndexApi;
-   @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiSimpleImpl
+   //@Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiSimpleImpl
    private PcuSearchApi delegateSearchCrudApi;
-   @Autowired @Qualifier("pcuSearchApiEngineImpl")
+   //@Autowired @Qualifier("pcuSearchApiEngineImpl")
    private PcuSearchApi delegateSearchEngineApi;
    // delegateCrudApi
    // delegateSearchApi

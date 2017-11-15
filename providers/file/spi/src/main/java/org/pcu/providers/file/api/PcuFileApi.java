@@ -16,14 +16,17 @@ import javax.ws.rs.core.MediaType;
 import io.swagger.annotations.Api;
 
 /**
+ * TODO LATER REST : return mimetype & name in header (requires PcuFileDownloadApi/Impl on top of this and
+ * PcuSearchApi which knows it, or BETTER to store it along the content in order not to impact ElasticSearch)
+ * 
  * TODO move hash store as another store impl ON TOP of trivial impl (else can append to hashed file !!)
  * TODO Q also type param ?!
  * @author mardut
  *
  */
 @Path("/file/api") // extend to override it for alt impl ; TODO Q or /filecpt, /filestore, /blob ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
-@Consumes({MediaType.APPLICATION_JSON})
-@Produces({MediaType.APPLICATION_JSON})
+@Consumes({MediaType.APPLICATION_OCTET_STREAM})
+@Produces({MediaType.APPLICATION_OCTET_STREAM}) // TODO LATER return mimetype
 @Api(value = "file api") // name of the api, merely a tag ; not required (only required on impl) 
 public interface PcuFileApi {
    

@@ -9,7 +9,7 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
-import org.pcu.search.elasticsearch.api.ElasticSearchApi;
+import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,18 @@ public class PcuElasticSearchClientConfiguration {
    ///public static final DateTimeFormatter ELASTICSEARCH_DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
    //       i.e. Jackson default for ZonedDateTime, see ZonedDateTimeSerializer.java, BUT NO MILLIS https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
    // ES supports Z or ZZ (+0000 having millis) but not ZZZZ (GMT+02:00) https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
-   
+
+   @Value("${devmode:false}")
+   private boolean devmode;
+   /**
+    * all props of integrated component APIs are not supported extensively. Therefore enable in dev to detect it,
+    * but don't enable in prod to be lenient and avoid :
+Caused by: com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "type" (class org.pcu.search.elasticsearch.api.query.HighlightParameters), not marked as ignorable (3 known properties: "fragment_size", "number_of_fragments", "highlight_query"])
+ at [Source: org.apache.cxf.transport.http.AbstractHTTPDestination$1@7655315b; line: 1, column: 166] (through reference chain: org.pcu.search.elasticsearch.api.query.ESQueryMessage["highlight"]->org.pcu.search.elasticsearch.api.query.Highlight["fields"]->java.util.LinkedHashMap["fulltext"]->org.pcu.search.elasticsearch.api.query.HighlightParameters["type"])
+   at com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.from(UnrecognizedPropertyException.java:62)
+    */
+   @Value("${pcu.rest.failOnUnknownProperties:false}")
+   private boolean failOnUnknownProperties;
    @Value("${pcu.rest.enableIndenting:false}")
    private boolean enableIndenting;
    
@@ -87,7 +98,7 @@ public class PcuElasticSearchClientConfiguration {
       // https://stackoverflow.com/questions/11757487/how-to-tell-jackson-to-ignore-a-field-during-serialization-if-its-value-is-null
       mapper.setSerializationInclusion(Include.NON_NULL);
       
-      //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties || devmode);
       
       mapper.configure(SerializationFeature.INDENT_OUTPUT, enableIndenting);
       mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true); // to load from default bootstrap file conf
@@ -127,7 +138,7 @@ public class PcuElasticSearchClientConfiguration {
       bean.setThreadSafe(threadSafe);
       
       bean.setAddress(address);
-      bean.setServiceClass(ElasticSearchApi.class);
+      bean.setServiceClass(ElasticSearchClientApi.class);
       bean.setProvider(elasticSearchJsonProvider); // actually an addProvider
       bean.setProvider(exceptionMapper);
       bean.setProvider(responseExceptionMapper);
