@@ -18,10 +18,31 @@
          <groupId>org.pcu-consortium.pcu</groupId>
          <artifactId>pcu-platform-rest-server</artifactId>
       </dependency>
+      
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-         <artifactId>pcu-features-search-simple</artifactId>
+          <artifactId>pcu-providers-search-spi</artifactId>
       </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-file-spi</artifactId>
+      </dependency>
+        
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- or only test yet ?! -->
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId>
+         <type>test-jar</type>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-file-local-spi-impl</artifactId>
+      </dependency>
+        
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
          <artifactId>pcu-features-search-pipeline</artifactId>
@@ -146,31 +167,6 @@
                <!-- shortRevisionLength>8</shortRevisionLength -->
             </configuration>
          </plugin>
-         <!-- plugin>
-            <groupId>nl.geodienstencentrum.maven</groupId>
-            <artifactId>sass-maven-plugin</artifactId>
-            <version>2.2</version>
-            <executions>
-               <execution>
-                  <id>generate-css</id>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>update-stylesheets</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <configuration>
-               <resources>
-                  <resource>
-                     <source>
-                        <directory>${basedir}/src/main/sass/</directory>
-                     </source>
-                     <destination>${basedir}/src/main/resources/static/css</destination>
-                  </resource>
-               </resources>
-               <useBourbon>false</useBourbon>
-            </configuration>
-         </plugin -->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
