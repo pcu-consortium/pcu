@@ -10,7 +10,15 @@ import LoginOverlay from './components/login.js'
 // Stylesheets
 import '../style/main.css'
 
-var url = "http://localhost:9200/"
+var debug = false;
+
+var pcuUrl = '/pcu/';
+//var pcuUrl = 'http://localhost:45665/'; // on mock default random port
+var searchUrl = pcuUrl + 'search/esapi/'; // on PCU's ElasticSearch-like API impl'd on local ElasticSearch
+//var searchUrl = 'http://localhost:9200/'; // directly on local ElasticSearch
+//var searchUrl = 'http://localhost:45665/search/elasticsearch'; // on mock default random port
+var searchFileUrl = searchUrl + 'files/file/_search'; 
+var fileApiUrl = pcuUrl + 'file/api/content/';
    
 var t = {
    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'DOC'
@@ -40,7 +48,7 @@ class SearchApp extends React.Component {
          queryRequest.size = 10;
       }
       this.setState(prevState => ({...prevState, queryRequest: queryRequest }));
-      axios.post(url + "files/file/_search", queryRequest).then(response => {
+      axios.post(searchFileUrl, queryRequest).then(response => {
          this.setState(prevState => ({...prevState, hits: response.data.hits, took: response.data.took }));
          console.log("response state", this.state);
       }).catch(error => {
@@ -97,30 +105,21 @@ class SearchApp extends React.Component {
             { this.state.hits.total == 0 ? '' : (
             <div>
             
-            {/*
+            { debug ? (
             <div className="resultsNumbers">
-                  Results {this.state.queryRequest.from + 1}-{this.state.queryRequest.from + this.state.queryRequest.size} of {this.state.hits.total}
-                  &nbsp;
-                  for query {JSON.stringify(this.state.queryRequest.query, null, '\t')}.
-                  Search took {this.state.took}ms. Sort by&nbsp;
-                  
-                  <div>
-                        <a title="sort by last modified date" onClick={() => this.handleSearch({from: 0, size: 10, sort: [{'file.last_modified': 'desc'}]}, true)}>date</a>
-                        &nbsp;/&nbsp;
-                        <a title="sort by score" onClick={() => this.handleSearch({from: 0, size: 10, sort: ['_score']}, true)}>relevance</a>
-                  </div>
+                  query: {JSON.stringify(this.state.queryRequest.query, null, '\t')}.
             </div>
-            */}
+            ) : '' }
 
             {  // && this.state.currentPage != 1
                (this.state.queryRequest.from != 0) ? (
-                     <div><span title="previous" onClick={() => this.handlePrevious()}>&lt; ...</span></div>
+                     <div style={{ paddingLeft: '100px'}}><span title="previous" onClick={() => this.handlePrevious()}>&lt; ...</span></div>
                ) : ''
             }
-            <ResultList hits={this.state.hits} handleSearch={this.handleSearch} queryRequest={this.state.queryRequest} />
+            <ResultList hits={this.state.hits} took={this.state.took} handleSearch={this.handleSearch} queryRequest={this.state.queryRequest} />
             {
                (this.state.queryRequest.from + this.state.queryRequest.size < this.state.hits.total - 1) ? (
-                     <div style={{ display: 'none'}}><span title="next" onClick={() => this.handleNext()}>... &gt;</span></div>
+                     <div style={{ paddingLeft: '100px'}}><span title="next" onClick={() => this.handleNext()}>... &gt;</span></div>
                ) : ''
             }
 
@@ -130,9 +129,20 @@ class SearchApp extends React.Component {
                   <div className={"footer" + (this.state.isActiveFooterMobile ? ' show' : '')}>
                         <div className="footer__wrapper">
                               <ul className="footer__list">
-                              <li><a href="">PCU Consortium</a></li>
+                              <li><a href="http://pcu-consortium.github.io/">PCU Consortium</a></li>
                               <li><a href="">Documentation</a></li>
-                              <li><a href="">Support</a></li>
+                              <li><a href="http://smile.fr/">Support</a></li>
+                              {/*}
+                              // TODO font awesome in webpack :
+                              <li><a>Follow us 
+                                 <a alt="Github" href="https://github.com/pcu-consortium" target="_blank"><i class="fa fa-github fa-2x"></i></a>
+                                 <a alt="Twitter" href="https://twitter.com/PCUConsortium" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+                                 <a alt="Facebook" href="https://facebook.com/pcu-consortium" target="_blank"><i class="fa fa-facebook fa-2x"></i></a>
+                                 <a alt="Linkedin" href="https://www.linkedin.com/company/pcu-consortium" target="_blank"><i class="fa fa-linkedin fa-2x"></i></a>
+                                 <a alt="Slideshare" href="https://www.slideshare.net/pcuconsortium" target="_blank"><i class="fa fa-slideshare fa-2x"></i></a>
+                              </a></li>
+                              */}
+                              <li><a>© 2017 PCU Consortium</a></li>
                               </ul>
                         </div>
                   </div>
@@ -170,13 +180,14 @@ class SearchBar extends React.Component {
    }
    handleSearchText = () => {
       this.props.handleSearch({ query: { multi_match: { query: this.state.searchText, fields: [ "path.tree^0.5", "file.name", "meta.author", "meta.title", "fulltext^0.8" ] } },
-         highlight: { fields: { fulltext: { type: 'unified' } } } });
+         highlight: { fields: { fulltext: { } } } }); // unified highlighter is default, no need for type: 'unified'
    }
    onChangeSortFilter= (e) => {
       if(e.target.value === 'date') {
-            this.props.handleSearch({from: 0, size: 10, sort: [{'file.last_modified': 'desc'}]}, true);
+            this.props.handleSearch({from: 0, size: 10, sort: {'file.last_modified': 'desc'}}, true);
       } else if (e.target.value === 'relevance') {
-            this.props.handleSearch({from: 0, size: 10, sort: ['_score']}, true);
+            this.props.handleSearch({from: 0, size: 10, sort: {'_score': 'desc'}}, true);
+            // is default but has to be set in ordere to override previous one. NB. , merely sort: ['_score'] NO SUPPORTED by PCU ES API
       }
    }
    render() {
@@ -192,8 +203,8 @@ class SearchBar extends React.Component {
                         </div>
                         <div className="searchBar__bar">
                               <input placeholder="John Doe" onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"/>
-                              <button class="SearchBtn">
-                                    <img src="/img/loupe.svg" onClick={this.handleSearchText}/>
+                              <button class="SearchBtn" onClick={this.handleSearchText}>
+                                    <img src="/img/loupe.svg"/>
                               </button>
                               <button className={"cancelSearchBtn" +  (this.state.showClearButton ? ' show' : '')} onClick={this.clearField}>
                                     <img src="/img/suppr.svg" />
@@ -259,7 +270,7 @@ class ResultList extends React.Component {
       this.setState({ isLoadedContent: false});
    }
    handleBrowseToPath = (pathElts, depth) => {
-      this.props.handleSearch({ query: { term: { 'path.tree': '/' + pathElts.slice(0, depth + 1).join('/') } } }); // file.path.tree '/AkIesvz+/home/mardut/dev/pcu/workshop_elastic/kibana-5.2.2-linux-x86_64/README.txt'
+      this.props.handleSearch({ query: { terms: { 'path.tree': ['/' + pathElts.slice(0, depth + 1).join('/')] } } }); // file.path.tree '/AkIesvz+/home/mardut/dev/pcu/workshop_elastic/kibana-5.2.2-linux-x86_64/README.txt'
    }
    handleFindLater = (lastModified) => {
       this.props.handleSearch({ query: { range: { 'file.last_modified': { gt: lastModified } } } });
@@ -268,7 +279,7 @@ class ResultList extends React.Component {
       this.props.handleSearch({ query: { range: { 'content.length': { gt: length } } } });
    }
    handleFindSameHash = (hash) => {
-      this.props.handleSearch({ query: { term: { 'content.hash': hash } } });
+      this.props.handleSearch({ query: { terms: { 'content.hash': [hash] } } });
    }
    render() {
       return (
@@ -276,7 +287,8 @@ class ResultList extends React.Component {
                   <div className="results__colLeft">
 
                         <div className="resultsNumbers">
-                              Results {this.props.queryRequest.from + 1}-{this.props.queryRequest.from + this.props.queryRequest.size} of {this.props.hits.total}
+                              Results {this.props.queryRequest.from + 1}-{this.props.queryRequest.from + this.props.queryRequest.size} of {this.props.hits.total}.
+                              Search took {this.props.took}ms.
                         </div>
 
                         {
@@ -347,9 +359,9 @@ class ResultList extends React.Component {
                                     <div className="resultsItem__filtersMenu">
                                           <span title={hit._source.fulltext}>Text</span>
                                           &nbsp;-&nbsp;
-                                          <a href={'/file/api/content/' + hit._source.content.store_path}>Cached</a>
+                                          <a href={fileApiUrl + hit._source.content.store_path}>Cached</a>
                                           &nbsp;-&nbsp;
-                                          <span title={ "find file with same hash" + hit._source.content.hash } onClick={() => this.props.handleSearch({ query : { term: { 'content.hash': hit._source.content.hash } } })}>Same</span>
+                                          <span title={ "find file with same hash" + hit._source.content.hash } onClick={() => this.handleFindSameHash(hit._source.content.hash)}>Same</span>
                                           &nbsp;-&nbsp;
                                           <span title="find similar documents" onClick={() => this.props.handleSearch({ query : { more_like_this: { like: [{ _index: hit._index, _type: hit._type, _id: hit._id }] } } })}>Similar</span>
                                           &nbsp;

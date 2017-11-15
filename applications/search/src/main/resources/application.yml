@@ -1,2 +1,18 @@
-#spring:
+# (defaults are commented out)
+spring:
     #profiles.active: staging
+
+application:
+  #devmode: true
+  entreprisesearch:
+
+pcu:
+  search:
+    es:
+      client:
+         #address: http://localhost:9200/
+      #restLogFile: es-rest-mock.log
+      restLogFile: 
+  rest:
+    #failOnUnknownProperties: true
+    #enableIndenting: false
