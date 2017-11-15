@@ -3,7 +3,12 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import moment from 'moment';
-import '../style/style.css'
+
+// React Components
+import LoginOverlay from './components/login.js'
+
+// Stylesheets
+import '../style/main.css'
 
 var url = "http://localhost:9200/"
    
@@ -19,6 +24,8 @@ class SearchApp extends React.Component {
       this.state = {
             loading : false,
             loaded : true,
+            isActiveFooterMobile: false,
+            isActiveOverlay: false,
             queryRequest : { query: {}, from: 0, size: 10 },
             hits : { hits: [], total: 0 },
             took: 0
@@ -48,45 +55,90 @@ class SearchApp extends React.Component {
       var size = this.state.queryRequest.size;
       this.handleSearch({...this.state.queryRequest, from: this.state.queryRequest.from + size, size: size}, true);
    }
+   toggleModal = () => {
+      if(this.state.isActiveOverlay === true) {
+            this.setState({
+                  isActiveOverlay: false
+            });
+      } else if (this.state.isActiveOverlay === false) {
+            this.setState({
+                  isActiveOverlay: true
+            });
+      }
+   }
+   toggleFooter = () => {
+      if(this.state.isActiveFooterMobile === true) {
+            this.setState({
+                  isActiveFooterMobile: false
+            });
+      } else if (this.state.isActiveFooterMobile === false) {
+            this.setState({
+                  isActiveFooterMobile: true
+            });
+      }
+   }
    render = () => {
       return (
-            <div>
+            <div className="appWrapper">
             
-            <SearchBar handleSearch={this.handleSearch}/>
+            <LoginOverlay isActiveOverlay={this.state.isActiveOverlay} toggleModal={this.toggleModal} />
+
+            <SearchBar
+                  handleSearch={this.handleSearch}
+                  toggleModal={this.toggleModal} 
+                  isActiveFooterMobile={this.state.isActiveFooterMobile} 
+                  toggleFooter={this.toggleFooter} 
+            />
             
+            {/*
             Focus rather than browse / rollover browse mode (facets) / keep previous criteria
-            
+            */}
+
             { this.state.hits.total == 0 ? '' : (
             <div>
             
-            <div>
-            Results {this.state.queryRequest.from + 1}-{this.state.queryRequest.from + this.state.queryRequest.size} of {this.state.hits.total}
-            &nbsp;
-            for query {JSON.stringify(this.state.queryRequest.query, null, '\t')}.
-            Search took {this.state.took}ms. Sort by&nbsp;
-            <a title="sort by last modified date" onClick={() => this.handleSearch({from: 0, size: 10, sort: [{'file.last_modified': 'desc'}]}, true)}>date</a>
-            &nbsp;/&nbsp;
-            <a title="sort by score" onClick={() => this.handleSearch({from: 0, size: 10, sort: ['_score']}, true)}>relevance</a>
-            .
-            
+            {/*
+            <div className="resultsNumbers">
+                  Results {this.state.queryRequest.from + 1}-{this.state.queryRequest.from + this.state.queryRequest.size} of {this.state.hits.total}
+                  &nbsp;
+                  for query {JSON.stringify(this.state.queryRequest.query, null, '\t')}.
+                  Search took {this.state.took}ms. Sort by&nbsp;
+                  
+                  <div>
+                        <a title="sort by last modified date" onClick={() => this.handleSearch({from: 0, size: 10, sort: [{'file.last_modified': 'desc'}]}, true)}>date</a>
+                        &nbsp;/&nbsp;
+                        <a title="sort by score" onClick={() => this.handleSearch({from: 0, size: 10, sort: ['_score']}, true)}>relevance</a>
+                  </div>
             </div>
+            */}
 
             {  // && this.state.currentPage != 1
                (this.state.queryRequest.from != 0) ? (
-                     <div><span title="previous" onClick={() => this.handlePrevious()} style={{color:'blue'}}>&lt; ...</span></div>
+                     <div><span title="previous" onClick={() => this.handlePrevious()}>&lt; ...</span></div>
                ) : ''
             }
-            <ResultList hits={this.state.hits} handleSearch={this.handleSearch}/>
+            <ResultList hits={this.state.hits} handleSearch={this.handleSearch} queryRequest={this.state.queryRequest} />
             {
                (this.state.queryRequest.from + this.state.queryRequest.size < this.state.hits.total - 1) ? (
-                     <div><span title="next" onClick={() => this.handleNext()} style={{color:'blue'}}>... &gt;</span></div>
+                     <div style={{ display: 'none'}}><span title="next" onClick={() => this.handleNext()}>... &gt;</span></div>
                ) : ''
             }
 
             </div>
             ) }
-            
+
+                  <div className={"footer" + (this.state.isActiveFooterMobile ? ' show' : '')}>
+                        <div className="footer__wrapper">
+                              <ul className="footer__list">
+                              <li><a href="">PCU Consortium</a></li>
+                              <li><a href="">Documentation</a></li>
+                              <li><a href="">Support</a></li>
+                              </ul>
+                        </div>
+                  </div>
+
             </div>
+            
       );
    }
 }
@@ -95,25 +147,93 @@ class SearchBar extends React.Component {
    constructor(props) {
       super(props);
       this.state = {
-            searchText : ""
+            searchText : "",
+            showClearButton : false
       };
    }
    onSearchTextChange = (e) => {
       var searchText = e.target.value;
       this.setState((prevState) => ({...prevState, searchText:searchText })); // searchText:e.target.value KO !
       console.log("onSearchTextChange", this.state, e);
+      this.isFilled(e);
+   }
+   isFilled = (e) => {
+      if(e.target.value !== "") {
+            this.setState({ showClearButton: true});
+      }
+      else {
+            this.setState({ showClearButton: false});
+      }
+   }
+   clearField = () => {
+      this.refs.inputSearch.value = '';
    }
    handleSearchText = () => {
       this.props.handleSearch({ query: { multi_match: { query: this.state.searchText, fields: [ "path.tree^0.5", "file.name", "meta.author", "meta.title", "fulltext^0.8" ] } },
          highlight: { fields: { fulltext: { type: 'unified' } } } });
    }
+   onChangeSortFilter= (e) => {
+      if(e.target.value === 'date') {
+            this.props.handleSearch({from: 0, size: 10, sort: [{'file.last_modified': 'desc'}]}, true);
+      } else if (e.target.value === 'relevance') {
+            this.props.handleSearch({from: 0, size: 10, sort: ['_score']}, true);
+      }
+   }
    render() {
       return (
-            <div>
-            <input onChange={(e) => this.onSearchTextChange(e)}/>
-            &nbsp;
-            <span onClick={this.handleSearchText}>search</span>
-            &nbsp;- images - advanced - tips
+            <div className="searchBar">
+                  <div className="searchBar__wrapperSearch--large">
+                        <button className={"searchBar__toggleFooter" + (this.props.isActiveFooterMobile ? ' closeFooter' : ' openFooter')} onClick={this.props.toggleFooter}>
+                              <img src="/img/burger.svg" alt="Footer Menu" width="22" className="burger" />
+                              <img src="/img/white_suppr.svg" alt="Close Footer Menu" width="22" className="suppr" />
+                        </button>      
+                        <div className="searchBar__logo">
+                              <img src="/img/logo.png" alt="LOGO PCU" width="69" />
+                        </div>
+                        <div className="searchBar__bar">
+                              <input placeholder="John Doe" onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"/>
+                              <button class="SearchBtn">
+                                    <img src="/img/loupe.svg" onClick={this.handleSearchText}/>
+                              </button>
+                              <button className={"cancelSearchBtn" +  (this.state.showClearButton ? ' show' : '')} onClick={this.clearField}>
+                                    <img src="/img/suppr.svg" />
+                              </button>
+                        </div>
+                        <div className="searchBar__menuList">
+                              <ul>
+                                    <li><a href="">Overview</a></li>
+                                    <li><a href="">Use Cases</a></li>
+                                    <li><a href="">Resources</a></li>
+                                    <li><a href="">News</a></li>
+                                    <li><a href="">Community</a></li>
+                              </ul>
+                        </div>
+                        <div className="searchBar__loginArea">
+                              <button className="btnLogin" onClick={this.props.toggleModal}>
+                                    <img src="/img/login.svg" alt="LOG IN LOCK" width="17" height="21" />
+                                    LOG IN
+                              </button>
+                        </div>
+                  </div>      
+                  <div className="searchBar__searchFilter">
+                     <div className="searchBar__searchFilter__wrapper">   
+                       <ul>
+                              <li onClick={this.handleSearchText}>Search</li>
+                              <li>Images</li>
+                              <li>Advanced</li>
+                              <li>Tips</li>
+                        </ul>
+                        <div className="selectSortFilter__wrapper">
+                              <div>
+                              <select onClick={this.onChangeSortFilter} className="selectSortFilter">
+                                    <option style={{display: 'none'}} value='Sort By'>Sort By</option>
+                                    <option value='date'>Date</option>
+                                    <option value='relevance'>Relevance</option>
+                              </select>
+                              </div>
+                        </div>
+                     </div>    
+                  </div>
             </div>
       );
    }
@@ -123,11 +243,20 @@ class ResultList extends React.Component {
    constructor(props) {
       super(props);
       this.state = {
-            currentPage: 1
+            currentPage: 1,
+            isLoadedContent: false,
+            currentTitle: ''
           };
    }
    displayFileDetails = () => {
       console.log("displayFileDetails");
+   }
+   fileDetailsLoad = (title) => {
+      this.setState({ isLoadedContent: true} );
+      this.setState({ currentTitle: title})
+   }
+   fileDetailsClose = () => {
+      this.setState({ isLoadedContent: false});
    }
    handleBrowseToPath = (pathElts, depth) => {
       this.props.handleSearch({ query: { term: { 'path.tree': '/' + pathElts.slice(0, depth + 1).join('/') } } }); // file.path.tree '/AkIesvz+/home/mardut/dev/pcu/workshop_elastic/kibana-5.2.2-linux-x86_64/README.txt'
@@ -143,96 +272,116 @@ class ResultList extends React.Component {
    }
    render() {
       return (
-            <div>
-            {
-               this.props.hits.hits.map(function(hit, hitInd) {
-                  var path = hit._source.path;
-                  var pathElts = path.substring(1).split('/'); // remove root / first
-                  var hostPathElt = pathElts[0];
-                  var filePathElt = pathElts[pathElts.length - 1];
-                  var pathSpan = pathElts.slice(1, -1).map(function(pathElt, pathEltInd) { // remove then special cases (host & file)
-                     return (
-                        <span key={pathEltInd}>/<span title="browse to path" onClick={() => this.handleBrowseToPath(pathElts, pathEltInd + 1)} style={{color:'blue'}}>{pathElt}</span></span>
-                     );
-                  }.bind(this));
-                  
-                  var title = hit._source.meta.title ? hit._source.meta.title : filePathElt;
-                  // or any other metas, including for dir : Index of x Name Last modified Size Parent [DIR]
-                  
-                  var lastModifiedMoment = moment(hit._source.file.last_modified); // "2011-04-11T10:20:30Z" "2016-10-01T15:29:45.000+0000"
-                  
-                  return (
-                     <div key={hitInd}>
-                     
-                     <div>
-                     [{t[hit._source.http.mimetype]}]
-                     &nbsp;
-                     <a href={hit._source.http.url} title={JSON.stringify(hit, null, '\t')}>{title}</a>
-                     </div>
-                     
-                     <div>
-                     { hit.highlight ? hit.highlight.fulltext.map(function(hl, hlInd) {
-                        var res = [];
-                        var emInd = 0;
-                        var endEmInd;
-                        while ((emInd = hl.indexOf('<em>', emInd)) != -1) {
-                           res.push({ text: hl.substring(endEmInd, emInd) });
-                           endEmInd = hl.indexOf('</em>', emInd)
-                           res.push({ hl:true, text: hl.substring(emInd + 4, endEmInd) });
-                           emInd = endEmInd + 5;
-                           endEmInd = emInd;
+            <div className="results">
+                  <div className="results__colLeft">
+
+                        <div className="resultsNumbers">
+                              Results {this.props.queryRequest.from + 1}-{this.props.queryRequest.from + this.props.queryRequest.size} of {this.props.hits.total}
+                        </div>
+
+                        {
+                        this.props.hits.hits.map(function(hit, hitInd) {
+                              var path = hit._source.path;
+                              var pathElts = path.substring(1).split('/'); // remove root / first
+                              var hostPathElt = pathElts[0];
+                              var filePathElt = pathElts[pathElts.length - 1];
+                              var pathSpan = pathElts.slice(1, -1).map(function(pathElt, pathEltInd) { // remove then special cases (host & file)
+                              return (
+                                    <span key={pathEltInd}>/<span title="browse to path" onClick={() => this.handleBrowseToPath(pathElts, pathEltInd + 1)}>{pathElt}</span></span>
+                              );
+                              }.bind(this));
+                              
+                              var title = hit._source.meta.title ? hit._source.meta.title : filePathElt;
+                              // or any other metas, including for dir : Index of x Name Last modified Size Parent [DIR]
+                              
+                              var lastModifiedMoment = moment(hit._source.file.last_modified); // "2011-04-11T10:20:30Z" "2016-10-01T15:29:45.000+0000"
+                              
+                              return (
+                                    <div className="resultsItem" key={hitInd}>
+                                    
+                                    <div className="resultsItem__title">
+                                    [{t[hit._source.http.mimetype]}]
+                                    &nbsp;
+                                    <a href={hit._source.http.url} title={JSON.stringify(hit, null, '\t')}>{title}</a>
+                                    </div>
+                                    
+                                    <div className="resultsItem__description" onClick={() => this.fileDetailsLoad(title)}>
+                                    { hit.highlight ? hit.highlight.fulltext.map(function(hl, hlInd) {
+                                          var res = [];
+                                          var emInd = 0;
+                                          var endEmInd;
+                                          while ((emInd = hl.indexOf('<em>', emInd)) != -1) {
+                                          res.push({ text: hl.substring(endEmInd, emInd) });
+                                          endEmInd = hl.indexOf('</em>', emInd)
+                                          res.push({ hl:true, text: hl.substring(emInd + 4, endEmInd) });
+                                          emInd = endEmInd + 5;
+                                          endEmInd = emInd;
+                                          }
+                                          if (endEmInd < hl.length - 1) { // highlight line did not end by a stressed part
+                                          res.push({ text: hl.substring(endEmInd, hl.length) });
+                                          res.push({ text: '... ' });
+                                          } else if (hlInd < hit.highlight.fulltext.length - 1) { // not the last highlight line
+                                          res.push({ text: '... ' });
+                                          }
+                                          return res;
+                                    }).map(function(hloa) { return hloa.map(function(hlo) {
+                                          return hlo.hl ? (
+                                          <span>{hlo.text}</span>
+                                          ) : hlo.text;
+                                    }) }) : hit._source.fulltext ? (
+                                          <span>{hit._source.fulltext.substring(0, 512)}</span>
+                                    ) : (
+                                          a
+                                    ) }
+                                    </div>
+                                    
+                                    <div className="resultsItem__extraInformations">    
+                                          <span>/<span title={hostPathElt} onClick={() => this.handleBrowseToPath(pathElts, 0)}>{hit._source.readable_host}</span></span>
+                                          {pathSpan}
+                                          <span>/<span onClick={() => this.displayFileDetails()} title={JSON.stringify(hit, null, '\t')}>{filePathElt}</span></span>
+                                          &nbsp;-&nbsp;
+                                          <span title="find bigger file" onClick={() => this.handleFindBigger(hit._source.content.length)}>{hit._source.content.length} octet</span>
+                                          &nbsp;-&nbsp;
+                                          <span className="resultsItem__date" title={"find modified after " + lastModifiedMoment.format("LLL")} onClick={() => this.handleFindLater(hit._source.file.last_modified)}>{lastModifiedMoment.fromNow()}</span>
+                                    </div>
+                                    <div className="resultsItem__filtersMenu">
+                                          <span title={hit._source.fulltext}>Text</span>
+                                          &nbsp;-&nbsp;
+                                          <a href={'/file/api/content/' + hit._source.content.store_path}>Cached</a>
+                                          &nbsp;-&nbsp;
+                                          <span title={ "find file with same hash" + hit._source.content.hash } onClick={() => this.props.handleSearch({ query : { term: { 'content.hash': hit._source.content.hash } } })}>Same</span>
+                                          &nbsp;-&nbsp;
+                                          <span title="find similar documents" onClick={() => this.props.handleSearch({ query : { more_like_this: { like: [{ _index: hit._index, _type: hit._type, _id: hit._id }] } } })}>Similar</span>
+                                          &nbsp;
+                                          ({hit._score})
+                                    </div>   
+                                    </div>
+                              );
+                        }.bind(this))
                         }
-                        if (endEmInd < hl.length - 1) { // highlight line did not end by a stressed part
-                           res.push({ text: hl.substring(endEmInd, hl.length) });
-                           res.push({ text: '... ' });
-                        } else if (hlInd < hit.highlight.fulltext.length - 1) { // not the last highlight line
-                           res.push({ text: '... ' });
-                        }
-                        return res;
-                     }).map(function(hloa) { return hloa.map(function(hlo) {
-                        return hlo.hl ? (
-                           <span style={{fontWeight: 'bold'}}>{hlo.text}</span>
-                        ) : hlo.text;
-                     }) }) : hit._source.fulltext ? (
-                           <span>{hit._source.fulltext.substring(0, 512)}</span>
-                     ) : (
-                           a
-                     ) }
-                     </div>
-                     
-                     <div>
-                     <span>/<span title={hostPathElt} onClick={() => this.handleBrowseToPath(pathElts, 0)} style={{color:'red'}}>{hit._source.readable_host}</span></span>
-                     {pathSpan}
-                     <span>/<span onClick={() => this.displayFileDetails()} title={JSON.stringify(hit, null, '\t')} style={{color:'blue'}}>{filePathElt}</span></span>
-                     
-                     &nbsp;-&nbsp;
-                     <span title="find bigger file" onClick={() => this.handleFindBigger(hit._source.content.length)}>{hit._source.content.length} o</span>
-                     &nbsp;-&nbsp;
-                     <span title={"find modified after " + lastModifiedMoment.format("LLL")} onClick={() => this.handleFindLater(hit._source.file.last_modified)}>{lastModifiedMoment.fromNow()}</span>
-                     &nbsp;-&nbsp;
-                     <span title={hit._source.fulltext} style={{color:'cyan'}}>Text</span>
-                     &nbsp;-&nbsp;
-                     <a href={'/file/api/content/' + hit._source.content.store_path}>Cached</a>
-                     &nbsp;-&nbsp;
-                     <span title={ "find file with same hash" + hit._source.content.hash } onClick={() => this.props.handleSearch({ query : { term: { 'content.hash': hit._source.content.hash } } })} style={{color:'cyan'}}>Same</span>
-                     &nbsp;-&nbsp;
-                     <span title="find similar documents" onClick={() => this.props.handleSearch({ query : { more_like_this: { like: [{ _index: hit._index, _type: hit._type, _id: hit._id }] } } })} style={{color:'cyan'}}>Similar</span>
-                     &nbsp;
-                     ({hit._score})
-                     </div>
-                     
-                     </div>
-                  );
-               }.bind(this))
-            }
+                  </div>
+                  <div className="results__colRight">
+                     <div className={"colRight__wrapper" +  (this.state.isLoadedContent ? ' show' : '')}>   
+                        <h3 className="document__title">{ this.state.currentTitle }</h3>
+                        <button className="closeDocumentBtn" onClick={() => this.fileDetailsClose()}>
+                              <img src="/img/suppr.svg" alt="Close Button" />
+                        </button>
+                        <div className="document__wrapper">
+                              <div className="document__content">
+                                    <img src="http://via.placeholder.com/400x520" alt="Document Content" />
+                              </div>
+                        </div>    
+                     </div>     
+                  </div>
             </div>
       );
    }
 }
+
 SearchBar.defaultProps = {
       results : []
 };
 
 ReactDOM.render(
       <SearchApp/>,
-      document.querySelector('.container'));
+      document.querySelector('.app'));
