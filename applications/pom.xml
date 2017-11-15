@@ -13,7 +13,7 @@
     <description>PCU Applications Parent POM</description>
 
     <modules>
-        <!-- module>search</module -->
+        <module>search</module>
         <!-- module>ecommerce</module -->
     </modules>
     
