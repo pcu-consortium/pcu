@@ -158,15 +158,22 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
 
    @Test
    public void testSimulateCrawlHome() {
+      // dataset :
+      simulateCrawlFolder(new File("/home/mardut/Documents/projets/pcu/WP7 search/dataset"));
+      // home :
       simulateCrawlFolder(new File(System.getProperty("user.home"))); // + File.separator + "Documents" // "/home/mardut/dev/pcu/workspace"
    }
    public void simulateCrawlFolder(File folder) {
       for (File file : folder.listFiles()) {
          if (file.isFile()) {
-            if (file.canRead() && file.getName().endsWith(".txt")) {
+            if (file.canRead()) {
                try {
                   System.err.println("crawling " + file.getAbsolutePath());
-                  simulateCrawl(file, IOUtils.toString(new FileInputStream(file), (Charset) null)); // null
+                  String content = null; // disables fulltext & checks
+                  if (file.getName().endsWith(".txt")) {
+                     content = IOUtils.toString(new FileInputStream(file), (Charset) null);
+                  }
+                  simulateCrawl(file, content); // null
                } catch (AssertionError e) {
                   // test fails but it still works
                } catch (Exception e) {
@@ -196,6 +203,12 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       }
       simulateCrawl(testFile, testContent);
    }
+   /**
+    * 
+    * @param testFile
+    * @param testContent null disables fulltext & checks
+    * @throws Exception
+    */
    public void simulateCrawl(File testFile, String testContent) throws Exception {
       // init crawler :
       String store = "fileCrawlerStore"; // TODO manage
@@ -224,6 +237,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       }
       // and check :
       InputStream testFileInRes = fileApi.getContent(store, fileRes.getPath());
+      if (testContent != null)
       assertEquals(testContent, IOUtils.toString(testFileInRes, (Charset) null));
       
       // 2. index crawled metadata :
@@ -295,6 +309,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // description, created, print_date, metadata_date, latitude, longitude, altitude, rating, comments ?!
       // TODO dynamic field mappings for ex. "xmpDM:audioCompressor" : "MP3" => or could be enabled by Link scripts called by a top script or yaml gotten from server : zookeeper (tree nodes & listen, but small), ES, git (but no ACL) ?! for now mere content tree API
 
+      if (testContent != null)
       pcuDoc.getProperties().put("fulltext", testContent); // parsed client-side by tika in connector crawler ; below top, meta, content ?? => could be too big ex. dictionary, which lucene can handle but probably not ES
       // OPT properties : alternatively parsed JSON (& XML) as nested complex objects ? => OR fulltext for each page in order to known which one, or for each successive language, or one fulltext_fr/en field by language, in addition to mere ascii fulltext
       
@@ -321,6 +336,7 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       // get content :
       String[] storePath = ((String) pcuDoc.getByPath("content.store_path")).split("/", 2);
       InputStream foundContent = fileApi.getContent(storePath[0], storePath[1]);
+      if (testContent != null)
       assertEquals(testContent, IOUtils.toString(foundContent, (Charset) null));
       
       // TODO test versionS & optimistic locking
@@ -400,12 +416,14 @@ public class PcuSearchApiServerImplTest /*extends PcuSearchApiClientTest */{
       try (FileInputStream testFileIn = new FileInputStream(testFile)) {
          fileRes = fileApi.appendContent(store, globalFilePath, null, testFileIn);
       }
+      if (testContent != null)
       assertEquals(testContent, IOUtils.toString(fileApi.getContent(store, fileRes.getPath()), (Charset) null));
       // and index meta :
       content.put("store_path", fileRes.getPath());
       indexRes = searchApi.index(index, pcuDoc);
       // then, actual append (using random access) :
       fileRes = fileApi.appendContent(store, fileRes.getPath(), testFile.length(), new ByteArrayInputStream(testAppendContent.getBytes()));
+      if (testContent != null)
       assertEquals(testContent + testAppendContent, IOUtils.toString(fileApi.getContent(store, fileRes.getPath()), (Charset) null));
       // NB. don't index metas anymore, or ONLY WHAT DOESN'T CHANGE, besides that at most length or modified MIGHT be updated using (even batch ?) event system
       

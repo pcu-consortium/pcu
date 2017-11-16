@@ -179,8 +179,10 @@ class SearchBar extends React.Component {
       this.refs.inputSearch.value = '';
    }
    handleSearchText = () => {
-      this.props.handleSearch({ query: { multi_match: { query: this.state.searchText, fields: [ "path.tree^0.5", "file.name", "meta.author", "meta.title", "fulltext^0.8" ] } },
-         highlight: { fields: { fulltext: { } } } }); // unified highlighter is default, no need for type: 'unified'
+      this.props.handleSearch({ query: { bool: { should: [
+         { multi_match: { query: this.state.searchText, fields: [ "path.tree^0.5", "file.name", "meta.author", "meta.title", "fulltext^0.8" ] } }, // analyzed
+         { terms: { "path.tree^0.5": [this.state.searchText] } } // not analyzed TODO NOO better
+         ] } }, highlight: { fields: { fulltext: { } } } }); // unified highlighter is default, no need for type: 'unified'
    }
    onChangeSortFilter= (e) => {
       if(e.target.value === 'date') {
@@ -336,14 +338,12 @@ class ResultList extends React.Component {
                                           res.push({ text: '... ' });
                                           }
                                           return res;
-                                    }).map(function(hloa) { return hloa.map(function(hlo) {
+                                    }).map(function(hloa) { return hloa.map(function(hlo, hloInd) {
                                           return hlo.hl ? (
-                                          <span>{hlo.text}</span>
+                                          <span style={{fontWeight: 'bold'}} key={hloInd}>{hlo.text}</span>
                                           ) : hlo.text;
-                                    }) }) : hit._source.fulltext ? (
-                                          <span>{hit._source.fulltext.substring(0, 512)}</span>
-                                    ) : (
-                                          a
+                                    }) }) : (
+                                          <span>{hit._source.fulltext ? hit._source.fulltext.substring(0, 512) : ''}</span>
                                     ) }
                                     </div>
                                     
@@ -357,7 +357,7 @@ class ResultList extends React.Component {
                                           <span className="resultsItem__date" title={"find modified after " + lastModifiedMoment.format("LLL")} onClick={() => this.handleFindLater(hit._source.file.last_modified)}>{lastModifiedMoment.fromNow()}</span>
                                     </div>
                                     <div className="resultsItem__filtersMenu">
-                                          <span title={hit._source.fulltext}>Text</span>
+                                          <span title={hit._source.fulltext ? hit._source.fulltext : ''}>Text</span>
                                           &nbsp;-&nbsp;
                                           <a href={fileApiUrl + hit._source.content.store_path}>Cached</a>
                                           &nbsp;-&nbsp;
