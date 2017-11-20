@@ -2,6 +2,7 @@ package org.pcu.search.elasticsearch.api.query;
 
 import org.pcu.search.elasticsearch.api.query.clause.bool;
 import org.pcu.search.elasticsearch.api.query.clause.function_score;
+import org.pcu.search.elasticsearch.api.query.clause.more_like_this;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
 import org.pcu.search.elasticsearch.api.query.clause.prefix;
 import org.pcu.search.elasticsearch.api.query.clause.query_string;
@@ -26,7 +27,7 @@ import io.swagger.annotations.ApiModel;
         subTypes={
             bool.class,
             multi_match.class,
-            terms.class })
+            terms.class }) // TODO subtypes don't appear in swagger UI (but appears in swagger.json)
 @JsonTypeInfo(include=As.WRAPPER_OBJECT, use=Id.NAME)
 @JsonSubTypes({
    @JsonSubTypes.Type(value = bool.class),
@@ -34,6 +35,7 @@ import io.swagger.annotations.ApiModel;
    @JsonSubTypes.Type(value = terms.class),
    @JsonSubTypes.Type(value = range.class),
    @JsonSubTypes.Type(value = prefix.class),
+   @JsonSubTypes.Type(value = more_like_this.class),
    @JsonSubTypes.Type(value = query_string.class),
    @JsonSubTypes.Type(value = script.class),
    @JsonSubTypes.Type(value = function_score.class)

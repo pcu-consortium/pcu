@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.GetResult;
+import org.pcu.search.elasticsearch.api.QueryDocument;
 import org.pcu.search.elasticsearch.api.mapping.Analysis;
 import org.pcu.search.elasticsearch.api.mapping.Analyzer;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
@@ -41,6 +43,7 @@ import org.pcu.search.elasticsearch.api.query.clause.FieldValueFactorFunctionSco
 import org.pcu.search.elasticsearch.api.query.clause.FunctionScoreFilter;
 import org.pcu.search.elasticsearch.api.query.clause.bool;
 import org.pcu.search.elasticsearch.api.query.clause.function_score;
+import org.pcu.search.elasticsearch.api.query.clause.more_like_this;
 import org.pcu.search.elasticsearch.api.query.clause.multi_match;
 import org.pcu.search.elasticsearch.api.query.clause.query_string;
 import org.pcu.search.elasticsearch.api.query.clause.script;
@@ -83,15 +86,17 @@ public class PcuElasticSearchApiClientTest {
    @Autowired
    protected ElasticSearchClientApi es;
 
-   protected String index = "files";
+   protected String index = "files" + "_test"; // TODO ? + "_ElasticSearchApi"; // to avoid polluting (production) db
+   protected String type = "file";
    protected String docId;
    
    
    protected PutMappingResult cleanAndSetupIndex(String index, IndexMapping indexMapping) throws ESApiException {
       // clean :
       try {
-         es.deleteMapping(index); // TODO deleteIndex
+         es.deleteMapping(index);
       } catch(ESApiException esex) {
+         assertTrue(esex.getAsJson().contains("index_not_found_exception"));
          LOGGER.info("There was no need to cleanup before testing");
          //String msg = IOUtils.toString((InputStream) waex.getResponse().getEntity());
          //msg.toString();
@@ -372,7 +377,7 @@ public class PcuElasticSearchApiClientTest {
       queryMessage.setQuery(multiMatch);
       multiMatch.setQuery("file");
       multiMatch.setFields(Arrays.asList("name", "protocol"));
-      SearchResult searchRes = es.search(queryMessage , null, null);
+      SearchResult searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertNotNull(searchRes);
       assertNotNull(searchRes.getHits());
       assertEquals(1, searchRes.getHits().getTotal());
@@ -383,40 +388,40 @@ public class PcuElasticSearchApiClientTest {
 
       // file name letter tokenizing thanks to word_delimiter :
       multiMatch.setQuery("cv_johndoe.doc");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("cv_johndoe");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("johndoe"); // thanks to word_delimiter
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setFields(Arrays.asList("name_default"));
       multiMatch.setQuery("cv_johndoe.doc");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("cv_johndoe");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal()); // no word_delimiter
       
       // no asciifolding (yet) :
       multiMatch.setQuery("johndôe"); // thanks to word_delimiter
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
 
       // stopwords (TODO rm, rather through TF/IDF) :
       multiMatch.setFields(Arrays.asList("content.content"));
       multiMatch.setQuery("and");
       //multiMatch.setQuery("et"); // TODO fr
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal()); // and et stopword
 
       // no stemming (?) :
       multiMatch.setQuery("experiences");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       multiMatch.setQuery("experience");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
       
       // terms :
@@ -424,41 +429,41 @@ public class PcuElasticSearchApiClientTest {
       terms.setFieldToTermListOrLookupMap(new LinkedHashMap<>());
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("phone"));
       queryMessage.setQuery(terms);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // shingles :
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("i phone"));
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       terms.getFieldToTermListOrLookupMap().put("content.content", Arrays.asList("i developer"));
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
 
       // number :
       terms.getFieldToTermListOrLookupMap().clear();
       terms.getFieldToTermListOrLookupMap().put("content.length", Arrays.asList(1234123));
       queryMessage.setQuery(terms);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // french :
       multiMatch.setFields(Arrays.asList("content.content_fr"));
       multiMatch.setQuery("expériences");
       queryMessage.setQuery(multiMatch);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       // french stemming :
       multiMatch.setQuery("expérience");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       // french elision :
       multiMatch.setQuery("l");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
       // french stopwords :
       multiMatch.setQuery("et");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
 
       // bool - must / AND :
@@ -469,14 +474,14 @@ public class PcuElasticSearchApiClientTest {
       multiMatch2.setQuery("smartphone");
       multiMatch2.setFields(Arrays.asList("content.content"));
       bool.setMust(Arrays.asList(multiMatch, multiMatch2));
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(0, searchRes.getHits().getTotal());
       
       // query-time synonyms (manual, not ES', still requires dict, & for acronyms), bool should / OR, boost :
       bool.setMust(null);
       bool.setShould(Arrays.asList(multiMatch, multiMatch2));
       //bool.setBoost(boost);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // TODO on path (prefix & keyword), see PcuSearchApiServerImplTest
@@ -485,18 +490,18 @@ public class PcuElasticSearchApiClientTest {
       query_string nativeQuery = new query_string();
       queryMessage.setQuery(nativeQuery);
       nativeQuery.setQuery("+content.content:\"i phone\"^2");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       
       // explain :
       queryMessage.setExplain(true);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertTrue(searchRes.getHits().getHits().get(0).get_explanation().toString().contains("description"));
       queryMessage.setExplain(false);
       
       // filter_path :
-      searchRes = es.search(queryMessage , null, null, "took, hits.hits._id");
+      searchRes = es.searchInType(index, type, queryMessage, null, null, "took, hits.hits._id");
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertNull(searchRes.getHits().getHits().get(0).get_index());
       
@@ -516,7 +521,7 @@ public class PcuElasticSearchApiClientTest {
       function_score.setScript_score(esScript);
       esScriptScript.setInline("Math.log(2 + doc['content.length'].value)");
       float previousScore = searchRes.getHits().getHits().get(0).get_score();
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertNotEquals(previousScore, searchRes.getHits().getHits().get(0).get_score());
       
@@ -538,7 +543,7 @@ public class PcuElasticSearchApiClientTest {
       decayFunctionScoreField.setOrigin("0");
       decayFunctionScoreField.setScale("20");
       previousScore = searchRes.getHits().getHits().get(0).get_score();
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertNotEquals(previousScore, searchRes.getHits().getHits().get(0).get_score());
       
@@ -548,7 +553,7 @@ public class PcuElasticSearchApiClientTest {
       esScriptScript.getParams().put("multiplier", 2);
       queryMessage.setScript_fields(new LinkedHashMap<>());
       queryMessage.getScript_fields().put("content.length_doubled", esScript);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertNull(searchRes.getHits().getHits().get(0).get_source());
       assertEquals(Arrays.asList(2468246), // TODO Q why list ?
@@ -559,13 +564,13 @@ public class PcuElasticSearchApiClientTest {
       script script = new script();
       queryMessage.setQuery(script);
       script.setScript(esScriptScript);
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       hit = searchRes.getHits().getHits().get(0);
       assertEquals(docId, hit.get_id());
       
       // error (script) :
       esScriptScript.setInline("doc['nofield'].value * params.multiplier");
-      searchRes = es.search(queryMessage , null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertTrue(searchRes.get_shards().getFailures().get(0).getReason().getCaused_by().getReason().contains("No field found"));
       
       // highlight :
@@ -575,7 +580,7 @@ public class PcuElasticSearchApiClientTest {
       HighlightParameters contentContentHighlightParameters = new HighlightParameters();
       highlight.getFields().put("content.content", contentContentHighlightParameters);
       queryMessage.setHighlight(highlight);
-      searchRes = es.search(queryMessage, null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       //assertTrue(searchRes.getHits().getHits().get(0)
       //      .getHighlight().get("content.content").get(0).toLowerCase().contains("phone")); // NOO none TODO Q why ???
@@ -589,10 +594,42 @@ public class PcuElasticSearchApiClientTest {
       rescore.getQuery().setRescore_query(bool);
       rescore.getQuery().setQuery_weight(0.7f);
       rescore.getQuery().setRescore_query_weight(0.7f);
-      searchRes = es.search(queryMessage, null, null);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
       assertEquals(docId, searchRes.getHits().getHits().get(0).get_id());
       assertTrue(searchRes.getHits().getHits().get(0)
             .getHighlight().get("content.content").get(0).toLowerCase().contains("phone"));
+
+      // similar (more like this) :
+      String type = "file";
+      queryMessage = new ESQueryMessage(); // removes highlighting & rescore
+      more_like_this more_like_this = new more_like_this();
+      List<QueryDocument> like = new ArrayList<QueryDocument>();
+      more_like_this.setMin_doc_freq(1); // else not found in only 1 (another) indexed doc (unless indexing 30 docs)
+      more_like_this.setMin_term_freq(1); // else not found in only 1 (another) indexed doc (unless indexing 30 docs)
+      more_like_this.setLike(like);
+      more_like_this.setFields(new ArrayList<String>(3));
+      more_like_this.getFields().add("content.content");
+      QueryDocument likeQueryDocument = new QueryDocument();
+      like.add(likeQueryDocument);
+      likeQueryDocument.set_index(index);
+      likeQueryDocument.set_type(type);
+      likeQueryDocument.set_id(docId);
+      queryMessage.setQuery(more_like_this);
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
+      assertEquals("there should be no other document like this one because the index only contains this one", 0, searchRes.getHits().getTotal());
+      
+      // with another, similar doc having been indexed :
+      ///for (int i = 0; i < 5 ; i++) { // only 10 returns none, 30 returns up to 28 !?!
+      String id = new UUID().toString(); // best lucene id http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html
+      Document doc = es.searchInType(index, type, new ESQueryMessage(), null, null).getHits().getHits().get(0).get_source();
+      IndexResult indexRes = es.indexDocument(index, type, id, doc, null, null, null, null, null, null, "wait_for"); // refresh=wait_for else not found,
+      // because indexing is not synchronous (BUT works elsewhere) https://github.com/elastic/elasticsearch/pull/17986
+      assertNotNull(indexRes);
+      assertEquals(id, indexRes.get_id());
+      ///}
+      searchRes = es.searchInType(index, type, queryMessage, null, null);
+      assertNotEquals(0, searchRes.getHits().getTotal());
+      assertEquals(id, searchRes.getHits().getHits().get(0).get_id());
    }
    
 }

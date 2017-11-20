@@ -16,6 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+
+/**
+ * Used to provide (index, but also more_like_this & term vectors's "artificial" documents) or get (query hit) documents.
+ * @author mardut
+ *
+ */
 @ApiModel(value = "A PCU search Document")
 @JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class Document {

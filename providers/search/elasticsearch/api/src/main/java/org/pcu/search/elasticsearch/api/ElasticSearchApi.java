@@ -122,7 +122,7 @@ public interface ElasticSearchApi {
          @QueryParam("version") Long version, @QueryParam("version_type") String version_type, // internal (> 0 !), external & external_gte do not support versioning, use index API instead (force is deprecated) https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
          @ApiParam(value = "create, or _create path param", required = false) @QueryParam("op_type") String op_type,
          @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException; // enum https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException; // enum https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
    @ApiOperation("same as PUT /{index}/{type}/id with id generation")
    @Path("/{index}/{type}")
    @PUT

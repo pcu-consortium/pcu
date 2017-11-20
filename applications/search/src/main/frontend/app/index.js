@@ -283,6 +283,10 @@ class ResultList extends React.Component {
    handleFindSameHash = (hash) => {
       this.props.handleSearch({ query: { terms: { 'content.hash': [hash] } } });
    }
+   handleFindSimilar = (hit) => {
+      this.props.handleSearch({ query : { more_like_this: { fields : ["fulltext"], // way faster than on all fields (default)
+         like: [{ _index: hit._index, _type: hit._type, _id: hit._id }] } } });
+   }
    render() {
       return (
             <div className="results">
@@ -363,7 +367,7 @@ class ResultList extends React.Component {
                                           &nbsp;-&nbsp;
                                           <span title={ "find file with same hash" + hit._source.content.hash } onClick={() => this.handleFindSameHash(hit._source.content.hash)}>Same</span>
                                           &nbsp;-&nbsp;
-                                          <span title="find similar documents" onClick={() => this.props.handleSearch({ query : { more_like_this: { like: [{ _index: hit._index, _type: hit._type, _id: hit._id }] } } })}>Similar</span>
+                                          <span title="find similar documents" onClick={() => this.handleFindSimilar(hit)}>Similar</span>
                                           &nbsp;
                                           ({hit._score})
                                     </div>   
