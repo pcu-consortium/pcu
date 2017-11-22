@@ -8,6 +8,8 @@ https://github.com/pcu-consortium/pcu
 
 Copyright (c) 2017 The PCU Consortium
 
+[![Build Status](https://travis-ci.org/pcu-consortium/pcu.svg?branch=master)](https://travis-ci.org/pcu-consortium/pcu) [![Project Stats](https://www.openhub.net/p/pcu-consortium-pcu/widgets/project_thin_badge.gif)](https://www.openhub.net/p/pcu-consortium-pcu)
+
 =====================================================
 
 
