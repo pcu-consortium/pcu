@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - openjdk6
+  - openjdk8
 services:
   - elasticsearch
 # does not support 5.5.x, so see https://docs.travis-ci.com/user/database-setup/#ElasticSearch https://www.peterbe.com/plog/elasticsearch-5-in-travis-ci
