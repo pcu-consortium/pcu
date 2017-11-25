@@ -11,6 +11,37 @@
     <name>PCU Providers Metadata SPI Extractor Implementation</name>
     <description>PCU Providers Metadata SPI Extractor Implementation</description>
 
+    <!-- Dependencies conflict management for Qwazr -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.qwazr</groupId>
+                <artifactId>qwazr-bom</artifactId>
+                <version>1.4.0-SNAPSHOT</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- The Qwazr branch 1.4.x is in the snapshot repo -->
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <properties>
+        <qwazr.version>1.4.0-SNAPSHOT</qwazr.version>
+    </properties>
+
     <dependencies>
 
         <!-- PCU -->
@@ -21,7 +52,59 @@
         <dependency>
             <groupId>com.qwazr</groupId>
             <artifactId>qwazr-extractor</artifactId><!-- or only test ? -->
-            <version>1.3.0</version>
+            <version>${qwazr.version}</version>
+        </dependency>
+
+        <!-- File extraction codecs -->
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-audio</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-csv</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-email</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-html</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-markdown</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-odf</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-pdfbox</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-poi</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-rss</artifactId>
+            <version>${qwazr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-library-tess4j</artifactId>
+            <version>${qwazr.version}</version>
         </dependency>
 
         <!-- tests -->
