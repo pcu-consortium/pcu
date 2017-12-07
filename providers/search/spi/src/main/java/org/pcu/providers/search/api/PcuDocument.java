@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModel;
 @ApiModel(value = "A PCU data document")
 //@JsonAutoDetect(fieldVisibility = Visibility.NONE) // , getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE
 public class PcuDocument {
-
+   
    /** mandatory in PCU */
    private String type;
    /** mandatory in PCU (create in client connector using TODO) */
@@ -94,19 +94,44 @@ public class PcuDocument {
       String[] pathNames = path.split("\\."); // TODO better using indexOf()
       return getMapByPath(pathNames, pathNames.length - 1).get(pathNames[pathNames.length - 1]);
    }
-   /** set by JSON path (dotted), doesn't work with List */
+   /** set by JSON path (dotted), if null removes existing value, doesn't work with List */
    @JsonIgnore
    public Object setByPath(String path,  Object value) {
+      return setByPath(path, value, false);
+   }
+   /** set by JSON path (dotted), if null removes existing value unless evenIfNull (which sets null value), doesn't work with List */
+   @JsonIgnore
+   public Object setByPath(String path,  Object value, boolean evenIfNull) {
       String[] pathNames = path.split("\\."); // TODO better using indexOf()
-      return getMapByPath(pathNames, pathNames.length - 1).put(pathNames[pathNames.length - 1], value);
+      LinkedHashMap<String, Object> map = getMapByPath(pathNames, pathNames.length - 1);
+      String name = pathNames[pathNames.length - 1];
+      if (!evenIfNull && value == null) {
+         if (map.containsKey(name)) {
+            return map.remove(name);
+         } else {
+            return null;
+         }
+      }
+      return map.put(name, value);
    }
    @SuppressWarnings("unchecked")
    @JsonIgnore
    public LinkedHashMap<String,Object> getMapByPath(String[] pathNames, int depth) {
       LinkedHashMap<String, Object> map = properties;
       for (int i = 0; i < depth; i++) {
-         map = (LinkedHashMap<String, Object>) map.get(pathNames[i]);
+         LinkedHashMap<String, Object> submap = (LinkedHashMap<String, Object>) map.get(pathNames[i]);
+         if (submap == null) {
+            submap = new LinkedHashMap<String, Object>();
+            map.put(pathNames[i], submap);
+         }
+         map = submap;
       }
+      return map;
+   }
+   @JsonIgnore
+   public LinkedHashMap<String,Object> getMapByPath(String path) {
+      String[] pathNames = path.split("\\."); // TODO better using indexOf()
+      LinkedHashMap<String, Object> map = getMapByPath(pathNames, pathNames.length);
       return map;
    }
    /*public String getRaw() {
