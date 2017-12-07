@@ -19,12 +19,13 @@ var searchUrl = pcuUrl + 'search/esapi/'; // on PCU's ElasticSearch-like API imp
 //var searchUrl = 'http://localhost:45665/search/elasticsearch'; // on mock default random port
 var searchFileUrl = searchUrl + 'files/file/_search'; 
 var fileApiUrl = pcuUrl + 'file/api/content/';
-   
-var t = {
-   'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'DOC'
-}
+
 var locale = window.navigator.userLanguage || window.navigator.language;
 moment.locale(locale); // 'fr_FR'
+var t = {
+   'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'DOC',
+   'application/pdf' : 'PDF',
+}
 
 class SearchApp extends React.Component {
    constructor(props) {
@@ -314,13 +315,23 @@ class ResultList extends React.Component {
                               
                               var lastModifiedMoment = moment(hit._source.file.last_modified); // "2011-04-11T10:20:30Z" "2016-10-01T15:29:45.000+0000"
                               
+                              var fileExtension = filePathElt.substring(filePathElt.lastIndexOf('.') + 1, filePathElt.length);
+                              var mimetype = fileExtension;
+                              var displayedMimetype = fileExtension;
+                              if (hit._source.http && hit._source.http.mimetype) {
+                                 mimetype = hit._source.http.mimetype;
+                                 if (t[mimetype]) {
+                                    displayedMimetype = t[mimetype];
+                                 }
+                              }
+                              
                               return (
                                     <div className="resultsItem" key={hitInd}>
                                     
                                     <div className="resultsItem__title">
-                                    [{t[hit._source.http.mimetype]}]
+                                    [<span title={mimetype}>{displayedMimetype}</span>]
                                     &nbsp;
-                                    <a href={hit._source.http.url} title={JSON.stringify(hit, null, '\t')}>{title}</a>
+                                    <a href={hit._source.http && hit._source.http.url ? hit._source.http.url : ''} title={JSON.stringify(hit, null, '\t')}>{title}</a>
                                     </div>
                                     
                                     <div className="resultsItem__description" onClick={() => this.fileDetailsLoad(title)}>
