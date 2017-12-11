@@ -51,10 +51,14 @@ Roadmap : TODO
 # Quickstart
 
 ## Clone sources
+````bash
 git clone git@github.com:pcu-consortium/pcu.git
+````
 
 ## Build
+````bash
 mvn clean install
+````
 
 ## Test
 The easiest way to test the PCU platform is to use it as an Entreprise Search server :
@@ -74,16 +78,14 @@ then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=ht
 
 # Developers
 
-## REST  & JAXRS best practices
+## Faster build
 
-- no 2 operations with same path, rather provide suppl helper operations in ElasticSearchClientApi,
-else JAXRS can't differentiate them :
-nov. 15, 2017 1:33:22 PM org.apache.cxf.jaxrs.model.OperationResourceInfoComparator compare
-AVERTISSEMENT: Both org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType
-and org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType are equal candidates
-for handling the current request which can lead to unpredictable results
+To achieve a faster build, you can skip tests, stay offline (provided all dependencies have already been installed in a previous build) and skip installing node & npm & npm packages (provided they've already been in a previous build hand have not changed since) :
+````bash
+mvn clean install -o -DskipTests -DskipNpm
+````
 
-## frontend
+## Frontend
 
 Hot deploy (of js changes) should work out of the box. Otherwise, rather use the proxy :
 ````bash
@@ -97,6 +99,15 @@ If compilation fails overall, recheck compilation without restarting with :
 cd src/main/frontend
 ./node_modules/webpack/bin/webpack.js
 ````
+
+## REST  & JAXRS best practices
+
+- no 2 operations with same path, rather provide suppl helper operations in ElasticSearchClientApi,
+else JAXRS can't differentiate them :
+nov. 15, 2017 1:33:22 PM org.apache.cxf.jaxrs.model.OperationResourceInfoComparator compare
+AVERTISSEMENT: Both org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType
+and org.pcu.providers.search.elasticsearch.spi.ESSearchProviderEsApiServerImpl#searchInType are equal candidates
+for handling the current request which can lead to unpredictable results
 
 ### React.js best practices
 - built using babel (provides jsx compilation, latest ES2015, polyfill)

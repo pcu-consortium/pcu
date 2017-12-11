@@ -83,7 +83,7 @@
     </modules>
     
     <properties>
-        <java.version>1.8</java.version>
+        <!-- spring boot : -->
         <spring-boot.version>1.4.5.RELEASE</spring-boot.version><!-- 1.4.0.RELEASE 1.5.6.RELEASE -->
         <spring.version>4.3.7.RELEASE</spring.version><!-- 4.3.2.RELEASE -->
         <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version><!-- newest though depends on 4.1.0 but supports 4.x -->
@@ -102,9 +102,12 @@
         <groovy.version>2.4.9</groovy.version><!-- spring-boot's (2.4.7 : logback's is 2.4.0) -->
         
         <!-- build : -->
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding><!-- else [WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent -->
         <org.jacoco.version>0.7.7.201606060606</org.jacoco.version>
+        <cobertura-plugin.version>2.7</cobertura-plugin.version>
+        <coveralls-plugin.version>4.0.0</coveralls-plugin.version>
     </properties>
     
     <dependencies>
@@ -137,6 +140,14 @@
             <artifactId>groovy-all</artifactId><!-- ? for conf ? -->
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId><!-- for tests -->
+            <!-- scope>test</scope --><!-- NO because also compile scope, in explicit dependencies of each module ex. pcu-platform-rest-server for swagger2
+            and what’s defined in the parent POM seems to take the precedence over transitive dependencies defined in the module’s POM
+            see https://blog.pragmasphere.com/2014/06/05/maven-and-test-dependencies/ -->
+        </dependency>
        
         <!-- TODO not global ?  -->     
         <dependency>
@@ -163,6 +174,11 @@
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-providers-search-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-spi-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -194,7 +210,22 @@
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-file-spi-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-providers-file-local-spi-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-metadata-extractor-spi-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-features-connector</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -206,10 +237,10 @@
             <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-features-search-client</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency><!-- TODO rm -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-simple</artifactId>
+            <artifactId>pcu-features-search-simple</artifactId><!-- TODO rm -->
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -229,16 +260,15 @@
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-web</artifactId>
+            <artifactId>pcu-features-search-server</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
+            <!-- scope>test</scope -->
         </dependency>
-        <!-- example (TODO rm) : -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-providers-search-elasticsearch-service</artifactId>
+            <artifactId>pcu-features-search-web</artifactId><!-- TODO rm -->
             <version>${project.version}</version>
-            <type>test-jar</type> <!-- also ? -->
-            <scope>test</scope>
         </dependency>
 
         <!-- Spring -->
@@ -415,6 +445,14 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId><!-- replace cxf swagger's 3.2.1 by qwazr's 3.5-7, else
+            Caused by: java.lang.NoSuchMethodError: org.apache.commons.lang3.StringUtils.compare(Ljava/lang/String;Ljava/lang/String;)I
+   at com.qwazr.library.audio.AudioParser.lambda$static$1(AudioParser.java:95)
+            -->
+            <version>3.6</version>
         </dependency>
           
         <!-- Test dependencies -->
@@ -602,6 +640,36 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Cobertura & Coveralls.io -->
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>cobertura-maven-plugin</artifactId>
+               <version>${cobertura-plugin.version}</version>
+               <configuration>
+                  <format>xml</format>
+                  <maxmem>256m</maxmem>
+                  <aggregate>true</aggregate>
+                  <instrumentation>
+                     <!-- Exclude JPA meta-model generated classes (hibernate-jpamodelgen) -->
+                     <ignores>
+                        <ignore>**/*_.java</ignore>
+                     </ignores>
+                     <excludes>
+                        <exclude>**/*_.class</exclude>
+                     </excludes>
+                  </instrumentation>
+                  <check />
+               </configuration>
+            </plugin>
+            <plugin>
+               <groupId>org.eluder.coveralls</groupId>
+               <artifactId>coveralls-maven-plugin</artifactId>
+               <version>${coveralls-plugin.version}</version>
+               <configuration>
+                  <repoToken>Sk0qF3TUPPVr7F7AkrNrRu9Xi7Wa72tGp</repoToken>
+               </configuration>
             </plugin>
             
             <!-- replace BCEL dep with Java 8 compatible version :

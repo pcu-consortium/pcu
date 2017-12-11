@@ -14,6 +14,10 @@
    <description>PCU Application : Search Web UI</description>
 
 	<properties>
+		<orika-core.version>1.4.6</orika-core.version>
+		<assertj-core.version>3.2.0</assertj-core.version>
+		<lombok.version>1.16.14</lombok.version><!-- 1.16.6 -->
+      
 		<frontend-plugin.version>0.0.27</frontend-plugin.version>
 		<node.version>v5.7.0</node.version>
 		<npm.version>3.7.1</npm.version>
@@ -35,11 +39,11 @@
             <type>pom</type>
             <scope>import</scope>
          </dependency --><!-- 1.4.0.M1 ; 1.3.3.RELEASE for the last stable release -->
-         <dependency>
+         <!-- dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-features-search-server</artifactId>
             <version>${project.version}</version>
-         </dependency>
+         </dependency -->
       </dependencies>
    </dependencyManagement>
 
@@ -53,20 +57,64 @@
          <groupId>org.pcu-consortium.pcu</groupId>
          <artifactId>pcu-features-search-server</artifactId>
       </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-features-connector</artifactId>
+      </dependency>
       
 		<!-- Spring Boot Starters -->
-		<dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-actuator</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+		<!-- dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency -->
+		<!-- Database -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+         <scope>runtime</scope><!-- without this line, h2 inherits a test scope from some other dep -->
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+		</dependency>
+		<!-- Other -->
+		<dependency>
+			<groupId>ma.glasnost.orika</groupId>
+			<artifactId>orika-core</artifactId>
+			<version>${orika-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -75,8 +123,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring-boot.version}</version>
 			</plugin>
-			<!-- Frontend -->
+         
+			<!-- react.js / webpack frontend : -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -119,5 +169,157 @@
 			</plugin>
 		</plugins>
 	</build>
+   
+   <profiles>
+      <profile>
+         <id>skipNpm</id>
+         <activation>
+            <!-- file>
+               <missing>src/main/frontend/node_modules/</missing>
+            </file -->
+            <property>
+               <name>skipNpm</name>
+               <value>true</value>
+            </property>
+         </activation>
+   <build>
+      <plugins>
+         <!-- Frontend -->
+         <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>${frontend-plugin.version}</version>
+            <configuration>
+               <workingDirectory>src/main/frontend</workingDirectory>
+               <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
+               <nodeVersion>${node.version}</nodeVersion>
+               <npmVersion>${npm.version}</npmVersion>
+               <installDirectory>target</installDirectory>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>install node and npm</id>
+                  <phase>none</phase>
+               </execution>
+               <execution>
+                  <id>npm install</id>
+                  <phase>none</phase>
+               </execution>
+               <execution>
+                  <id>webpack build</id>
+                  <goals>
+                     <goal>webpack</goal>
+                  </goals>
+                  <configuration>
+                     <arguments>-d --display-modules</arguments>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+   
+      </profile>
+      
+      <!-- Package PCU Entreprise Search as an executable jar, run it with :
+      mvn clean install -Pjar -DskipTests -->
+      <profile>
+         <id>jar</id>
+        
+   <build>
+      <finalName>${project.artifactId}</finalName><!-- without -${project.version}-r${buildNumber} else cumbersome for .conf when full executable -->
+      <plugins>
+         <!-- metamodel - business bean gen for ex. client TODO move -->
+         <!-- plugin>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+            <version>1.8.2</version>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>schema</goal>
+                  </goals>
+                  <configuration>
+                     <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                     <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+               <execution>
+                  <phase>validate</phase>
+                  <goals>
+                     <goal>create</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <doCheck>false</doCheck><!-- true = fail if modified files -->
+               <doUpdate>false</doUpdate><!-- true = pull first -->
+               <!-- shortRevisionLength>8</shortRevisionLength -->
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.2</version>
+            <configuration>
+               <archive>
+                  <manifestEntries>
+                     <Implementation-Build>${buildNumber}</Implementation-Build>
+                  </manifestEntries>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+               <!-- jvmArguments> NOO only works when starting using mvn,
+               (and both args don't work together because of quoting problems)
+               rather set env props in jarfilename.conf :
+               see https://github.com/spring-projects/spring-boot/issues/5505#issuecomment-202239406
+                  -Dloader.path=".,BOOT-INF/lib/" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002
+               </jvmArguments -->
+               <!-- embeddedLaunchScriptProperties> alas can't conf JAVA_OPTS, see
+               http://mrhaki.blogspot.fr/2016/06/grails-goodness-creating-fully.html
+                  <initInfoDescription>myDesc</initInfoDescription>
+               </embeddedLaunchScriptProperties -->
+               <!-- profiles>
+                  <profile>default</profile>
+               </profiles -->
+               <executable>true</executable><!-- creates a "fully executable" jar
+               http://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html -->
+               <layout>ZIP</layout><!-- similar to the JAR layout using PropertiesLauncher
+               http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html
+               PropertiesLauncher behaves the same as JarLauncher when no additional configuration is provided
+               http://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html -->
+            </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>repackage</goal><!-- create a jar or war file that is auto-executable
+                     The plugin rewrites your manifest, and in particular it manages the Main-Class and Start-Class entries
+                     http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html -->
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+      <resources>
+         <resource>
+            <directory>${basedir}/config</directory>
+         </resource>
+      </resources>
+   </build>
+   
+      </profile>
+   </profiles>
 
 </project>
