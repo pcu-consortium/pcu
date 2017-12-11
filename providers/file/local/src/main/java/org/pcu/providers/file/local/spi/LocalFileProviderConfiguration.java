@@ -19,8 +19,8 @@ public class LocalFileProviderConfiguration {
     * @param localFileProviderApiImpl
     * @return
     */
-   @Bean
-   PcuFileApi defaultFileProviderApiImpl(/*TODO @Qualifier("LocalFileProviderApiImpl")*/ PcuFileApi localFileProviderApiImpl) {
+   ///@Bean
+   PcuFileApi defaultFileProviderApi(/*TODO @Qualifier("LocalFileProviderApiImpl")*/ PcuFileApi localFileProviderApiImpl) {
       return localFileProviderApiImpl;
    }
    

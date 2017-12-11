@@ -9,11 +9,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
@@ -26,6 +32,8 @@ import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.file.api.PcuFileResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.swagger.annotations.Api;
@@ -41,20 +49,19 @@ import io.swagger.annotations.Api;
  *
  */
 @javax.ws.rs.Path("/file/api") // extend to override it for alt impl ; TODO Q or /filecpt, /filestore, /blob ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
-@Consumes({MediaType.APPLICATION_OCTET_STREAM})
-@Produces({MediaType.APPLICATION_OCTET_STREAM}) // TODO LATER return mimetype & name
 @Api(value = "file api") // name of the api, merely a tag ; not required (only required on impl) 
-@Service // @Component // (@Service rather at application level)
+@Service("defaultFileProviderApi") // @Component // (@Service rather at application level) HOW TO INJECT : SECURITY MAPPING CHECK & CRITERIA, SCHEMA CHECK ?? EVEN IN MODELSERVICE ??
 public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuFileApi {
    
    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileProviderApiImpl.class);
 
+   @Autowired @Value("${pcu.file.local.storeRootPath:/tmp/pcu_store}")
    private String storeRootPath = "/tmp/pcu_store";
-   private File storeRootDir = new File(storeRootPath);
+   private File storeRootDir;
    // temp file dir. NB. set it to the same fs as the final file
    // (so its bytes won't be copied, even with glusterfs http://blog.vorona.ca/the-way-gluster-fs-handles-renaming-the-file.html )
    // or accept temp place (make it big enough) and bandwidth costs of moving it
-   private File customTempDir = null; // TODO on same FS ex. gluster
+   private File customTempDir; // TODO on same FS ex. gluster
    
    public LocalFileProviderApiImpl() {
       
@@ -64,9 +71,15 @@ public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuF
    @PostConstruct
    void init() {
       // TODO check :
+      storeRootDir = new File(storeRootPath);
       if (!storeRootDir.exists()) {
          storeRootDir.mkdirs();
       }
+      customTempDir = new File(storeRootDir, "tmp"); // in SAME partition else rename (move) fails silently
+      if (!customTempDir.exists()) {
+         customTempDir.mkdirs();
+      }
+      LOGGER.info("storeRoot is " + storeRootDir.getAbsolutePath());
    }
 
    @Override
@@ -163,19 +176,25 @@ public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuF
       try {
          return new FileInputStream(contentFile);
       } catch (FileNotFoundException fnfex) {
-         throw new RuntimeException("Can't find content " + pathOrHash); // TODO better ; NOT JAXRS NotFoundException else ClassNotFoundException: org.glassfish.jersey.internal.RuntimeDelegateImpl
+         //throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND)
+         //      .entity("Can't find store/content " + store + "/" + pathOrHash)
+         //      .type(cxfJaxrsApiProvider.getNegotiatedResponseMediaType()).build()); // NOT JAXRS NotFoundException else ClassNotFoundException: org.glassfish.jersey.internal.RuntimeDelegateImpl
+         throw new RuntimeException("Can't find store/content " + store + "/" + pathOrHash); // TODO better ; 
       }
    }
 
    @Override
    public PcuFileResult deleteContent(String store, String pathOrHash) {
+      if (pathOrHash.startsWith("/")) {
+         throw new RuntimeException("pathOrHash must not start by /");
+      }
       try {
          Files.deleteIfExists(getContentPath(store, pathOrHash)); // NB. failing if not exist would not be REST
          PcuFileResult res = new PcuFileResult();
          res.setPath(pathOrHash);
          return res ;
       } catch (IOException fnfex) {
-         throw new RuntimeException("Can't delete content " + pathOrHash); // TODO better ; NOT JAXRS NotFoundException else ClassNotFoundException: org.glassfish.jersey.internal.RuntimeDelegateImpl
+         throw new RuntimeException("Can't delete store/content " + store + "/" + pathOrHash); // TODO better ; NOT JAXRS NotFoundException else ClassNotFoundException: org.glassfish.jersey.internal.RuntimeDelegateImpl
       }
    }
    
@@ -211,6 +230,50 @@ public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuF
                LOGGER.info("error closing streamedContent AFTER reading it", e);
             }
          }
+      }
+   }
+   
+   
+   //////////////////////////////////////////
+   // ADMIN ONLY
+
+   /**
+    * admin only (or check rights)
+    * allows ex. to prune unreferenced content after using their metadata in the entity store
+    * @param store
+    * @return
+    * @throws IOException 
+    */
+   public List<String> listContentPathes(String store) throws IOException {
+      Path storePath = Paths.get(getStorePath(store));
+      return Files.walk(storePath).filter(Files::isRegularFile).map(Path::toString).collect(Collectors.toList());
+   }
+
+   /**
+    * admin only
+    * only for cleanup, ex. for tests or to prune unreferenced content after having identified
+    * them using listContentPathes and their metadata in the entity store
+    * @param store
+    * @throws IOException 
+    */
+   public void deleteStore(String store) throws IOException {
+      Path storePath = Paths.get(getStorePath(store));
+      try {
+         Files.walkFileTree(storePath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+         });
+      } catch (NoSuchFileException e) {
+         // silent
       }
    }
    

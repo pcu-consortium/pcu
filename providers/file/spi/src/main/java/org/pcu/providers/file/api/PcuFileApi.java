@@ -26,7 +26,7 @@ import io.swagger.annotations.Api;
  */
 @Path("/file/api") // extend to override it for alt impl ; TODO Q or /filecpt, /filestore, /blob ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
 @Consumes({MediaType.APPLICATION_OCTET_STREAM})
-@Produces({MediaType.APPLICATION_OCTET_STREAM}) // TODO LATER return mimetype
+@Produces({MediaType.APPLICATION_JSON}) // TODO LATER return mimetype
 @Api(value = "file api") // name of the api, merely a tag ; not required (only required on impl) 
 public interface PcuFileApi {
    
@@ -48,7 +48,7 @@ public interface PcuFileApi {
     * Modifiable content store - create or replace
     * @param store
     * @param streamedContent
-    * @return file name = hash
+    * @return file name : (original) hash or path, may contain slashes
     */
    @Path("/content/{store}/{path:.+}")
    @PUT
@@ -61,7 +61,7 @@ public interface PcuFileApi {
     * @param store
     * @param position where to append if any, else at end
     * @param streamedContent
-    * @return file name = hash
+    * @return file name : (original) hash or path, may contain slashes
     */
    @Path("/content/{store}/{path:.+}")
    @POST
@@ -69,6 +69,7 @@ public interface PcuFileApi {
    
    @GET
    @Path("/content/{store}/{pathOrHash:.+}")
+   @Produces({MediaType.APPLICATION_OCTET_STREAM})
    InputStream getContent(@PathParam("store") String store, @PathParam("pathOrHash") String pathOrHash); // TODO not found BUT NOT NotFoundException
 
    @DELETE
