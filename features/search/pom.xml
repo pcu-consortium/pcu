@@ -14,7 +14,6 @@
    
 
     <modules>
-        <module>simple</module>
         <module>pipeline</module>
         <module>engine</module>
         <module>server</module>

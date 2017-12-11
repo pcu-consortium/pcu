@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.pcu.platform.rest.server.PcuJaxrsServerBase;
@@ -286,6 +283,41 @@ public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuF
    }
    private String getStorePath(String store) {
       return storeRootPath + File.separatorChar + store;
+   }
+
+
+   /**
+    * TODO LATER update doc meta on content change :
+    * async notify or sync index, called in store/put/appendContent
+    * NOO rather client side !
+    * @param path
+    * @param index
+    * @param docId
+    * @param digestHexString
+    */
+   private void handleContentChanged(String path, String index, String docId, String digestHexString) {
+      /*
+      // notify :
+      kafkaEventSystem.sendEvent("store.content.changed", path, digestHexString, index, docId);
+      
+      // update entity if required : (in event ??)
+      // NB. a single entity could have several contents by having more path props
+      //if (docId != null) {
+      PcuDocument pcuDoc = new PcuDocument();
+      pcuDoc.setId(docId);
+      // set props :
+      // TODO rather using PcuContentProps object model ? or JSON-LD ??
+      pcuDoc.setProperties(new LinkedHashMap<>(3));
+      //pcuDoc.getProperties().put("content.path", path); // to refer to it
+      //if (digestHexString != null) pcuDoc.getProperties().put("content.hash", digestHexString); // if any, same alt way to refer to it
+      LinkedHashMap<String, Object> contentProps = new LinkedHashMap<>(3);
+      pcuDoc.getProperties().put("content", contentProps);
+      contentProps.put("path", path); // to refer to it
+      if (digestHexString != null) contentProps.put("hash", digestHexString); // if any, same alt way to refer to it
+      // TODO OPT could plug other server-side metadata provider here ex. file, tika ??
+      
+      esSearchProviderApi.index(index, pcuDoc); // TODO sync ; ideally patch, require that exists ??
+      */
    }
    
 }
