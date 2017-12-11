@@ -1,0 +1,72 @@
+[
+   {
+      "type": "record",
+      "name": "file",
+      "doc": "",
+      "fields": [
+         {"name":"type", "type":"string", "doc":""},/* TODO ENUM file ; or not in JSON ?? */
+         {"name":"id", "type":"string", "doc":""},
+         {"name":"version", "type":"long", "doc":""},
+         {"name":"version_global", "type":"long", "doc":""},
+         {"name":"crawl_id", "type":"string", "doc":""},
+         {"name":"synced", "type":"long", "logicalType": "timestamp-millis", "doc":""},
+         /*{"name":"host_id", "type":"string", "doc":""}, already in (global) path */
+         {"name":"readable_host", "type":"string", "doc":""},/* NOT "bytes" : in JSON would be strings, but where Unicode code points 0-255 are mapped to unsigned 8-bit byte values 0-255, ex. \u00FF */
+         {"name":"file", "type":{
+            "type": "record",
+            "name": "file.file",
+            "doc": "",
+            "fields": [
+               {"name":"last_modified", "type":"long", "logicalType": "timestamp-millis", "doc":""},
+               {"name":"name", "type":"string", "doc":""},
+               {"name":"path", "type":"string", "doc":""}
+            ]
+         }},
+         {"name":"http", "type":{
+            "type": "record",
+            "name": "file.http",
+            "doc": "",
+            "fields": [
+               {"name":"url", "type":"string", "doc":""},
+               {"name":"mimetype", "type":"string", "doc":""}
+            ]
+         }},
+         {"name":"meta", "type":{
+            "type": "record",
+            "name": "file.meta",
+            "doc": "",
+            "fields": [
+               {"name":"author", "type":"string", "default": null, "doc":""},
+               {"name":"title", "type":"string", "default": null, "doc":""},
+               {"name":"created", "type":"long", "default": null, "logicalType": "timestamp-millis", "doc":""},
+               {"name":"modified", "type":"long", "default": null, "logicalType": "timestamp-millis", "doc":""},
+               {"name":"keywords", "type":{"type":"array", "items":"string", "doc":""}},
+               {"name":"language", "type":"string", "default": null, "doc":""}
+            ]
+         }},
+         {"name":"content", "type":{
+            "type": "record",
+            "name": "file.content",
+            "doc": "",
+            "fields": [
+               {"name":"length", "type":"long", "doc":""},
+               {"name":"hash", "type":"string", "doc":""},
+               {"name":"store_path", "type":"string", "doc":""}
+            ]
+         }},
+         {"name":"fulltext", "type":"string", "doc":""},
+         {"name":"path", "type":"string", "doc":""},
+         {"name":"rights", "type":{
+            "type": "record",
+            "name": "file.rights",
+            "doc": "",
+            "fields": [
+               {"name":"r", "type":{"type":"array", "items":"string", "doc":""}},
+               {"name":"w", "type":{"type":"array", "items":"string", "doc":""}},
+               {"name":"o", "type":{"type":"array", "items":"string", "doc":""}},
+               {"name":"ar", "type":{"type":"array", "items":"string", "doc":""}}
+            ]
+         }}
+      ]
+   }
+]
