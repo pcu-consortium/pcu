@@ -22,6 +22,11 @@
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-platform-rest-server</artifactId>
 		</dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-features-connector</artifactId>
+         <!-- or only test here ? -->
+      </dependency>
 		<!-- dependency> <groupId>org.pcu-consortium.pcu</groupId> <artifactId>TODO 
 			pipeline inAndOutPoc</artifactId> </dependency> <dependency> <groupId>org.pcu-consortium.pcu</groupId> 
 			<artifactId>TODO pipeline inAndOutPoc</artifactId> <type>test-jar</type> 
@@ -33,6 +38,11 @@
 			<version>0.10.2.0</version><!-- 0.11.0.1 -->
 		</dependency>
       
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- for ModelService ; TODO better or only test yet ?! -->
+         <scope>test</scope>
+      </dependency>
 
 	</dependencies>
 </project>

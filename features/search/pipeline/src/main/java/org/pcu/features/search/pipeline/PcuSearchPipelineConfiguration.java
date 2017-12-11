@@ -4,6 +4,7 @@ import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxrs.client.Client;
 import org.pcu.features.search.client.PcuPlatformRestClientConfiguration;
 import org.pcu.features.search.client.PcuSearchApiClientConfiguration;
+import org.pcu.platform.model.PcuModelConfiguration;
 import org.pcu.platform.rest.server.PcuPlatformRestServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  */
 @Configuration
 @ComponentScan(basePackageClasses={PcuSearchPipelineConfiguration.class, PcuSearchApiClientConfiguration.class,
-      PcuPlatformRestServerConfiguration.class})
+      PcuPlatformRestServerConfiguration.class, PcuModelConfiguration.class})
 public class PcuSearchPipelineConfiguration {
    
    @Autowired
