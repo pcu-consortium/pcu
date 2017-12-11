@@ -18,6 +18,6 @@ import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 @Path("/search/esapi") // extend to override it for alt impl ; TODO Q or /searchcpt, /data, /nosql ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
-public interface PcuSearchEsClientApi extends ElasticSearchClientApi {
+public interface PcuSearchEsClientApi extends PcuSearchEsApi {
    
 }

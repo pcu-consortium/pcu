@@ -19,10 +19,10 @@ import io.swagger.annotations.Api;
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
 @Api("search api") // name of the api, merely a tag ; else not in swagger
-@Service // for what, or only @Component ?
+///@Service // for what, or only @Component ? NOO NAME CONFLICTS WITH PCUSEARCHAPI
 public class PcuSearchApiServerImpl extends PcuJaxrsServerBase implements PcuSearchApi {
 
-   @Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiPipelineImpl
+   @Autowired @Qualifier("defaultSearchProviderApi") // pcuSearchApiPipelineImpl
    private PcuSearchApi delegateSearchIndexApi;
    //@Autowired @Qualifier("defaultSearchProviderApiImpl") // pcuSearchApiSimpleImpl
    private PcuSearchApi delegateSearchCrudApi;

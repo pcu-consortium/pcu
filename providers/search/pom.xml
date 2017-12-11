@@ -15,6 +15,7 @@
 
     <modules>
         <module>spi</module>
+        <module>spi-client</module>
         <module>elasticsearch</module>
     </modules>
     

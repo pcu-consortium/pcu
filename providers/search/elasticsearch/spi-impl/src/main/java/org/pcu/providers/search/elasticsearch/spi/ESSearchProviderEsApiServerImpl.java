@@ -31,8 +31,9 @@ import org.springframework.stereotype.Service;
 import io.swagger.annotations.Api;
 
 /**
- * PCU ElasticSearch-like API Impl.
+ * PCU ElasticSearch-like API Impl on ElasticSearch.
  * Copy this and modify it to support other versions of ElasticSearch (or other search servers).
+ * Impl'ing a PCU API implies also impl'ing its transversal concerns i.e. security NOOOOOO
  * @author mardut
  *
  */
@@ -40,7 +41,7 @@ import io.swagger.annotations.Api;
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
 @Api("search ES api") // name of the api, merely a tag ; else not in swagger
-@Service // for what, or only @Component ?
+@Service("defaultSearchProviderEsApi") // for what, or only @Component ? HOW TO INJECT : SECURITY MAPPING CHECK & CRITERIA, SCHEMA CHECK ?? EVEN IN MODELSERVICE ??
 public class ESSearchProviderEsApiServerImpl extends PcuJaxrsServerBase implements PcuSearchEsApi {
 
    //@Autowired @Qualifier("elasticSearchRestClient")

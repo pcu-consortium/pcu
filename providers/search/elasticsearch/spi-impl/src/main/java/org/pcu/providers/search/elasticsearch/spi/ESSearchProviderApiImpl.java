@@ -1,23 +1,32 @@
 package org.pcu.providers.search.elasticsearch.spi;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.LinkedHashMap;
 
 import javax.annotation.Resource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
+import org.pcu.platform.rest.server.PcuJaxrsServerBase;
 import org.pcu.providers.search.api.PcuDocument;
 import org.pcu.providers.search.api.PcuIndexResult;
-import org.pcu.providers.search.api.PcuResult;
 import org.pcu.providers.search.api.PcuSearchApi;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.GetResult;
 import org.pcu.search.elasticsearch.api.mapping.IndexResult;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component // (@Service rather at application level)
-public class ESSearchProviderApiImpl implements PcuSearchApi {
+import io.swagger.annotations.Api;
+
+@Path("/search/api") // TODO Q or /searchcpt, /data, /nosql ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
+@Consumes({MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_JSON})
+@Api("search api") // name of the api, merely a tag ; else not in swagger
+@Service("defaultSearchProviderApi") // for what, or only @Component ? HOW TO INJECT SECURITY MAPPING CHECK & CRITERIA ?? model check ?
+//@Component // (@Service rather at application level)
+public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSearchApi {
    
    @Resource(name="elasticSearchRestClient") // NOT @Autowired else NoSuchBean because proxy has not the same class https://stackoverflow.com/questions/15614786/could-not-autowire-jaxrs-client
    private ElasticSearchApi esApi;
