@@ -19,11 +19,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -79,6 +80,11 @@ public class PcuPlatformRestClientConfiguration {
             new ZonedDateTimeSerializer(PCU_API_DATE_FORMATTER)); // else 2016-09-30T16:53:40.255
       mapper.registerModule(javaTimeModule);
       mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // else 1501857549.048000000 http://www.baeldung.com/jackson-serialize-dates
+      // deserialize date in map :
+      // see https://stackoverflow.com/questions/18796349/jackson-de-serializing-date-to-string-to-date-in-generic-maps https://www.leveluplunch.com/java/tutorials/033-custom-jackson-date-deserializer/
+      SimpleModule dateInMapDeserializerModule = new SimpleModule("DateInMapDeserializer");
+      dateInMapDeserializerModule.addDeserializer(Object.class, new CustomObjectWithDateInMapDeserializer(PCU_API_DATE_FORMATTER)); // extend and replace UntypedObjectDeserializer
+      mapper.registerModule(dateInMapDeserializerModule);
       
       // more lenient parsing that accepts single element as array :
       // NB. required on server-side only for ESQueryClause.must/...
