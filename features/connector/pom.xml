@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <artifactId>pcu-features-parent</artifactId>
+      <groupId>org.pcu-consortium.pcu</groupId>
+      <version>1.0-SNAPSHOT</version>
+   </parent>
+   <artifactId>pcu-features-connector</artifactId>
+   <name>PCU Features Connector</name>
+   <description>PCU Features Connector</description>
+
+   <dependencies>
+
+      <!-- PCU -->
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-platform-rest-client</artifactId><!-- NOT server -->
+      </dependency>
+      
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+          <artifactId>pcu-providers-search-spi-client</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-file-spi-client</artifactId>
+      </dependency>
+        
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- for ModelService ; TODO better or only test yet ?! -->
+         <!-- scope>test</scope -->
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId>
+         <type>test-jar</type>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-file-local-spi-impl</artifactId>
+      </dependency>
+      
+      <!-- TODO : and / or server-side, using uploaded content and URL -->
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-metadata-extractor-spi-impl</artifactId>
+      </dependency>
+
+      <!-- metamodel TODO move -->
+      <dependency>
+         <groupId>org.apache.avro</groupId>
+         <artifactId>avro</artifactId>
+         <version>1.8.2</version><!-- TODO move -->
+      </dependency>
+
+      <!-- TODO rm UUID -->
+      <!-- http://johannburkard.de/software/uuid/ https://github.com/stephenc/eaio-uuid -->
+      <dependency>
+         <groupId>com.github.stephenc.eaio-uuid</groupId>
+         <artifactId>uuid</artifactId>
+         <version>3.4.0</version>
+      </dependency>
+
+   </dependencies>
+
+   <build>
+      <plugins>
+         <!-- metamodel - business bean gen for ex. client TODO move -->
+         <!-- plugin>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+            <version>1.8.2</version>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>schema</goal>
+                  </goals>
+                  <configuration>
+                     <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                     <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin -->
+      </plugins>
+   </build>
+         
+
+   <profiles>
+   
+      <!-- Shortcut for running PCU connector, use it with :
+      mvn -Pconnector -->
+      <profile>
+         <id>connector</id>
+         <build>
+            <defaultGoal>spring-boot:run</defaultGoal>
+            <plugins>
+               <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+               </plugin>
+            </plugins>
+            <resources>
+               <resource>
+                  <directory>${basedir}/config</directory>
+               </resource>
+            </resources>
+         </build>
+      </profile>
+   </profiles>
+</project>
+
