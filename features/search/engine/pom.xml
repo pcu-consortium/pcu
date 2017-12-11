@@ -15,17 +15,24 @@
         <!-- PCU -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.pcu-consortium.pcu</groupId>
             <artifactId>pcu-platform-rest-server</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-features-search-simple</artifactId><!-- to test over actual ES (through SPI) -->
-            <scope>test</scope>
-        </dependency>
+        
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-spi-client</artifactId>
+      </dependency>
+        
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- or only test yet ?! -->
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId>
+         <type>test-jar</type>
+         <scope>test</scope>
+      </dependency>
         <!-- TODO deps : to setup spark batch ML jobs, read results in ES (if not directly used by ES query)... -->
 
     </dependencies>

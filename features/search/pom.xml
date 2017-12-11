@@ -17,7 +17,6 @@
         <module>pipeline</module>
         <module>engine</module>
         <module>server</module>
-        <module>web</module><!-- TODO swagger ; or in platform ?! -->
     </modules>
     
 </project>

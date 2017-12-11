@@ -21,11 +21,11 @@
       
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-          <artifactId>pcu-providers-search-spi</artifactId>
+          <artifactId>pcu-providers-search-spi-client</artifactId><!-- brings -spi API -->
       </dependency>
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-         <artifactId>pcu-providers-file-spi</artifactId>
+         <artifactId>pcu-providers-file-spi-client</artifactId><!-- brings -spi API -->
       </dependency>
         
       <dependency>
@@ -52,53 +52,7 @@
          <artifactId>pcu-features-search-engine</artifactId>
       </dependency>
 
-      <!-- deps -->
-      <dependency>
-         <groupId>commons-io</groupId>
-         <artifactId>commons-io</artifactId>
-         <!-- not only test scope -->
-      </dependency>
-
-      <!-- metamodel TODO move -->
-      <dependency>
-         <groupId>org.apache.avro</groupId>
-         <artifactId>avro</artifactId>
-         <version>1.8.2</version><!-- TODO move -->
-      </dependency>
-
-      <!-- TODO move UUID -->
-      <!-- http://johannburkard.de/software/uuid/ https://github.com/stephenc/eaio-uuid -->
-      <dependency>
-         <groupId>com.github.stephenc.eaio-uuid</groupId>
-         <artifactId>uuid</artifactId>
-         <version>3.4.0</version>
-         <scope>test</scope>
-      </dependency>
-
    </dependencies>
-
-   <build>
-      <plugins>
-         <!-- metamodel - business bean gen for ex. client TODO move -->
-         <!-- plugin>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro-maven-plugin</artifactId>
-            <version>1.8.2</version>
-            <executions>
-               <execution>
-                  <phase>generate-sources</phase>
-                  <goals>
-                     <goal>schema</goal>
-                  </goals>
-                  <configuration>
-                     <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
-                     <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin -->
-      </plugins>
-   </build>
          
 
    <profiles>

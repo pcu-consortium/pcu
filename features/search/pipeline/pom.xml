@@ -16,21 +16,27 @@
 		<!-- PCU -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
-			<artifactId>pcu-features-search-client</artifactId><!-- brings api -->
-		</dependency>
-		<dependency>
-			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-platform-rest-server</artifactId>
 		</dependency>
       <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
-         <artifactId>pcu-features-connector</artifactId>
-         <!-- or only test here ? -->
+          <artifactId>pcu-providers-search-spi</artifactId>
       </dependency>
-		<!-- dependency> <groupId>org.pcu-consortium.pcu</groupId> <artifactId>TODO 
-			pipeline inAndOutPoc</artifactId> </dependency> <dependency> <groupId>org.pcu-consortium.pcu</groupId> 
-			<artifactId>TODO pipeline inAndOutPoc</artifactId> <type>test-jar</type> 
-			<scope>test</scope> </dependency -->
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>pcu-features-connector</artifactId>
+         <!-- or only test here ?? -->
+      </dependency>
+		<!-- dependency>
+         <groupId>org.pcu-consortium.pcu</groupId>
+         <artifactId>TODO pipeline inAndOutPoc</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.pcu-consortium.pcu</groupId> 
+			<artifactId>TODO pipeline inAndOutPoc</artifactId>
+         <type>test-jar</type> 
+			<scope>test</scope>
+      </dependency -->
 		<!-- TODO kafka -->
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
