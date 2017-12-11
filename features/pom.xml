@@ -14,6 +14,7 @@
    
 
     <modules>
+        <module>connector</module>
         <module>search</module>
         <!-- module>rec</module -->
     </modules>
