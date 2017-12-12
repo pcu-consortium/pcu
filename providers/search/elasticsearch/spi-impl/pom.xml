@@ -13,9 +13,13 @@
     <dependencies>
 
         <!-- PCU -->
+        <!-- dependency>
+            <groupId>org.pcu-consortium.pcu</groupId>
+            <artifactId>pcu-providers-search-spi</artifactId><- Default integrated component cloned API + PCU specific API ->
+        </dependency -->
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>
-            <artifactId>pcu-providers-search-spi</artifactId><!-- Default integrated component cloned API + PCU specific API -->
+            <artifactId>pcu-providers-search-spi-client</artifactId><!-- for tests, brings -spi -->
         </dependency>
         <dependency>
             <groupId>org.pcu-consortium.pcu</groupId>

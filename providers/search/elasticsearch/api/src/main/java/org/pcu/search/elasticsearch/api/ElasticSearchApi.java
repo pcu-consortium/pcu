@@ -46,8 +46,9 @@ import io.swagger.annotations.ApiParam;
  * - TODO requirements : MES (function_score, index mgmt ex. reindex ?), ekeller's list...
  * 
  * gotchas :
- * - doc id : slash not supported by ES (though JAXRS could : {id:.+}), but file path is not a good Lucene id anyway.
- * So rather use UUID v1 (the best Lucene id : http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html ),
+ * - doc id : slash not supported by ES (though JAXRS could : {id:.+}) which therefore requires it to be encoded.
+ * Anyway file path is not a good Lucene id, save for auto dedup / identity resolution, which hash also provides but with risks of collision.
+ * So rather use cowtowncoder / Jackson UUID, rather than UUID v1 (the best Lucene id : http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html ),
  * or hash id fields (like fscrawler does with file path https://github.com/shadiakiki1986/docker-fscrawler )
  * which provides auto dedup.
  * 

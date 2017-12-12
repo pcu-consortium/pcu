@@ -1,5 +1,7 @@
 package org.pcu.providers.search.elasticsearch.spi;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 
 import javax.annotation.Resource;
@@ -43,7 +45,8 @@ public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSe
          IndexResult res;
          // TODO rather unify using @BeanParam :
          if (doc.getId() != null) {
-            res = esApi.indexDocument(index, doc.getType(), doc.getId(), esDoc, null, null, null, null, null, null, null);
+            String encodedDocId = URLEncoder.encode(doc.getId(), "UTF-8"); // else error : No handler found for uri
+            res = esApi.indexDocument(index, doc.getType(), encodedDocId, esDoc, null, null, null, null, null, null, null);
          } else { // generate id (TODO Q support ?)
             res = esApi.indexDocument(index, doc.getType(), esDoc, null, null, null, null, null, null, null);
          }
@@ -53,6 +56,8 @@ public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSe
          return pcuRes;
       } catch (ESApiException e) {
          throw new RuntimeException("Error calling ElasticSearch", e); // TODO better (convert in ExceptionWrapper)
+      } catch (UnsupportedEncodingException e) {
+         throw new RuntimeException("Error calling ElasticSearch", e); // can't happen
       }
    }
 
@@ -60,8 +65,9 @@ public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSe
    public PcuDocument get(String index, String docId) {
       Long version = null; // TODO optimistic locking, from ETag ; other ES features ?
       try {
+         String encodedDocId = URLEncoder.encode(docId, "UTF-8");
          GetResult res = esApi.getDocument(index, "_all", // TODO if used through REST would be auto default
-               docId, null, null, version, null, null, null, null, null);
+               encodedDocId, null, null, version, null, null, null, null, null);
          PcuDocument pcuDoc = new PcuDocument();
          pcuDoc.setId(docId);
          pcuDoc.setVersion(res.get_version());
@@ -73,6 +79,8 @@ public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSe
          return pcuDoc ;
       } catch (ESApiException e) {
          throw new RuntimeException("Error calling ElasticSearch", e); // TODO better (convert in ExceptionWrapper)
+      } catch (UnsupportedEncodingException e) {
+         throw new RuntimeException("Error calling ElasticSearch", e); // can't happen
       }
    }
    
