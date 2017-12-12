@@ -34,7 +34,8 @@ public class FileCrawler extends Crawler<File> {
       // TODO if already running KO
 
       if (roots != null) {
-         this.toBeCrawledQeue.addAll(roots.stream().map(p -> new File(p)).collect(Collectors.toList()));
+         this.toBeCrawledQeue.addAll(roots.stream().map(p -> new File(p))
+               .filter(f -> f.exists()).collect(Collectors.toList())); // else erroneously non-existing files from conf
       }
       if (suffixes != null) {
          this.suffixFileFilter = new SuffixFileFilter(suffixes);

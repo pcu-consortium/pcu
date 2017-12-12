@@ -12,15 +12,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -31,17 +27,16 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.features.search.server.meta.PcuField;
@@ -80,11 +75,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
 
 
 /**
@@ -165,6 +156,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    }
 
    @Test
+   @Ignore // remove this to use it
    public void testSimulateCrawlHome() throws UnknownHostException, SocketException {
       // init crawler :
       String index = "files";
@@ -188,7 +180,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       for (File file : folder.listFiles()) {
          if (file.isFile()) {
             if (file.canRead()) {
-               if (fileFilter.accept(file)) {
+               if (fileFilter == null || fileFilter.accept(file)) {
                   try {
                      log.debug("crawling " + file.getAbsolutePath());
                      simulateCrawlFile(fileCrawler, file);
@@ -199,7 +191,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
             }
          } else if (file.isDirectory()) {
             if (file.canRead()) {
-               simulateCrawlFolder(fileCrawler, file);
+               recursiveCrawlFolder(fileCrawler, file, fileFilter);
             }
          } // else non-regular files : symlinks (TODO resolve), devices, pipes, sockets https://stackoverflow.com/a/21224032
       }
@@ -293,7 +285,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       assertTrue(!hits.isEmpty());
       assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
       rangeParams.setLt(ZonedDateTime.parse("2016-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
-      rangeParams.setGt(null);
+      rangeParams.setGt(ZonedDateTime.parse("2015-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter)); // not null because crawling samples write 0 date i.e. 1970
       hits = searchEsApi.searchInType(index, type, dateRangeMsg, null, null, null).getHits().getHits();
       assertTrue(hits.isEmpty());
 

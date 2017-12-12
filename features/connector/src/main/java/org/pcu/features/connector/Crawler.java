@@ -38,7 +38,7 @@ public abstract class Crawler<T> {
    private String connectorComputerId;
    
    /** changes between crawl sessions / job tasks */
-   private String crawlId;
+   private String crawlId = null;
    
    protected PcuSearchEsClientApi searchEsApi;
    protected PcuSearchApi searchApi;
@@ -85,6 +85,10 @@ public abstract class Crawler<T> {
    protected abstract List<PcuDocument> buildPcuDocuments(T crawled, String uploadPath);
    
    public void crawlIteration() throws CrawlCompletedException, Exception {
+      if (this.crawlId == null) {
+         throw new Exception("Not inited");
+      }
+      
       T toBeCrawled = toBeCrawledQeue.poll();
       if (toBeCrawled == null) {
          throw new CrawlCompletedException();

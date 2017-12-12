@@ -87,12 +87,13 @@ public class PcuSearchApiPipelineImplTest {
       
       // init crawler :
       FileCrawler fileCrawler = new FileCrawler();
-      fileCrawler.setIndex("files");
+      fileCrawler.setIndex("files"); // TODO test
       fileCrawler.setType("file");
       fileCrawler.setSearchEsApi(searchEsApi);
       fileCrawler.setSearchApi(searchApi);
       fileCrawler.setFileApi(fileApi);
       fileCrawler.setMetadataExtractorApi(metadataExtractorApi);
+      fileCrawler.init();
       
       // TODO more, from ES client API test
 
