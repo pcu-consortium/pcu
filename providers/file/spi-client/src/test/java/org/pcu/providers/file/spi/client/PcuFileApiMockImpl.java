@@ -5,17 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.IOUtils;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.file.api.PcuFileResult;
 
 //@Path("/") // else "not found" because overrides // else not in swagger ; but NOT "/pcu/search/es" else blocks UI servlet
-@Consumes({MediaType.APPLICATION_JSON + "; charset=utf-8"})
-@Produces({MediaType.APPLICATION_JSON + "; charset=utf-8"}) // else default tomcat conf produces ISO-8859-1 BUT STILL 500 KO
 public class PcuFileApiMockImpl implements PcuFileApi {
    
    public static final String TEST_PATH = "test_path";

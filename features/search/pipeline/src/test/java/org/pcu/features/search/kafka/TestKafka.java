@@ -1,6 +1,7 @@
 package org.pcu.features.search.kafka;
 
 import org.apache.kafka.clients.producer.Producer;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pcu.features.search.pipeline.kafka.KafkaProducerFactory;
 import org.pcu.features.search.pipeline.kafka.ProducerKafka;
@@ -24,6 +25,7 @@ public class TestKafka {
 	}
 
 	@Test
+	@Ignore // disabled until this test becomes meaningful & its topic is set up
 	public void testPcuDoc() throws Exception {
 
 		Producer<String, String> producer2 = KafkaProducerFactory.createProducer();
