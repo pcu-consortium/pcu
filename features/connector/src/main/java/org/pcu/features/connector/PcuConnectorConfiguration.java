@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @Configuration
 @ComponentScan(basePackageClasses={PcuConnectorConfiguration.class,
-      PcuSearchApiClientConfiguration.class, PcuFileApiClientConfiguration.class,
+      PcuSearchApiClientConfiguration.class, PcuFileApiClientConfiguration.class, // PCU API REST clients in required !
       PcuPlatformRestClientConfiguration.class})
 public class PcuConnectorConfiguration {
    

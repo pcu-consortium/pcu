@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 @Component
-public class PcuConnector {
+public class PcuConnector implements ApplicationListener<ApplicationReadyEvent> {
 
    protected static final Logger log = LoggerFactory.getLogger(PcuConnector.class);
 
@@ -72,8 +74,13 @@ public class PcuConnector {
       }
 
       // TODO schedule jobs from conf
-      
+   }
+
+   @Override
+   public void onApplicationEvent(ApplicationReadyEvent event) {
       // run at startup by default (not in test profile) :
+      // NOT in @PostConstruct else embedded connector blocks deployment of REST API server
+      // and fails with ConnectException : Connection refused !
       if (runAtStartup) {
          defaultCrawl();
       }
