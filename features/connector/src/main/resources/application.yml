@@ -22,6 +22,9 @@ pcu:
   file:
     local:
       storeRootPath: ./pcu_store
+  providers:
+  - org.pcu.providers.search.elasticsearch.spi
+  - org.pcu.providers.file.local.spi
   rest:
     #failOnUnknownProperties: true
     #enableIndenting: false

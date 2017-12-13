@@ -1,10 +1,9 @@
 package org.pcu.features.search.server;
 
-import org.pcu.features.connector.PcuConnectorConfiguration;
 import org.pcu.features.search.client.PcuSearchApiClientConfiguration;
 import org.pcu.features.search.pipeline.PcuSearchPipelineConfiguration;
 import org.pcu.platform.rest.server.PcuPlatformRestServerConfiguration;
-import org.pcu.providers.file.local.spi.LocalFileProviderConfiguration;
+import org.pcu.providers.file.spi.client.PcuFileApiClientConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,10 +16,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan(basePackageClasses={PcuSearchServerConfiguration.class,
-      PcuSearchApiClientConfiguration.class, LocalFileProviderConfiguration.class,
+      PcuSearchApiClientConfiguration.class, PcuFileApiClientConfiguration.class, // REST clients are not really useful, API (no Spring conf) would be enough // LocalFileProviderConfiguration.class, 
       // NB. integrated big data components are brought (selected to be scanned) by conf in PcuEntrepriseSearchApplication
-      ///PcuConnectorConfiguration.class, // else starts to crawl
-      PcuSearchPipelineConfiguration.class, /*PcuSearchEngineConfiguration.class,*/ // PcuSearchSimpleConfiguration.class,
+      PcuSearchPipelineConfiguration.class, /*PcuSearchEngineConfiguration.class,*/
+      //PcuModelConfiguration.class, // brought by PcuSearchPipelineConfiguration
       PcuPlatformRestServerConfiguration.class})
 public class PcuSearchServerConfiguration {
    
