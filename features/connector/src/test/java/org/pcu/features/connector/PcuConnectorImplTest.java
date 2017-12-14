@@ -457,6 +457,16 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
 
    
    public FileCrawler buildFileCrawler(String index) throws UnknownHostException, SocketException {
+      Collections.list(NetworkInterface.getNetworkInterfaces()).stream().forEach(itf -> System.out.println(itf.toString()));
+      for (NetworkInterface itf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+         try {
+            System.out.println(itf + " " + itf.isVirtual() + " " + itf.isLoopback() + " " + itf.getHardwareAddress() + " " + itf.getMTU());
+         } catch (SocketException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      };
+      
       FileCrawler fileCrawler = new FileCrawler();
       fileCrawler.setContentStore("fileCrawlerStore"); // TODO manage
       fileCrawler.setIndex(index);
@@ -472,15 +482,6 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       byte[] localhostHardwareAddress = localhostNetworkInterface.getHardwareAddress();
       System.out.println("localhostHardwareAddress " + localhostHardwareAddress);
       fileCrawler.setConnectorComputerId(Base64.getEncoder().encodeToString(localhostHardwareAddress));
-      Collections.list(NetworkInterface.getNetworkInterfaces()).stream().forEach(itf -> System.out.println(itf.toString()));
-      for (NetworkInterface itf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-         try {
-            System.out.println(itf + " " + itf.isVirtual() + " " + itf.isLoopback() + " " + itf.getHardwareAddress() + " " + itf.getMTU());
-         } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      };
       
       return fileCrawler;
    }
