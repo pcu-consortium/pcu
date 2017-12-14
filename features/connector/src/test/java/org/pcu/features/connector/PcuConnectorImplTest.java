@@ -12,10 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -23,8 +19,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -158,7 +152,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
 
    @Test
    @Ignore // remove this to use it
-   public void testSimulateCrawlHome() throws UnknownHostException, SocketException {
+   public void testSimulateCrawlHome() throws IOException {
       // init crawler :
       String index = "files";
       FileCrawler fileCrawler = buildFileCrawler(index);
@@ -456,32 +450,12 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    }
 
    
-   public FileCrawler buildFileCrawler(String index) throws UnknownHostException, SocketException {
-      Collections.list(NetworkInterface.getNetworkInterfaces()).stream().forEach(itf -> System.out.println(itf.toString()));
-      for (NetworkInterface itf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-         try {
-            System.out.println(itf + " " + itf.isVirtual() + " " + itf.isLoopback() + " " + itf.getHardwareAddress() + " " + itf.getMTU());
-         } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      };
-      
+   public FileCrawler buildFileCrawler(String index) throws IOException {
       FileCrawler fileCrawler = new FileCrawler();
       fileCrawler.setContentStore("fileCrawlerStore"); // TODO manage
       fileCrawler.setIndex(index);
       fileCrawler.setType("file");
-      InetAddress localhost = InetAddress.getLocalHost();
-      System.out.println("localhost " + localhost);
-      String localhostName = localhost.getHostName();
-      System.out.println("localhostName " + localhostName);
-      // server id : MAC address (else system info using OS-specific commands like dmesg or /proc & /sys) ; TODO Q or readable host ??
-      fileCrawler.setConnectorComputerHostName(localhostName); // or IP by getCanonicalHostName(), or both ?
-      NetworkInterface localhostNetworkInterface = NetworkInterface.getByInetAddress(localhost);
-      System.out.println("localhostNetworkInterface " + localhostNetworkInterface);
-      byte[] localhostHardwareAddress = localhostNetworkInterface.getHardwareAddress();
-      System.out.println("localhostHardwareAddress " + localhostHardwareAddress);
-      fileCrawler.setConnectorComputerId(Base64.getEncoder().encodeToString(localhostHardwareAddress));
+      fileCrawler.setConnectorComputerId(CrawlUtils.macAddress());
       
       return fileCrawler;
    }
