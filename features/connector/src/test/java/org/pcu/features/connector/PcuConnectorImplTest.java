@@ -152,6 +152,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    private PcuConnector pcuConnector;
    @Test
    public void testCrawler() {
+      System.out.println("testCrawler " + pcuConnector);
       pcuConnector.defaultCrawl();
    }
 
@@ -213,6 +214,8 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
     */
    @Test
    public void testSimulateCrawl() throws Exception {
+      System.out.println("testSimulateCrawl " + pcuConnector);
+      
       // prepare file to crawl :
       String testContent = "My test content";
       File testFile = createTestFile(testContent);
@@ -458,9 +461,17 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       fileCrawler.setContentStore("fileCrawlerStore"); // TODO manage
       fileCrawler.setIndex(index);
       fileCrawler.setType("file");
+      InetAddress localhost = InetAddress.getLocalHost();
+      System.out.println("localhost " + localhost);
+      String localhostName = localhost.getHostName();
+      System.out.println("localhostName " + localhostName);
       // server id : MAC address (else system info using OS-specific commands like dmesg or /proc & /sys) ; TODO Q or readable host ??
-      fileCrawler.setConnectorComputerHostName(InetAddress.getLocalHost().getHostName()); // or IP by getCanonicalHostName(), or both ?
-      fileCrawler.setConnectorComputerId(Base64.getEncoder().encodeToString(NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress()));
+      fileCrawler.setConnectorComputerHostName(localhostName); // or IP by getCanonicalHostName(), or both ?
+      NetworkInterface localhostNetworkInterface = NetworkInterface.getByInetAddress(localhost);
+      System.out.println("localhostNetworkInterface " + localhostNetworkInterface);
+      byte[] localhostHardwareAddress = localhostNetworkInterface.getHardwareAddress();
+      System.out.println("localhostHardwareAddress " + localhostHardwareAddress);
+      fileCrawler.setConnectorComputerId(Base64.getEncoder().encodeToString(localhostHardwareAddress));
       Collections.list(NetworkInterface.getNetworkInterfaces()).stream().forEach(itf -> System.out.println(itf.toString()));
       for (NetworkInterface itf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
          try {
