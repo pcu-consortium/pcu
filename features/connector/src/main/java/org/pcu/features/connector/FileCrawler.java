@@ -71,18 +71,34 @@ public class FileCrawler extends Crawler<File> {
       PcuMetadataResult metadataRes = null;
       String textContent = null;
       try {
+         if (log.isDebugEnabled()) {
+            log.debug("Extracting metadata from " + file);
+         }
          metadataRes = metadataExtractorApi.extract(file.toURI().toASCIIString()); // http://cache.media.education.gouv.fr/file/ICT/44/7/H2020-ICT-2017-1_Liste_projets_retenus_802447.pdf
          @SuppressWarnings("unchecked")
          String textContentTmp = (String) metadataRes.getContent().stream()
                .map(pageContent -> pageContent.get("content")).filter(pcc -> pcc != null).flatMap(pcc -> ((List<String>) pcc).stream())
                .collect(Collectors.joining(" "));
          textContent = textContentTmp;
-      } catch (Exception e) { // WebApplicationException, ex. 
+         
+      } catch (Exception e) { // WebApplicationException, ex. :
          // Caused by: org.apache.poi.hssf.record.RecordInputStream$LeftoverDataException: Initialisation of record 0x1D(SelectionRecord) left 2 bytes remaining still to be read.
+         
          // Caused by: org.apache.xmlbeans.XmlException: error: The document is not a theme@http://schemas.openxmlformats.org/drawingml/2006/main: document element namespace mismatch expected "http://schemas.openxmlformats.org/drawingml/2006/main" got "http://schemas.openxmlformats.org/drawingml/2006/3/main"
+         
          // java.lang.IllegalArgumentException: The document is really a UNKNOWN file
+         
          // java.lang.IllegalArgumentException: The document is really a OOXML file
-         // TODO Auto-generated catch block
+         
+         // java.lang.NullPointerException: null
+         // at com.qwazr.extractor.ParserAbstract.extractField(ParserAbstract.java:95)
+         // => OK patched in newer extractor
+         
+         // NoSuchMethodException: org.openxmlformats.schemas.wordprocessingml.x2006.main.impl.CTPictureBaseImpl.<init>(org.apache.xmlbeans.SchemaType, boolean)
+         // at org.apache.xmlbeans.impl.schema.SchemaTypeImpl.getJavaImplConstructor2(SchemaTypeImpl.java:1817)
+         // => because XML does not follow MS XML format http://www.datypic.com/sc/ooxml/t-w_CT_PictureBase.html
+         // TODO Qwazr see how to get a better error
+         
          if (log.isDebugEnabled()) {
             log.debug("Error extracting metadata from " + file, e);
          }

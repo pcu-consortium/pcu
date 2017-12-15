@@ -146,7 +146,6 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    private PcuConnector pcuConnector;
    @Test
    public void testCrawler() {
-      System.out.println("testCrawler " + pcuConnector);
       pcuConnector.defaultCrawl();
    }
 

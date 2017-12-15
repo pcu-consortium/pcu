@@ -3,14 +3,14 @@ package org.pcu.features.connector;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.uuid.EthernetAddress;
 
 public class CrawlUtils {
 
@@ -37,6 +37,7 @@ public class CrawlUtils {
     * @throws IOException
     */
    public static String macAddress() throws IOException {
+      /*
       byte[] macAddress = null;
       // NOO localhost's network interface is null on Travis (because within Docker ?)
       //macAddress = (NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress());
@@ -67,6 +68,8 @@ public class CrawlUtils {
       }
       
       return CrawlUtils.base64(macAddress);
+      */
+      return base64(EthernetAddress.fromInterface().asByteArray());
    }
 
    public static String hostName() throws IOException {

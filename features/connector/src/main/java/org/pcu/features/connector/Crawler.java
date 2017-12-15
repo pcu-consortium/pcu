@@ -35,7 +35,8 @@ public abstract class Crawler<T> {
    private String contentStore;
    private int bulkSize = 0;
    private String connectorComputerHostName;
-   private String connectorComputerId;
+   /** if not configured in ((poller.)yaml) conf, uses best MAC address */
+   private String connectorComputerId = null;
    
    /** changes between crawl sessions / job tasks */
    private String crawlId = null;
@@ -63,11 +64,16 @@ public abstract class Crawler<T> {
       }
       try {
          // TODO or in constructor ?
-         this.setConnectorComputerHostName(CrawlUtils.hostName()); // or IP by getCanonicalHostName(), or both ?
-         //this.setConnectorComputerId(uuidGenerator.getEthernetAddress().toString()); // Ethernet address not good enough
-         this.setConnectorComputerId(CrawlUtils.macAddress());
+         if (this.connectorComputerHostName == null) {
+            this.setConnectorComputerHostName(CrawlUtils.hostName()); // or IP by getCanonicalHostName(), or both ?
+            log.info("Using autodetected connectorComputerHostName (readable host name): " + this.getConnectorComputerHostName());
+         }
+         if (this.connectorComputerId == null) {
+            this.setConnectorComputerId(CrawlUtils.macAddress());
+            log.warn("connectorComputerId (id of crawled filesystem) not configured (should be in production), "
+                  + "using autodetected base64'd MAC address: " + this.getConnectorComputerId());
+         }
       } catch (IOException ioex) {
-         // TODO rather use conf'd values
          throw new RuntimeException("Error initing crawl " + this, ioex);
       }
       

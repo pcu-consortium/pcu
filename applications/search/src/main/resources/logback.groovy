@@ -26,6 +26,7 @@ root(INFO, ["GLOBAL-CONSOLE", "GLOBAL-FILE"])
 // PCU :
 //logger("org.pcu", INFO)
 logger("org.pcu", DEBUG)
+//logger("org.pcu.features.connector", DEBUG)
 
 // Spring :
 //logger("org.springframework", DEBUG)
