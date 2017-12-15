@@ -207,8 +207,6 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
     */
    @Test
    public void testSimulateCrawl() throws Exception {
-      System.out.println("testSimulateCrawl " + pcuConnector);
-      
       // prepare file to crawl :
       String testContent = "My test content";
       File testFile = createTestFile(testContent);
@@ -454,7 +452,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       fileCrawler.setContentStore("fileCrawlerStore"); // TODO manage
       fileCrawler.setIndex(index);
       fileCrawler.setType("file");
-      fileCrawler.setConnectorComputerId(CrawlUtils.macAddress());
+      fileCrawler.init();
       
       return fileCrawler;
    }
