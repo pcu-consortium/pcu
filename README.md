@@ -60,6 +60,11 @@ git clone git@github.com:pcu-consortium/pcu.git
 mvn clean install
 ````
 
+NB. in order to get newer versions of the big data components that are integrated through their SNAPSHOT versions, such as [Qwazr Extractor](providers/metadata/extractor) :
+````bash
+mvn -U clean install
+````
+
 ## Test
 The easiest way to test the PCU platform is to use it as an Entreprise Search server :
 ````bash
@@ -77,6 +82,22 @@ then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=ht
 
 
 # Developers
+
+## Release
+
+In order to assemble a binary release, do as scripted in [make-release.sh](make-release.sh).
+
+In order to be able to do it with a non-SNAPSHOT version, do as follow :
+
+Remove -SNAPSHOT from integrated Big Data component provider modules, such as [Qwazr Extractor](providers/metadata/extractor). This implies that both release should be somewhat coordinated.
+
+Remove -SNAPSHOT from all modules, tag (-DtagNameFormat=@{project.version}), upgrade project version number :
+````bash
+mvn release:prepare -DautoVersionSubmodules=true (-Dresume=false) (-DdryRun=true)
+````
+To test it, add -DdryRun=true. To retry, add -Dresume=false. To publish to Maven Central repository, follow steps in [Sonatype guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) with help [from these hints](http://danhaywood.com/2013/07/11/deploying-artifacts-to-maven-central-repo/).
+
+Then (checkout said tag and) do as scripted in make-release.sh .
 
 ## Faster build
 
