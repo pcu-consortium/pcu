@@ -48,6 +48,10 @@ Requirements : [Java JDK 8](http://www.oracle.com/technetwork/java/javase/downlo
 Roadmap : TODO
 
 
+# Latest release
+The latest release is [PCU Entreprise Search beta Technology Preview](https://owncloud.smile.eu/s/6toBC6N2VJv4EHC).
+
+
 # Quickstart
 
 ## Clone sources
@@ -57,7 +61,7 @@ git clone git@github.com:pcu-consortium/pcu.git
 
 ## Build
 ````bash
-mvn clean install
+mvn clean install -DskipTests
 ````
 
 NB. in order to get newer versions of the big data components that are integrated through their SNAPSHOT versions, such as [Qwazr Extractor](providers/metadata/extractor) :
@@ -65,20 +69,50 @@ NB. in order to get newer versions of the big data components that are integrate
 mvn -U clean install
 ````
 
-## Test
+## Try it out
 The easiest way to test the PCU platform is to use it as an Entreprise Search server :
 ````bash
 cd application/search
 mvn spring-boot:run
 ````
-then start a file connector (upcoming) and browse to its web search UI at [http://localhost:8080](http://localhost:8080).
 
-You can also only start its backend :
+then configure a file connector to crawl for instance your home, and start it :
+````bash
+cd features/connector/
+vi src/main/resources/bootstrap/poller.yaml
+roots:
+  - /home/yourusername
+mvn spring-boot:run
+````
+
+and browse to its web search UI at [http://localhost:8080](http://localhost:8080).
+
+You can also only start its backend instead :
 ````bash
 cd features/search/server
 mvn -Pheadless spring-boot:run
 ````
 then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
+
+## Run unit tests
+Install [ElasticSearch 5.5.1](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.1.tar.gz) and start it :
+````bash
+cd elasticsearch-5.5.1/bin
+./elasticsearch
+````
+
+Install [Kafka 1.0](http://www.us.apache.org/dist/kafka/1.0.0/kafka_2.11-1.0.0.tgz), start it and create the "file" topic :
+````bash
+cd kafka
+bin/zookeeper-server-start.sh config/zookeeper.properties &
+bin/kafka-server-start.sh config/server.properties &
+bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic file --zookeeper localhost:2181
+````
+
+Run unit tests :
+````bash
+mvn clean install
+````
 
 
 # Developers
@@ -120,6 +154,10 @@ If compilation fails overall, recheck compilation without restarting with :
 cd src/main/frontend
 ./node_modules/webpack/bin/webpack.js
 ````
+
+## Continuous Integration
+
+PCU is continuously built and tested in [Travis]( https://travis-ci.org/pcu-consortium/pcu) (see [.travis.yml](.travis.yml) configuration), with provisioning of ElasticSearch and Kafka.
 
 ## REST  & JAXRS best practices
 
