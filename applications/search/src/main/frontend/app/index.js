@@ -205,7 +205,8 @@ class SearchBar extends React.Component {
                               <img src="/img/logo.png" alt="LOGO PCU" width="69" />
                         </div>
                         <div className="searchBar__bar">
-                              <input placeholder="John Doe" onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"/>
+                              <input placeholder="John Doe" onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"
+                                 onKeyPress={e => { if (e.key === 'Enter') { this.handleSearchText() } }}/>
                               <button class="SearchBtn" onClick={this.handleSearchText}>
                                     <img src="/img/loupe.svg"/>
                               </button>
