@@ -8,7 +8,7 @@ https://github.com/pcu-consortium/pcu
 
 Copyright (c) 2017 The PCU Consortium
 
-[![Build Status](https://travis-ci.org/pcu-consortium/pcu.svg?branch=master)](https://travis-ci.org/pcu-consortium/pcu) [![Coverage Status](https://coveralls.io/repos/github/pcu-consortium/pcu/badge.svg?branch=master)](https://coveralls.io/github/pcu-consortium/pcu?branch=master) [![Project Stats](https://www.openhub.net/p/pcu-consortium-pcu/widgets/project_thin_badge.gif)](https://www.openhub.net/p/pcu-consortium-pcu)
+[![Build Status](https://travis-ci.org/pcu-consortium/pcu.svg?branch=master)](https://travis-ci.org/pcu-consortium/pcu) [![Coverage Status](https://coveralls.io/repos/github/pcu-consortium/pcu/badge.svg?branch=master)](https://coveralls.io/github/pcu-consortium/pcu?branch=master) [![Download](https://api.bintray.com/packages/pcu-consortium/pcu/pcu-entreprise-search/images/download.svg?version=beta_20171206) ](https://bintray.com/pcu-consortium/pcu/pcu-entreprise-search/beta_20171206/view/files) [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](https://opensource.org/licenses/Apache-2.0) [![Project Stats](https://www.openhub.net/p/pcu-consortium-pcu/widgets/project_thin_badge.gif)](https://www.openhub.net/p/pcu-consortium-pcu)
 
 =====================================================
 
