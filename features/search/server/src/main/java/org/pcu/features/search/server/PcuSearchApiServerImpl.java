@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 
 import io.swagger.annotations.Api;
 
+/**
+ * OBSOLETE, rather see PcuSearchEsConfiguredApiImpl
+ * @author mardut
+ *
+ */
 @Path("/search/api") // TODO Q or /searchcpt, /data, /nosql ?? can be extended on client side, and overloaded by impl (whose value should ONLY be "/" else blocks UI servlet)
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
