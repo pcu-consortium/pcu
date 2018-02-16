@@ -64,6 +64,7 @@ public class ModelServiceImpl {
    private HashMap<String,Schema> typeSchemaMap = new HashMap<String,Schema>();
 
    private String defaultPcuDocJson;
+   private boolean forceBootstrap = true;
    
    @PostConstruct
    public void init() throws JsonParseException, JsonMappingException, IOException {
@@ -82,12 +83,21 @@ public class ModelServiceImpl {
             // - else in production mode fail, OR auto create another index _[datetime] (up to :
             // fill new index also with existing AND new incoming changes, schedule migration of
             // search API on this new index, and deletion of old index)
-            searchEsApi.deleteMapping(index);
+            
+            if (forceBootstrap) { // delete if already there
+               searchEsApi.deleteMapping(index);
+            } else {
+               continue;
+            }
+            
          } catch (ESApiException esex) {
-            if (!esex.getAsJson().contains("index_not_found_exception")) {
+            //if (esex.getAsJson() != null && !esex.getAsJson().contains("index_not_found_exception")) {
+            if (esex.getResponse().getStatus() != 404) {
                throw new RuntimeException("Unkown error reiniting mapping of index " + index, esex);
             }
          }
+         
+         // upload if not yet there or forceBootstrap :
          try {
             searchEsApi.putMapping(index, indexMapping);
          } catch (ESApiException esex) {
@@ -100,7 +110,7 @@ public class ModelServiceImpl {
       for (Resource avroSchemaResource : resourceLoader.getResources("classpath*:bootstrap/avro/*.avsc")) {
          try (InputStream avroSchemaResourceIs = avroSchemaResource.getInputStream()) {
             Schema schema = new Schema.Parser().parse(avroSchemaResourceIs);
-            fileSchemaMap.put(schema.getFullName(), schema);
+            fileSchemaMap.put(schema.getFullName(), schema); // NOO fullName = "union" !?!!
             for (Schema typeSchema : schema.getTypes()) {
                typeSchemaMap.put(typeSchema.getName(), typeSchema); // TODO fullName
             }

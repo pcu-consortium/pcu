@@ -1,0 +1,13 @@
+[
+   {
+      "type": "record",
+      "name": "person",
+      "doc": "",
+      "fields": [
+         {"name":"type", "type":"string", "doc":""},
+         {"name":"id", "type":"long", "doc":""}, /* TODO vs PCU id */
+         /*{"name":"path", "type":"long", "doc":""}, / TODO using sql in ex. view ?? */
+         {"name":"username", "type":"string", "doc":""}
+      ]
+   }
+]

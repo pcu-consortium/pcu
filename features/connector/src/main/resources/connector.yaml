@@ -1,0 +1,19 @@
+crawlers:
+- index: files
+  type: file
+  contentStore: fileCrawlerStore
+  toBeCrawledQeue:
+- index: persons
+  type: person
+#  contentStore: personCrawlerStore
+  toBeCrawledQeue:
+  - querySelect: select * from person
+    idFieldName: id
+    batchSize: 2
+#connectorComputerHostName:
+#connectorComputerId: TODO (otherwise MAC address instead)
+#roots:
+#  - /home/mardut/Documents
+#  - sample
+#suffixes:
+#  - .txt

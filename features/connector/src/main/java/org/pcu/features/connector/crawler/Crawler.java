@@ -1,4 +1,4 @@
-package org.pcu.features.connector;
+package org.pcu.features.connector.crawler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +48,10 @@ public abstract class Crawler<T> {
 
    protected TimeBasedGenerator uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
    
+   // state :
    protected LinkedBlockingQueue<T> toBeCrawledQeue = new LinkedBlockingQueue<T>(); // NB. no fixed capacity
    private ArrayList<PcuDocument> toBeIndexedPcuDocuments = new ArrayList<PcuDocument>(1000);
+   private Object lastCompletedCrawlStartedDate = null;
    
    // stats :
    private long crawled = 0;
@@ -78,6 +80,9 @@ public abstract class Crawler<T> {
       }
       
       this.crawlId = this.uuidGenerator.generate().toString(); // unique, contains start time (timestamp)
+      
+      // TODO LATER load state from persisted
+      this.lastCompletedCrawlStartedDate = null;
    }
    
    // TODO LATER Kafka topics to scale it up !(?)
@@ -86,7 +91,7 @@ public abstract class Crawler<T> {
    protected abstract List<T> getNextToBeCrawled(T toBeCrawledOrLastCrawled);
    /** TODO LATER several contents per crawled item ? */
    protected abstract InputStream getContentInputStream(T toBeCrawled) throws Exception;
-   /** returns indexable mapped doc, and optional dependent docs ex. category... */
+   /** Mapper & meta extractor : returns indexable mapped doc, and optional dependent docs ex. category... */
    // & if doc then extract
    protected abstract List<PcuDocument> buildPcuDocuments(T crawled, String uploadPath);
    
@@ -100,7 +105,7 @@ public abstract class Crawler<T> {
          throw new CrawlCompletedException();
       }
       
-      // upload content :
+      // upload content (if any) :
       String uploadedContentPath = null;
       try (InputStream contentIn = getContentInputStream(toBeCrawled)) {
          if (contentIn != null) {
@@ -121,6 +126,7 @@ public abstract class Crawler<T> {
       toBeCrawledQeue.addAll(nextToBeCrawled); // TODO check that inserted at the tail
    }
    
+   /** client */
    private void registerForIndexing(List<PcuDocument> pcuDocs) {
       toBeIndexedPcuDocuments.addAll(pcuDocs);
       if (this.toBeIndexedPcuDocuments.size() > this.bulkSize) {

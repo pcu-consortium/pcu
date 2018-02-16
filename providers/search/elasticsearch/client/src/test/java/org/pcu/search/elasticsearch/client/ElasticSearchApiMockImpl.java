@@ -1,14 +1,17 @@
 package org.pcu.search.elasticsearch.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.pcu.search.elasticsearch.api.BulkAction;
 import org.pcu.search.elasticsearch.api.BulkMessage;
 import org.pcu.search.elasticsearch.api.BulkResult;
 import org.pcu.search.elasticsearch.api.DeleteByQueryResult;
@@ -17,6 +20,7 @@ import org.pcu.search.elasticsearch.api.DocumentResult;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchApi;
 import org.pcu.search.elasticsearch.api.GetResult;
+import org.pcu.search.elasticsearch.api.IndexAction;
 import org.pcu.search.elasticsearch.api.UpdateRequest;
 import org.pcu.search.elasticsearch.api.mapping.DeleteMappingResult;
 import org.pcu.search.elasticsearch.api.mapping.IndexMapping;
@@ -127,22 +131,29 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    }
 
    @Override
-   public IndexResult deleteDocument(String index, String type, String id, String routing, String timeout,
-         Long version, String parent, String wait_for_active_shards, String refresh) {
-      // TODO Auto-generated method stub
-      return null;
+   public IndexResult deleteDocument(String index, String type, String id, String routing, String timeout, Long version,
+         String wait_for_active_shards, String refresh) throws ESApiException {
+      IndexResult res = new IndexResult();
+      res.set_index(index);
+      res.set_type(type);
+      res.set_id(id);
+      res.setFound(true);
+      res.setResult("deleted");
+      return res;
    }
 
    @Override
    public DeleteByQueryResult deleteDocumentByQuery(String index, String typePattern, ESQueryMessage query,
-         Boolean pretty, String timeout, String refresh, String wait_for_active_shards, Boolean wait_for_completion) {
+         String routing, String timeout, String refresh, String wait_for_active_shards, Boolean wait_for_completion)
+         throws ESApiException {
       // TODO Auto-generated method stub
       return null;
    }
 
    @Override
-   public GetResult getDocument(String index, String type, String id, String routing, Boolean refresh, Long version,
-         Boolean realtime, Boolean _source, String preference, String _source_include, String _source_exclude) {
+   public GetResult getDocument(String index, String type, String id, String routing, String refresh, Long version,
+         Boolean realtime, Boolean _source, String preference, String _source_include, String _source_exclude)
+         throws ESApiException {
       GetResult res = new GetResult();
       res.set_index(index);
       res.set_type(type);
@@ -154,23 +165,35 @@ public class ElasticSearchApiMockImpl implements ElasticSearchApi {
    }
 
    @Override
-   public GetResult getDocumentHead(String index, String type, String id, String routing, Boolean refresh, Long version,
-         Boolean realtime, String preference, String _source_include, String _source_exclude) {
+   public GetResult getDocumentHead(String index, String type, String id, String routing, String refresh, Long version,
+         Boolean realtime, String preference, String _source_include, String _source_exclude) throws ESApiException {
       GetResult res = new GetResult();
       res.set_index(index);
       return res;
    }
 
    @Override
-   public Document getDocumentSource(String index, String type, String id, String routing, Boolean refresh,
-         Long version, Boolean realtime, String preference, String _source_include, String _source_exclude) {
+   public Document getDocumentSource(String index, String type, String id, String routing, String refresh, Long version,
+         Boolean realtime, String preference, String _source_include, String _source_exclude) throws ESApiException {
       return docs.get(id).get_source();
    }
 
    @Override
-   public BulkResult bulk(BulkMessage doc, String wait_for_active_shards, String refresh) throws ESApiException {
-      // TODO Auto-generated method stub
-      return null;
+   public BulkResult bulk(BulkMessage bulkMessage, String wait_for_active_shards, String refresh) throws ESApiException {
+      BulkResult res = new BulkResult();
+      List<LinkedHashMap<String, IndexResult>> items = new ArrayList<LinkedHashMap<String, IndexResult>>();
+      res.setItems(items);
+      for (BulkAction bulkAction : bulkMessage.getActions()) {
+         IndexAction indexAction = bulkAction.getKindToAction().get("index");
+         LinkedHashMap<String, IndexResult> item = new LinkedHashMap<String, IndexResult>();
+         IndexResult indexResult = new IndexResult();
+         indexResult.set_index(indexAction.get_index());
+         indexResult.set_type(indexAction.get_type());
+         indexResult.set_id(indexAction.get_id());
+         item.put("index", indexResult );
+         items.add(item);
+      }
+      return res;
    }
 
    @Override

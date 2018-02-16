@@ -1,0 +1,11 @@
+index: files
+type: file
+#contentStore:
+#bulkSize: 0
+#connectorComputerHostName:
+#connectorComputerId: TODO (otherwise MAC address instead)
+roots:
+#  - /home/mardut/Documents
+  - sample
+suffixes:
+#  - .txt

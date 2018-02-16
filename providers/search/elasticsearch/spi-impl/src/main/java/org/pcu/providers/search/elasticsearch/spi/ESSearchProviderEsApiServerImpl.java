@@ -34,6 +34,9 @@ import io.swagger.annotations.Api;
  * PCU ElasticSearch-like API Impl on ElasticSearch.
  * Copy this and modify it to support other versions of ElasticSearch (or other search servers).
  * Impl'ing a PCU API implies also impl'ing its transversal concerns i.e. security NOOOOOO
+ * 
+ * TODO catch ESApiException in all methods and build a response with the right status (and infos ex. "found" !!)...
+ * 
  * @author mardut
  *
  */
@@ -108,36 +111,31 @@ public class ESSearchProviderEsApiServerImpl extends PcuJaxrsServerBase implemen
    }
 
    public IndexResult deleteDocument(String index, String type, String id, String routing, String timeout, Long version,
-         String parent, String wait_for_active_shards, String refresh) throws ESApiException {
-      return elasticSearchRestClient.deleteDocument(index, type, id, routing, timeout, version, parent,
-            wait_for_active_shards, refresh);
+         String wait_for_active_shards, String refresh) throws ESApiException {
+      return elasticSearchRestClient.deleteDocument(index, type, id, routing, timeout, version, wait_for_active_shards, refresh);
    }
 
    public DeleteByQueryResult deleteDocumentByQuery(String index, String typePattern, ESQueryMessage query,
-         Boolean pretty, String timeout, String refresh, String wait_for_active_shards, Boolean wait_for_completion)
+         String routing, String timeout, String refresh, String wait_for_active_shards, Boolean wait_for_completion)
          throws ESApiException {
-      return elasticSearchRestClient.deleteDocumentByQuery(index, typePattern, query, pretty, timeout, refresh,
-            wait_for_active_shards, wait_for_completion);
+      return elasticSearchRestClient.deleteDocumentByQuery(index, typePattern, query, routing, timeout, refresh, wait_for_active_shards, wait_for_completion);
    }
 
-   public GetResult getDocument(String index, String type, String id, String routing, Boolean refresh, Long version,
+   public GetResult getDocument(String index, String type, String id, String routing, String refresh, Long version,
          Boolean realtime, Boolean _source, String preference, String _source_include, String _source_exclude)
          throws ESApiException {
-      return elasticSearchRestClient.getDocument(index, type, id, routing, refresh, version, realtime, _source,
-            preference, _source_include, _source_exclude);
+      return elasticSearchRestClient.getDocument(index, type, id, routing, refresh, version, realtime, _source, preference, _source_include, _source_exclude);
    }
 
-   public GetResult getDocumentHead(String index, String type, String id, String routing, Boolean refresh, Long version,
+   public GetResult getDocumentHead(String index, String type, String id, String routing, String refresh, Long version,
          Boolean realtime, String preference, String _source_include, String _source_exclude) throws ESApiException {
-      return elasticSearchRestClient.getDocumentHead(index, type, id, routing, refresh, version, realtime, preference,
-            _source_include, _source_exclude);
+      return elasticSearchRestClient.getDocumentHead(index, type, id, routing, refresh, version, realtime, preference, _source_include, _source_exclude);
    }
 
-   public Document getDocumentSource(String index, String type, String id, String routing, Boolean refresh,
+   public Document getDocumentSource(String index, String type, String id, String routing, String refresh,
          Long version, Boolean realtime, String preference, String _source_include, String _source_exclude)
          throws ESApiException {
-      return elasticSearchRestClient.getDocumentSource(index, type, id, routing, refresh, version, realtime, preference,
-            _source_include, _source_exclude);
+      return elasticSearchRestClient.getDocumentSource(index, type, id, routing, refresh, version, realtime, preference, _source_include, _source_exclude);
    }
 
    public BulkResult bulk(BulkMessage doc, String wait_for_active_shards, String refresh) throws ESApiException {

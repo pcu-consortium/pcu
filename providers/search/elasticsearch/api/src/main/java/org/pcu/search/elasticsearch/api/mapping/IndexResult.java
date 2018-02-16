@@ -23,8 +23,9 @@ public class IndexResult extends EmptyDocumentResult {
    public void set_shards(ShardResult _shards) {
       this._shards = _shards;
    }
+   /** null if error ex. bulk 409 Conflict */
    public boolean isCreated() {
-      return created;
+      return created != null && created;
    }
    public void setCreated(boolean created) {
       this.created = created;
@@ -36,7 +37,7 @@ public class IndexResult extends EmptyDocumentResult {
       this.result = result;
    }
    public Boolean getFound() {
-      return found;
+      return found != null && found;
    }
    public void setFound(Boolean found) {
       this.found = found;

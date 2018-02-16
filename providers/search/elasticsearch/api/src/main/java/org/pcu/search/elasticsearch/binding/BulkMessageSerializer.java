@@ -18,12 +18,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  */
 public class BulkMessageSerializer extends StdSerializer<BulkMessage> {
    
-   protected BulkMessageSerializer() {
-      this(null);
-   }
-   
-   protected BulkMessageSerializer(Class<BulkMessage> t) {
-      super(t);
+   public BulkMessageSerializer() {
+      super(BulkMessage.class);
    }
 
    private static final long serialVersionUID = 5852768663142760830L;

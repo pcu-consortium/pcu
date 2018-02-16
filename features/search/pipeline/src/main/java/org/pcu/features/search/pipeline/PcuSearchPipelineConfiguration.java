@@ -1,12 +1,18 @@
 package org.pcu.features.search.pipeline;
 
+import java.util.List;
+
+import javax.ws.rs.ext.ExceptionMapper;
+
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxrs.client.Client;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.pcu.features.search.client.PcuPlatformRestClientConfiguration;
 import org.pcu.features.search.client.PcuSearchApiClientConfiguration;
 import org.pcu.platform.model.PcuModelConfiguration;
 import org.pcu.platform.rest.server.PcuPlatformRestServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +35,11 @@ public class PcuSearchPipelineConfiguration {
    /** TODO test only */
    @Bean
    public Client pcuSearchIndexPipelineApiRestClient(SpringBus bus,
-         JacksonJsonProvider pcuApiJsonProvider/*,
-         ESApiExceptionMapper exceptionMapper,
-         ESApiResponseExceptionMapper responseExceptionMapper*/) {
-      return clientConf.pcuApiRestClientForClass(PcuSearchIndexPipelineApi.class, bus, pcuApiJsonProvider);
+         @Qualifier("pcuApiJsonProvider") JacksonJsonProvider pcuApiJsonProvider,
+         List<ExceptionMapper<?>> pcuExceptionMappers,
+         List<ResponseExceptionMapper<?>> pcuResponseExceptionMappers) {
+      return clientConf.pcuApiRestClientForClass(PcuSearchIndexPipelineApi.class, bus,
+            pcuApiJsonProvider, pcuExceptionMappers, pcuResponseExceptionMappers);
    }
    
 }

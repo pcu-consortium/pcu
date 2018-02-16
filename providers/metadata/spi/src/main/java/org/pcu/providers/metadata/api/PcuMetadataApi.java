@@ -2,6 +2,8 @@ package org.pcu.providers.metadata.api;
 
 import io.swagger.annotations.Api;
 
+import java.io.InputStream;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,5 +25,8 @@ public interface PcuMetadataApi {
 	@Path("/metadata")
 	@GET
 	PcuMetadataResult extract(@QueryParam("url") String locator);
+
+	// TODO allows to download URLs first, in order to upload their content and access their headers
+   PcuMetadataResult extract(String fileName, String contentType, InputStream input);
 
 }

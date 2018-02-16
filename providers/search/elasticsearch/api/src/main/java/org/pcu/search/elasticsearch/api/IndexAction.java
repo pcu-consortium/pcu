@@ -9,7 +9,7 @@ public class IndexAction {
    private String _index;
    private String _type;
    private String _id;
-   private Boolean _version;
+   private Long _version;
    private String _routing;
    private String _parent;
    private String _retry_on_conflict;
@@ -34,11 +34,11 @@ public class IndexAction {
    public void set_id(String _id) {
       this._id = _id;
    }
-   public Boolean get_version() {
+   public Long get_version() {
       return _version;
    }
-   public void set_version(Boolean _version) {
-      this._version = _version;
+   public void set_version(Long long1) {
+      this._version = long1;
    }
    public String get_routing() {
       return _routing;

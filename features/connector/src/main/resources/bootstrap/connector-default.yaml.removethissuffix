@@ -1,0 +1,37 @@
+# default conf, taken out of logs when this file is not present
+components: !<java.util.ArrayList>
+- !<org.pcu.features.connector.Crawler2>
+  index: "files"
+  type: "file"
+  contentStore: "fileCrawlerStore"
+  toBeCrawledQeue:
+  - !<org.pcu.features.connector.FileCrawlBatch>
+    index: null
+    lastCrawledFilePath: null
+    lastCrawled: "sample"
+  toBeIndexedPcuDocuments: []
+  crawled: 0
+  indexed: 0
+  roots: null
+  suffixes: null
+- !<org.pcu.features.connector.Crawler2>
+  index: "persons"
+  type: null
+  contentStore: "personCrawlerStore"
+  toBeCrawledQeue:
+  - !<org.pcu.features.connector.AvroDrivenJDBCCrawlBatch>
+    index: null
+    jdbcProperties:
+      jdbcUrl: "jdbc:h2:mem:jdbcConnectorTest;DATABASE_TO_UPPER=false;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE\"\
+        ;DB_CLOSE_DELAY=-1"
+      username: "h2"
+    querySelect: "select * from person"
+    idFieldName: "id"
+    batchSize: 2
+    lastPolledId: null
+    avroSchemaName: "person"
+  toBeIndexedPcuDocuments: []
+  crawled: 0
+  indexed: 0
+  roots: null
+  suffixes: null

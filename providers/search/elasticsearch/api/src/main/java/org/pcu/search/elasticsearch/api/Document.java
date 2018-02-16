@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 
 /**
@@ -23,7 +22,8 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 @ApiModel(value = "A PCU search Document")
-@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
+@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.NONE)
+// NB. getter but not fields to allow extending classes such as PcuConfiguration to add their own data without adding an explicit "properties" field
 public class Document {
 
    /* ?????????
@@ -105,7 +105,7 @@ public class Document {
    }
    
    // TODO ?
-   private static ObjectMapper documentObjectMapper = new ObjectMapper(); // TODO custom ?
+   private static ObjectMapper documentObjectMapper = new ObjectMapper(); // TODO custom ? or from PcuPlatformRestClientConfiguration !
    public String toString() {
       try {
          return documentObjectMapper.writeValueAsString(this);

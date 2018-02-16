@@ -42,7 +42,7 @@ import io.swagger.annotations.ApiParam;
  * - ? mget/search/...
  * - unsupported search alternatives : (not mandatory for developers)
  * term (use terms), match (use multi_match), sort field array (use field to direction map), highlight type (only default unified)...
- * TODO but required to replace ES in an existing app
+ * TODO but required to replace ES in an existing app :
  * - TODO requirements : MES (function_score, index mgmt ex. reindex ?), ekeller's list...
  * 
  * gotchas :
@@ -51,11 +51,16 @@ import io.swagger.annotations.ApiParam;
  * So rather use cowtowncoder / Jackson UUID, rather than UUID v1 (the best Lucene id : http://blog.mikemccandless.com/2014/05/choosing-fast-unique-identifier-uuid.html ),
  * or hash id fields (like fscrawler does with file path https://github.com/shadiakiki1986/docker-fscrawler )
  * which provides auto dedup.
+ *  - 4xx HTTP status responses are translated to ESApiException by CXF client.
+ *  Therefore GetResult.isFound() is never false and useless, ESApiException 404 status should be checked instead.
  * 
  * ElasticSearch REST API reference source :
  * https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/
  * 
- * TODO swagger defaultValue to jaxrs @DefaultValue (?)
+ * TODO improvements :
+ * - move numerous non-functional request parameters in a JAXRS bean
+ * - or remove them altogether in the API and rather inject them through CXF interceptors, based on the conf of the API factory or Spring-injected props
+ * - swagger defaultValue to jaxrs @DefaultValue (?)
  * 
  * REST & JAXRS best practices : (TODO move)
  * - no 2 operations with same path, rather provide suppl helper operations in ElasticSearchClientApi,
@@ -119,7 +124,7 @@ public interface ElasticSearchApi {
          @ApiParam(value = "type") @PathParam("type") String type, @ApiParam(value = "id") @PathParam("id") String id,
          @ApiParam(value = "document", required = true) Document doc,
          @ApiParam(value = "routing, or mapped _routing field") @QueryParam("routing") String routing,
-         @ApiParam(value = "ex. 5m") @QueryParam("timeout") String timeout,
+         @ApiParam(value = "ex. 5m, 1000") @QueryParam("timeout") String timeout,
          @QueryParam("version") Long version, @QueryParam("version_type") String version_type, // internal (> 0 !), external & external_gte do not support versioning, use index API instead (force is deprecated) https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
          @ApiParam(value = "create, or _create path param", required = false) @QueryParam("op_type") String op_type,
          @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
@@ -131,48 +136,56 @@ public interface ElasticSearchApi {
          @ApiParam(value = "type") @PathParam("type") String type,
          @ApiParam(value = "document", required = true) Document doc,
          @ApiParam(value = "routing, or mapped _routing field") @QueryParam("routing") String routing,
-         @ApiParam(value = "ex. 5m") @QueryParam("timeout") String timeout,
+         @ApiParam(value = "ex. 5m, 1000") @QueryParam("timeout") String timeout,
          @QueryParam("version") Long version, @QueryParam("version_type") String version_type, // internal (> 0 !), external & external_gte do not support versioning, use index API instead (force is deprecated) https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
          @ApiParam(value = "create, or _create path param", required = false) @QueryParam("op_type") String op_type,
          @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException; // enum https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException; // enum https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
    @Path("/{index}/{type}/{id}")
    @POST
-   IndexResult updateDocument(@PathParam("index") String index, @PathParam("type") String type,
-         @PathParam("id") String id, Document doc,
-         @ApiParam(value = "routing") String routing, @ApiParam(value = "timeout") String timeout,
-         Long version, String version_type, // internal (> 0 !), no versioning with external & external_gte, use index API instead (force is deprecated) https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
-         Integer retry_on_conflict, @ApiParam(value = "int or all, default is primaries only i.e. 1") String wait_for_active_shards,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") String refresh, // 
-         boolean _source, String parent) throws ESApiException;
+   IndexResult updateDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
+         @ApiParam(value = "type") @PathParam("type") String type, @ApiParam(value = "id") @PathParam("id") String id,
+         @ApiParam(value = "document", required = true) Document doc,
+         @ApiParam(value = "routing, or mapped _routing field") @QueryParam("routing") String routing,
+         @ApiParam(value = "ex. 5m, 1000") @QueryParam("timeout") String timeout,
+         @QueryParam("version") Long version, @QueryParam("version_type") String version_type, // internal (> 0 !), external & external_gte do not support versioning, use index API instead (force is deprecated) https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+         @QueryParam("") Integer retry_on_conflict, @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("") String wait_for_active_shards,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh, // 
+         @QueryParam("") boolean _source, @QueryParam("") String parent) throws ESApiException;
+   // LATER tasks, _rethrottle, slice
    @Path("/{index}/{type}/{id}/_update")
    @POST
    IndexResult updateDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
          @ApiParam(value = "type", required = true) @PathParam("type") String type,
-         @ApiParam(value = "id", required = true) @PathParam("id") String id, UpdateRequest updateRequest) throws ESApiException; // TODO version ??
+         @ApiParam(value = "id", required = true) @PathParam("id") String id, UpdateRequest updateRequest) throws ESApiException; // TODO params in a Bean !!!
    void updateDocumentByQuery(ESQueryMessage query, Document doc);
+   // LATER conflicts=proceed, scroll_size, pipeline
+   // LATER tasks, _rethrottle, slice
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
    @Path("/{index}/{type}/{id}")
    @DELETE
    IndexResult deleteDocument(@ApiParam(value = "index", required = true) @PathParam("index") String index,
          @ApiParam(value = "type", required = true) @PathParam("type") String type,
          @ApiParam(value = "id", required = true) @PathParam("id") String id,
-         @ApiParam(value = "routing") String routing, @ApiParam(value = "ex. 5m, 1000") String timeout,
-         Long version, String parent,
-         @ApiParam(value = "int or all, default is primaries only i.e. 1") String wait_for_active_shards,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") String refresh) throws ESApiException;
+         @ApiParam(value = "routing, or mapped _routing field (use it instead of parent)") @QueryParam("routing") String routing,
+         @ApiParam(value = "ex. 5m, 1000") @QueryParam("timeout") String timeout,
+         @QueryParam("version") Long version,
+         @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException;
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
    @Path("/{indexPattern}/{typePattern}/_delete_by_query") // NB. .+ works but not {typePattern:(/[^/]+?)?} http://www.nakov.com/blog/2009/07/15/jax-rs-path-pathparam-and-optional-parameters/
    @POST
    DeleteByQueryResult deleteDocumentByQuery(@PathParam("indexPattern") String index,
          @PathParam("typePattern") String typePattern, ESQueryMessage query,
-         @ApiParam(defaultValue = "false") Boolean pretty, // TODO everywhere
-         @ApiParam(value = "ex. 5m, 1000") String timeout,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") String refresh,
-         @ApiParam(value = "int or all, default is primaries only i.e. 1") String wait_for_active_shards,
-         @ApiParam(value = "", defaultValue = "false") Boolean wait_for_completion) throws ESApiException;
-   // LATER tasks, rethrottle, slice
+         //@ApiParam(defaultValue = "false") Boolean pretty, // TODO everywhere
+         @ApiParam(value = "routing, or mapped _routing field (use it instead of parent)") @QueryParam("routing") String routing,
+         @ApiParam(value = "ex. 5m, 1000") @QueryParam("timeout") String timeout,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh,
+         @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
+         @ApiParam(value = "", defaultValue = "false") @QueryParam("wait_for_completion") Boolean wait_for_completion) throws ESApiException;
+   // LATER conflicts=proceed, scroll_size
+   // LATER tasks, _rethrottle, slice
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
    @Path("/{index}/{type}/{id}") // NOT id:.+ else No handler found for uri, URL encode it instead
    @GET
@@ -181,7 +194,7 @@ public interface ElasticSearchApi {
          @ApiParam(value = "type", defaultValue = "_all") @PathParam("type") String type,
          @ApiParam(value = "id", required = true) @PathParam("id") String id,
          @ApiParam(value = "routing") @QueryParam("routing") String routing,
-         @ApiParam(value = "refresh", defaultValue = "false") @QueryParam("refresh") Boolean refresh,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh,
          @ApiParam(value = "only if equal") @QueryParam("version") Long version,
          @ApiParam(value = "realtime", defaultValue = "false") @QueryParam("realtime") Boolean realtime,
          @ApiParam(value = "_source", defaultValue = "true") @QueryParam("_source") Boolean _source,
@@ -196,7 +209,7 @@ public interface ElasticSearchApi {
          @ApiParam(value = "type", defaultValue = "_all") @PathParam("type") String type,
          @ApiParam(value = "id", required = true) @PathParam("id") String id,
          @ApiParam(value = "routing") @QueryParam("routing") String routing,
-         @ApiParam(value = "refresh", defaultValue = "false") @QueryParam("refresh") Boolean refresh,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh,
          @ApiParam(value = "only if equal") @QueryParam("version") Long version,
          @ApiParam(value = "realtime", defaultValue = "false") @QueryParam("realtime") Boolean realtime,
          @ApiParam(value = "preference") @QueryParam("preference") String preference, // or _primary, _local, or custom (session id, user name...)
@@ -209,7 +222,7 @@ public interface ElasticSearchApi {
          @ApiParam(value = "type", defaultValue = "_all") @PathParam("type") String type,
          @ApiParam(value = "id", required = true) @PathParam("id") String id,
          @ApiParam(value = "routing") @QueryParam("routing") String routing,
-         @ApiParam(value = "refresh", defaultValue = "false") @QueryParam("refresh") Boolean refresh,
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh,
          @ApiParam(value = "only if equal") @QueryParam("version") Long version,
          @ApiParam(value = "realtime", defaultValue = "false") @QueryParam("realtime") Boolean realtime,
          @ApiParam(value = "preference") @QueryParam("preference") String preference, // or _primary, _local, or custom (session id, user name...)
@@ -224,7 +237,7 @@ public interface ElasticSearchApi {
    @POST
    BulkResult bulk(@ApiParam(value = "document", required = true) BulkMessage doc,
          @ApiParam(value = "int or all, default is primaries only i.e. 1") @QueryParam("wait_for_active_shards") String wait_for_active_shards,
-         @ApiParam(value = "true or empty, wait_for", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException;
+         @ApiParam(value = "true or empty, wait_for (makes indexing synchronous)", defaultValue = "false") @QueryParam("refresh") String refresh) throws ESApiException;
    
    // Query API. Difficulty is being composite.
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html

@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.pcu.search.elasticsearch.api.Document;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -180,6 +182,12 @@ public class PcuDocument {
       public Map<K, V> build() {
          return map;
       }
+   }
+
+   public Document toEsDocument() {
+      Document esDocument = new Document();
+      esDocument.setProperties(this.getProperties());
+      return esDocument;
    }
    
 }

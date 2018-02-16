@@ -34,6 +34,8 @@ spring:
     profiles: test
 pcu:
   connector:
+#    templateId: connector-default-template
+#    confId:
     runAtStartup: false
   file:
     local:

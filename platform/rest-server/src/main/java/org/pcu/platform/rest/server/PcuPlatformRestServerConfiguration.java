@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.pcu.features.search.client.PcuPlatformRestClientConfiguration;
 import org.pcu.platform.rest.server.swagger.PcuApiSwagger2Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -98,14 +101,17 @@ public class PcuPlatformRestServerConfiguration {
 
     /** NB. reusing client-defined bus (but xxxApiImpl is happily not API client) */ 
     @Bean
-    public Server pcuJaxrsServer(SpringBus bus, JacksonJsonProvider pcuSearchApiJsonProvider,
-          List<PcuJaxrsServerBase> pcuJaxrsServers,/* PcuApiExceptionMapper pcuApiExceptionMapper,*/
+    public Server pcuJaxrsServer(SpringBus bus, @Qualifier("pcuApiJsonProvider") JacksonJsonProvider pcuSearchApiJsonProvider,
+          List<PcuJaxrsServerBase> pcuJaxrsServers,
+          List<ExceptionMapper<?>> pcuExceptionMappers,
+          List<ResponseExceptionMapper<?>> pcuResponseExceptionMappers,
           PcuApiSwagger2Feature pcuApiSwagger2Feature) {
        //pcuSearchApiSimpleImpls = pcuSearchApiSimpleImpls.stream()
        //      .filter(apiImpl -> !(apiImpl instanceof Proxy)).collect(Collectors.toList()); // else WARN  | OperationResourceInfoComparator:126 - Both org.pcu.features.search.simple.PcuSearchApiSimpleImpl#index and com.sun.proxy.$Proxy102#index are equal candidates for handling the current request which can lead to unpredictable results
         ArrayList<Object> providers = new ArrayList<Object>();
         providers.add(pcuSearchApiJsonProvider); // else web app ex Response.Status.UNSUPPORTED_MEDIA_TYPE
-        ///providers.add(pcuApiExceptionMapper);
+        providers.addAll(pcuExceptionMappers);
+        providers.addAll(pcuResponseExceptionMappers);
         
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
         endpoint.setBus(bus);

@@ -19,6 +19,10 @@
          <artifactId>pcu-providers-file-spi</artifactId><!-- PCU file API is the one of its own impl -->
       </dependency>
       <dependency>
+        <groupId>org.pcu-consortium.pcu</groupId>
+        <artifactId>pcu-providers-search-elasticsearch-client</artifactId><!-- else No qualifying bean of type 'java.util.List<javax.ws.rs.ext.ExceptionMapper<?>>' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {} -->
+      </dependency>
+      <dependency>
          <groupId>org.pcu-consortium.pcu</groupId>
          <artifactId>pcu-platform-rest-server</artifactId><!-- to deploy "proxy" impl REST servers as a bonus / default -->
       </dependency>

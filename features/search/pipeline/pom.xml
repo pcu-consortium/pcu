@@ -49,6 +49,29 @@
          <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- for ModelService ; TODO better or only test yet ?! -->
          <scope>test</scope>
       </dependency>
+      
+      
+        <!-- JDBC connector
+        else java.sql.SQLException: No suitable driver, TODO better / shared dep -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+           <groupId>com.zaxxer</groupId>
+           <artifactId>HikariCP</artifactId>
+        </dependency>
+        <!-- JDBC connector test database -->
+        <dependency>
+           <groupId>com.h2database</groupId>
+           <artifactId>h2</artifactId>
+           <scope>test</scope>
+        </dependency>
+        <!-- dependency>
+           <groupId>org.postgresql</groupId>
+           <artifactId>postgresql</artifactId>
+           <scope>runtime</scope>
+        </dependency -->
 
 	</dependencies>
 </project>

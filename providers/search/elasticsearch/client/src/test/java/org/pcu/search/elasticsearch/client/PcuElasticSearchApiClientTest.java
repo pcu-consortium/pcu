@@ -16,10 +16,14 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.search.elasticsearch.PcuElasticSearchClientApplication;
+import org.pcu.search.elasticsearch.api.BulkAction;
+import org.pcu.search.elasticsearch.api.BulkMessage;
+import org.pcu.search.elasticsearch.api.BulkResult;
 import org.pcu.search.elasticsearch.api.Document;
 import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.GetResult;
+import org.pcu.search.elasticsearch.api.IndexAction;
 import org.pcu.search.elasticsearch.api.QueryDocument;
 import org.pcu.search.elasticsearch.api.mapping.Analysis;
 import org.pcu.search.elasticsearch.api.mapping.Analyzer;
@@ -96,7 +100,8 @@ public class PcuElasticSearchApiClientTest {
       try {
          es.deleteMapping(index);
       } catch(ESApiException esex) {
-         assertTrue(esex.getAsJson().contains("index_not_found_exception"));
+         //assertTrue(esex.getAsJson().contains("index_not_found_exception"));
+         assertTrue(esex.getResponse().getStatus() == 404);
          LOGGER.info("There was no need to cleanup before testing");
          //String msg = IOUtils.toString((InputStream) waex.getResponse().getEntity());
          //msg.toString();
@@ -333,11 +338,9 @@ public class PcuElasticSearchApiClientTest {
       
       // bulk :
       // TODO define another client with mapper without indent, or extract in another test disabling the pcu.rest.enableIndenting prop
-      /*
       BulkMessage bulkMessage = new BulkMessage();
       bulkMessage.setActions(new ArrayList<>());
       BulkAction bulkAction1 = new BulkAction();
-      bulkAction1.setKindToAction(new LinkedHashMap<>());
       IndexAction indexAction1 = new IndexAction();
       indexAction1.set_index("files");
       indexAction1.set_type("file");
@@ -352,16 +355,20 @@ public class PcuElasticSearchApiClientTest {
       indexAction2.set_type("file");
       indexAction2.set_id(new UUID().toString());
       BulkAction bulkAction2 = new BulkAction();
-      bulkAction2.setKindToAction(new LinkedHashMap<>());
       bulkAction2.getKindToAction().put("index", indexAction2);
       Document doc2 = new Document();
-      doc2.getProperties().put("name", "cv_janedoe.doc");
+      doc2.getProperties().put("name", "cv_jimdoe.doc");
       bulkAction2.setDoc(doc2);
       bulkMessage.getActions().add(bulkAction2);
       BulkResult bulkRes = es.bulk(bulkMessage, null, null);
       assertEquals(2, bulkRes.getItems().size());
       assertEquals(indexAction1.get_id(), bulkRes.getItems().get(0).get("index").get_id());
-      */
+      
+      // delete :
+      IndexResult deleteRes = es.deleteDocument("files", "file", indexAction1.get_id(), null, null, null, null, "true");
+      assertEquals(indexAction1.get_id(), deleteRes.get_id());
+      assertTrue(deleteRes.getFound());
+      assertEquals("deleted", deleteRes.getResult());
    }
    
    @Test

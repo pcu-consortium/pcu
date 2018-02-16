@@ -1,6 +1,7 @@
 package org.pcu.features.connector;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,6 +26,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -33,6 +37,13 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.pcu.features.configuration.api.GetConfigurationResult;
+import org.pcu.features.configuration.api.PcuConfigurationApi;
+import org.pcu.features.connector.crawler.CrawlUtils;
+import org.pcu.features.connector.crawler.Crawler2;
+import org.pcu.features.connector.crawler.FileCrawlBatch;
+import org.pcu.features.connector.crawler.FileCrawler;
+import org.pcu.features.connector.crawler.JDBCCrawlBatchBase;
 import org.pcu.features.search.server.meta.PcuField;
 import org.pcu.features.search.server.meta.PcuIndex;
 import org.pcu.features.search.server.meta.PcuIndexField;
@@ -42,11 +53,13 @@ import org.pcu.platform.model.PcuModelConfiguration;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.file.api.PcuFileResult;
 import org.pcu.providers.file.local.spi.LocalFileProviderConfiguration;
+import org.pcu.providers.metadata.api.PcuMetadataApi;
 import org.pcu.providers.search.api.PcuDocument;
 import org.pcu.providers.search.api.PcuIndexResult;
 import org.pcu.providers.search.api.PcuSearchApi;
 import org.pcu.providers.search.api.PcuSearchEsClientApi;
 import org.pcu.providers.search.elasticsearch.spi.ESSearchProviderConfiguration;
+import org.pcu.search.elasticsearch.api.ESApiException;
 import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.query.ESQuery;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
@@ -65,11 +78,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.zaxxer.hikari.HikariDataSource;
 
 
 /**
@@ -81,7 +104,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={PcuConnectorConfiguration.class, // client
+@ContextConfiguration(classes={PcuConnectorImplTest.JdbcConnectorTestConfiguration.class, PcuConnectorConfiguration.class, // client
       ESSearchProviderConfiguration.class, LocalFileProviderConfiguration.class, PcuModelConfiguration.class}, // server
       initializers = ConfigFileApplicationContextInitializer.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.DEFINED_PORT, properties="server.port=45665")
@@ -89,7 +112,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 //which would require listening to an ApplicationEvent and therefore using a Provider pattern
 //see https://docs.spring.io/spring-boot/docs/current/reference/html/howto-embedded-servlet-containers.html https://stackoverflow.com/questions/30312058/spring-boot-how-to-get-the-running-port
 //or with autoconf redefine cxf.jaxrs.client.address
-@ActiveProfiles("test")
+@ActiveProfiles("test") // TODO StarterProfiles.TEST ... in -common
+//@Sql({ "classpath:/sql/data.sql" }) // TODO move ; NOT "classpath:/sql/cleanup.sql" since not created by hibernate previously BUT THEN FAILS WHEN SEVERAL TESTS
+// NOO MOVED TO PcuConnectorConfiguration but using DataSourceInitializer since @Sql only works within tests
 public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    @LocalServerPort
    protected int serverPort;
@@ -100,6 +125,8 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    private PcuSearchApi searchApi;
    @Autowired @Qualifier("defaultFileProviderApi") //defaultFileProviderApi LocalFileProviderApiImpl pcuFileApiRestClient
    private PcuFileApi fileApi;
+   @Autowired @Qualifier("defaultMetadataExtractorApi") // possibly defaultMetadataExtractorRestClient ?
+   private PcuMetadataApi metadataExtractorApi;
 
    @Autowired @Qualifier("pcuApiDateTimeFormatter")
    private DateTimeFormatter pcuApiDateTimeFormatter;
@@ -108,14 +135,72 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    @Autowired @Qualifier("pcuApiPrettyMapper")
    private ObjectMapper pcuApiPrettyMapper;
 
+   ///@Resource(name="pcuConnectorApiRestClient") // NOT @Autowired else NoSuchBean because proxy has not the same class https://stackoverflow.com/questions/15614786/could-not-autowire-jaxrs-client
+   ///private PcuConnectorApi pcuConnectorApi;
+   @Resource(name="pcuConfigurationApiRestClient") // NOT @Autowired else NoSuchBean because proxy has not the same class https://stackoverflow.com/questions/15614786/could-not-autowire-jaxrs-client
+   private PcuConfigurationApi pcuConfigurationApi;
    @Autowired
    private ModelServiceImpl modelService;
+   @Autowired @Qualifier("pcuApiTypedMapper")
+   private ObjectMapper pcuApiTypedMapper;
 
    /** for tests */
    @Autowired @Qualifier("elasticSearchRestClient")
    private ElasticSearchClientApi elasticSearchRestClient;
    @Autowired @Qualifier("elasticSearchMapper")
    private ObjectMapper elasticSearchMapper;
+   
+   @Autowired
+   private JdbcTemplate jdbcConnectorJdbcTemplate;
+   
+   @Configuration
+   public static class JdbcConnectorTestConfiguration {
+      @Profile({ "standalone", "test" }) // TODO StarterProfiles.TEST ... in -common
+      @PropertySource("classpath:application-defaults.properties") // Not loaded by naming convention
+      @Configuration
+      static class StandaloneDatabaseConfig {
+         @Bean
+         public DataSource jdbcConnectorDataSource(final Environment env) {
+            final HikariDataSource ds = new HikariDataSource();
+            ds.setJdbcUrl(env.getRequiredProperty("pcu.connector.jdbc.url"));
+            ds.setUsername(env.getRequiredProperty("pcu.connector.jdbc.username"));
+            return ds;
+         }
+         @Bean
+         public JdbcTemplate jdbcConnectorJdbcTemplate(final Environment env, DataSource jdbcConnectorDataSource) {
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+            jdbcTemplate.setDataSource(jdbcConnectorDataSource);
+            return jdbcTemplate;
+         }
+      }
+
+      /*
+      @Profile(StarterProfiles.STAGING)
+      @Configuration
+      static class StagingDatabaseConfig {
+         @Bean
+         public DataSource dataSource(final Environment env) {
+            final HikariDataSource ds = new HikariDataSource();
+            ds.setJdbcUrl(env.getRequiredProperty("psql.jdbcurl"));
+            ds.setUsername(env.getRequiredProperty("psql.username"));
+            return ds;
+         }
+      }
+
+      @Profile(StarterProfiles.PRODUCTION)
+      @Configuration
+      static class ProuctionDatabaseConfig {
+         @Bean
+         public DataSource dataSource(final Environment env) {
+            final HikariDataSource ds = new HikariDataSource();
+            ds.setJdbcUrl(env.getRequiredProperty("psql.jdbcurl"));
+            ds.setUsername(env.getRequiredProperty("psql.username"));
+            return ds;
+         }
+      }
+      */
+      
+   }
    
    @Test
    public void testIndex() throws Exception {
@@ -145,39 +230,194 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    @Autowired
    private PcuConnector pcuConnector;
    @Test
-   public void testCrawler() {
+   public void testCrawler2full() {
       pcuConnector.defaultCrawl();
+   }
+
+   @Test
+   public void testCrawler2() throws Exception {
+      // prepare file to crawl :
+      String testContent = "My test content";
+      ///File testFile = createTestFile(testContent);
+      File testDir = new File("testDir");
+      if (!testDir.exists()) testDir.mkdirs();
+      File testFile = File.createTempFile("pcu_test_", ".txt", testDir);
+      testFile.deleteOnExit();
+      try (FileOutputStream testFileOut = new FileOutputStream(testFile)) {
+         IOUtils.write(testContent, testFileOut, (Charset) null);
+      }
+      
+      // init crawler :
+      Crawler2 fileCrawler = PcuConnector.buildDefaultSampleFileCrawler(pcuConnector).getCrawler();
+      fileCrawler.getToBeCrawledQeue().clear();
+      fileCrawler.getToBeCrawledQeue().add(new FileCrawlBatch(testDir, fileCrawler));
+      ///fileCrawler.getToBeCrawledQeue().add(new CrawlBatch(new File("/home/mardut/Documents"), fileCrawler));
+      fileCrawler.init();
+      
+      fileCrawler.crawlIteration();
+      fileCrawler.crawlIteration();
+      fileCrawler.crawlIteration();
+   }
+   
+   @Test
+   public void testCrawler2Jdbc() throws Exception {
+      // init crawler :
+      JDBCCrawlBatchBase jdbcCrawlBatch = PcuConnector.buildDefaultPersonAvroDrivenJDBCCrawler(pcuConnector);
+      Crawler2 crawler = jdbcCrawlBatch.getCrawler();
+      jdbcCrawlBatch.setBatchSize(2); // to be able to test batching with 3 items
+
+      crawler.init();
+      
+      crawler.crawlIteration();
+      crawler.crawlIteration();
+   }
+
+   @Test
+   public void testCrawler2Conf() throws Exception {
+      // init crawler :
+      Crawler2 crawler = PcuConnector.buildDefaultPersonAvroDrivenJDBCCrawler(pcuConnector).getCrawler();
+      
+      LinkedHashMap<String, Object> jdbcProperties = new LinkedHashMap<String,Object>();
+      jdbcProperties.put("jdbcUrl", "jdbc:h2:mem:jdbcConnectorTest;DATABASE_TO_UPPER=false;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE\";DB_CLOSE_DELAY=-1");
+      jdbcProperties.put("username", "h2");
+      jdbcProperties.put("userkokoname", "ko");
+      ((JDBCCrawlBatchBase) crawler.getToBeCrawledQeue().peek()).setJdbcProperties(jdbcProperties); // to allow ser / deser of JdbcTemplate and its datasource
+      
+      // YAML :
+      ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+      mapper.enableDefaultTyping(); 
+      ///jdbcCrawlBatch.setJdbcTemplate(null); // TODO ignore & bloom else seri KO
+      try {
+         //String jdbcCrawlBatchYaml = mapper.writeValueAsString(jdbcCrawlBatch); // NO MUST BE WITHIN A LIST else class name is not serialized along http://www.baeldung.com/jackson-inheritance
+         String crawlerYaml = mapper.writeValueAsString(crawler);
+         System.out.println("testCrawler2Conf :\n" + crawlerYaml);
+         Crawler2 parsedCrawler = mapper.readValue(crawlerYaml, Crawler2.class);
+         assertTrue(parsedCrawler.getToBeCrawledQeue().peek() instanceof JDBCCrawlBatchBase);
+         JDBCCrawlBatchBase jdbcCrawlBatch = (JDBCCrawlBatchBase) crawler.getToBeCrawledQeue().peek();
+         assertTrue(jdbcCrawlBatch.getJdbcTemplate() != null);
+      } catch (Exception e) {
+         log.error("Error setting up crawler TODO", e);
+      }
+      
+      // JSON that is ElasticSearch-compatible :
+      // (and not
+      ///pcuApiTypedMapper.setPropertyInclusion(JsonInclude., contentIncl));
+      pcuApiTypedMapper.writeValueAsString(crawler);
+   }
+   @Test
+   public void testCrawler2ConfDefault() throws ESApiException, IOException {
+      // 1. hardcoded default conf :
+      assertEquals(PcuConnector.hardcodedDefaultConfId, pcuConnector.getConfId());
+      assertEquals(2, pcuConnector.getConf().getComponents().size());
+      try {
+         pcuConfigurationApi.get(PcuConnector.confType, pcuConnector.getConfId(), null);
+         fail("conf should not exist in mgr");
+      } catch (ESApiException esapiex) {
+         assertEquals(404, esapiex.getStatus()); // hardcoded means not on server !
+      }
+      
+      // 2. using existing template :
+      pcuConnector.setTemplateId("connector-default-test-template");
+      // checking that template has been bootstrapped :
+      /*try { // uncomment if needed to get back to a correct state
+         pcuConfigurationApi.delete(PcuConnector.confType, pcuConnector.getConnectorTemplateId(), null);
+      } catch (ESApiException esapiex) {
+         assertEquals(404, esapiex.getStatus()); // i.e. not yet uploaded, but other errors are not allowed here
+      }*/
+      GetConfigurationResult pcuConfTemplateRes;
+      try {
+         pcuConfTemplateRes = pcuConfigurationApi.get(PcuConnector.confType, pcuConnector.getTemplateId(), true);
+         // testing PcuConfigurationApi btw :
+         assertEquals(pcuConnector.getTemplateId(), pcuConfTemplateRes.get_id());
+         assertEquals(pcuConnector.confType, pcuConfTemplateRes.get_type());
+         assertEquals(pcuConnector.CONF_INDEX, pcuConfTemplateRes.get_index());
+      } catch (ESApiException esapiex) {
+         fail("template should exist in mgr " + esapiex.getMessage());
+      }
+      // delete conf if already uploaded (by previous test...) :
+      try {
+         pcuConfigurationApi.delete(PcuConnector.confType, pcuConnector.getConfId(), null);
+      } catch (ESApiException esapiex) {
+         assertEquals(404, esapiex.getStatus()); // i.e. not yet uploaded, but other errors are not allowed here
+      }
+      // re trigger setup :
+      //pcuConnector.setRunAtStartup(false);
+      //pcuConnector.onApplicationEvent(null);
+      pcuConnector.setConfId(null); // rather than hardcoded conf id
+      pcuConnector.setup();
+      // check that conf has been created from template and uploaded :
+      try {
+         GetConfigurationResult pcuConfRes = pcuConfigurationApi.get(PcuConnector.confType, pcuConnector.getConfId(), true);
+         // testing PcuConfigurationApi btw :
+         assertEquals(pcuConnector.getConfId(), pcuConfRes.get_id());
+         assertEquals(CrawlUtils.macAddress(), pcuConfRes.get_id()); // check machine-specific default id
+         assertEquals(pcuConnector.confType, pcuConfRes.get_type());
+         assertEquals(pcuConnector.CONF_INDEX, pcuConfRes.get_index());
+         // TODO write value
+      } catch (ESApiException esapiex) {
+         fail("conf should exist in mgr");
+      }
+
+      // 3. using existing conf :
+      // re trigger setup :
+      //pcuConnector.setRunAtStartup(false);
+      //pcuConnector.onApplicationEvent(null);
+      pcuConnector.setup();
+      // check that conf has been created from template and uploaded :
+      try {
+         GetConfigurationResult pcuConfRes = pcuConfigurationApi.get(PcuConnector.confType, pcuConnector.getConfId(), true);
+         // testing PcuConfigurationApi btw :
+         assertEquals(pcuConnector.getConfId(), pcuConfRes.get_id());
+         assertEquals(pcuConnector.confType, pcuConfRes.get_type());
+         assertEquals(pcuConnector.CONF_INDEX, pcuConfRes.get_index());
+         // TODO write value
+      } catch (ESApiException esapiex) {
+         fail("conf should exist in mgr");
+      }
+   }
+
+   private PathMatchingResourcePatternResolver resourceLoader = new PathMatchingResourcePatternResolver(); // TODO @Bean
+   @Test
+   public void testCrawler2AvroJdbc() throws Exception {
+      // init crawler :
+      JDBCCrawlBatchBase jdbcCrawlBatch = PcuConnector.buildDefaultPersonAvroDrivenJDBCCrawler(pcuConnector);
+      Crawler2 crawler = jdbcCrawlBatch.getCrawler();
+      jdbcCrawlBatch.setBatchSize(2); // to be able to test batching with 3 items
+
+      crawler.init();
+      
+      crawler.crawlIteration();
+      crawler.crawlIteration();
    }
 
    @Test
    @Ignore // remove this to use it
    public void testSimulateCrawlHome() throws IOException {
       // init crawler :
-      String index = "files";
-      FileCrawler fileCrawler = buildFileCrawler(index);
+      FileCrawlBatch fileCrawlBatch = PcuConnector.buildDefaultSampleFileCrawler(pcuConnector);
       ///fileCrawler.seFilter();
       FileFilter txtFileFilter = new SuffixFileFilter(".txt"); // ONLY for .txt else too slow & big for demo
       
       // dataset :
-      recursiveCrawlFolder(fileCrawler, new File("/home/mardut/Documents/projets/pcu/WP7 search/dataset"), txtFileFilter);
+      recursiveCrawlFolder(fileCrawlBatch, new File("/home/mardut/Documents/projets/pcu/WP7 search/dataset"), txtFileFilter);
       // pcu
       //simulateCrawlFolder(fileCrawler, new File("/home/mardut/Documents/projets/pcu"));
       //simulateCrawlFolder(fileCrawler, new File("/home/mardut/dev/pcu"));
       // home :
-      recursiveCrawlFolder(fileCrawler, new File(System.getProperty("user.home")), txtFileFilter); // + File.separator + "Documents" // "/home/mardut/dev/pcu/workspace"
+      recursiveCrawlFolder(fileCrawlBatch, new File(System.getProperty("user.home")), txtFileFilter); // + File.separator + "Documents" // "/home/mardut/dev/pcu/workspace"
    }
-   public void simulateCrawlFolder(FileCrawler fileCrawler, File folder) {
-      this.recursiveCrawlFolder(fileCrawler, folder, null); // , PcuConnectorImplTest::simulateCrawlFile
+   public void simulateCrawlFolder(FileCrawlBatch fileCrawlBatch, File folder) {
+      this.recursiveCrawlFolder(fileCrawlBatch, folder, null); // , PcuConnectorImplTest::simulateCrawlFile
    }
    protected static final Logger log = LoggerFactory.getLogger(PcuConnectorImplTest.class);
-   public void recursiveCrawlFolder(FileCrawler fileCrawler, File folder, FileFilter fileFilter) {
+   public void recursiveCrawlFolder(FileCrawlBatch fileCrawlBatch, File folder, FileFilter fileFilter) {
       for (File file : folder.listFiles()) {
          if (file.isFile()) {
             if (file.canRead()) {
                if (fileFilter == null || fileFilter.accept(file)) {
                   try {
                      log.debug("crawling " + file.getAbsolutePath());
-                     simulateCrawlFile(fileCrawler, file);
+                     simulateCrawlFile(fileCrawlBatch, file);
                   } catch (Exception e) {
                      // test fails but it still works
                   }
@@ -185,17 +425,17 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
             }
          } else if (file.isDirectory()) {
             if (file.canRead()) {
-               recursiveCrawlFolder(fileCrawler, file, fileFilter);
+               recursiveCrawlFolder(fileCrawlBatch, file, fileFilter);
             }
          } // else non-regular files : symlinks (TODO resolve), devices, pipes, sockets https://stackoverflow.com/a/21224032
       }
    }
-   public void simulateCrawlFile(FileCrawler fileCrawler, File file) throws Exception {
+   public void simulateCrawlFile(FileCrawlBatch fileCrawlBatch, File file) throws Exception {
       try {
          System.err.println("crawling " + file.getAbsolutePath());
          ///String content = null; // disables fulltext & checks
          String content = IOUtils.toString(new FileInputStream(file), (Charset) null);
-         simulateCrawl(fileCrawler, file, content); // null
+         simulateCrawl(fileCrawlBatch, file, content); // null
       } catch (AssertionError e) {
          // test fails but it still works
       }
@@ -212,10 +452,9 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       File testFile = createTestFile(testContent);
       
       // init crawler :
-      String index = "files";
-      FileCrawler fileCrawler = buildFileCrawler(index);
+      FileCrawlBatch fileCrawlBatch = PcuConnector.buildDefaultSampleFileCrawler(pcuConnector);
       
-      simulateCrawl(fileCrawler, testFile, testContent);
+      simulateCrawl(fileCrawlBatch, testFile, testContent);
    }
    public File createTestFile(String testContent) throws IOException {
       File testFile = File.createTempFile("pcu_test_", ".doc");
@@ -233,7 +472,9 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
     * @param testContent null disables fulltext & checks
     * @throws Exception
     */
-   public void simulateCrawl(FileCrawler fileCrawler, File testFile, String testContent) throws Exception {
+   public void simulateCrawl(FileCrawlBatch fileCrawlBatch, File testFile, String testContent) throws Exception {
+      Crawler2 fileCrawler = fileCrawlBatch.getCrawler();
+      
       // 1. upload crawled content :
       PcuFileResult fileRes;
       try (FileInputStream testFileIn = new FileInputStream(testFile)) {
@@ -246,7 +487,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       
       // 2. index crawled metadata :
 
-      PcuDocument pcuDoc = fileCrawler.buildPcuDocument(testFile, testContent, fileRes.getPath());
+      PcuDocument pcuDoc = fileCrawlBatch.buildPcuDocument(testFile, null, testContent, fileRes.getPath(), null);
       
       PcuIndexResult indexRes = searchApi.index(fileCrawler.getIndex(), pcuDoc);
       
@@ -362,7 +603,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    public void testSimulateDocumentMetamodelCheck() throws Exception {*/
       
       // check indexed data :
-      assertEquals(1, modelService.getTypeSchemaMap().size());
+      assertNotEquals(0, modelService.getTypeSchemaMap().size());
       Schema schema = modelService.getTypeSchemaMap().get(pcuDoc.getType());
       assertNotNull(schema);
 
@@ -446,7 +687,13 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       }
    }
 
-   
+
+   /**
+    * @obsolete
+    * @param index
+    * @return
+    * @throws IOException
+    */
    public FileCrawler buildFileCrawler(String index) throws IOException {
       FileCrawler fileCrawler = new FileCrawler();
       fileCrawler.setContentStore("fileCrawlerStore"); // TODO manage

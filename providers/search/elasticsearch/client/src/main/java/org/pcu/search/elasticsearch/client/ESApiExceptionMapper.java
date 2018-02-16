@@ -25,6 +25,10 @@ public class ESApiExceptionMapper implements ExceptionMapper<ESApiException> {
 
    @Override
    public Response toResponse(ESApiException e) {
+      if (e.getResponse() != null) { // comes from ES client side within server
+         return e.getResponse();
+      }
+      // non-proxied response (thrown in PCU-specific code) :
       String errJson;
       try {
          errJson = mapper.writeValueAsString(e);

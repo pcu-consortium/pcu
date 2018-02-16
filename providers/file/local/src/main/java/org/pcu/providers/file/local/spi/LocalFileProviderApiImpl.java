@@ -276,6 +276,7 @@ public class LocalFileProviderApiImpl extends PcuJaxrsServerBase implements PcuF
    
    /** public for tests */
    public File getContentFile(String store, String pathOrHash) {
+      // TODO better to avoid dir with 1m files, ex. in a tree of dirs named after the first hash chars
       return new File(getStorePath(store), pathOrHash);
    }
    private Path getContentPath(String store, String pathOrHash) {

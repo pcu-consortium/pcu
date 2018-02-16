@@ -3,11 +3,16 @@ package org.pcu.features.search.client;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +24,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -125,18 +132,22 @@ public class PcuPlatformRestClientConfiguration {
    private Boolean threadSafe;
    ///@Bean
    public Client pcuApiRestClientForClass(Class<?> serviceClass, SpringBus bus,
-         JacksonJsonProvider pcuApiJsonProvider/*,
-         ESApiExceptionMapper exceptionMapper,
-         ESApiResponseExceptionMapper responseExceptionMapper*/) {
+         /*@Qualifier("pcuApiJsonProvider")*/ JacksonJsonProvider pcuApiJsonProvider,
+         List<ExceptionMapper<?>> pcuExceptionMappers,
+         List<ResponseExceptionMapper<?>> pcuResponseExceptionMappers) {
+      ArrayList<Object> providers = new ArrayList<Object>();
+      providers.add(pcuApiJsonProvider);
+      providers.addAll(pcuExceptionMappers);
+      providers.addAll(pcuResponseExceptionMappers);
+      
       JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
       bean.setBus(bus);        
       bean.setThreadSafe(threadSafe);
       
       bean.setAddress(address);
       bean.setServiceClass(serviceClass);
-      bean.setProvider(pcuApiJsonProvider); // actually an addProvider
-      /*bean.setProvider(exceptionMapper);
-      bean.setProvider(responseExceptionMapper);*/
+      //bean.setProvider(pcuApiJsonProvider); // actually an addProvider
+      bean.setProviders(providers);
       
       // log :
       // (to separate file, else pollutes logs ex. stacktraces)
@@ -153,5 +164,16 @@ public class PcuPlatformRestClientConfiguration {
    }
    
    ///public void addLoggingFeature() {}
+   
+   @Bean
+   public ObjectMapper pcuApiTypedMapper(@Qualifier("pcuApiMapper") ObjectMapper pcuApiMapper) {
+      ///pcuApiMapper.setDefaultTyping(typeResolverBuilder)
+      return pcuApiMapper.copy() // is itself a copy NOO TODO rm
+            .enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.WRAPPER_OBJECT); // else WRAPPER_ARRAY which is not compatible TODO
+   }
+   @Bean
+   public JacksonJsonProvider pcuApiTypedJsonProvider(@Qualifier("pcuApiTypedMapper") ObjectMapper pcuApiTypedMapper) {
+      return new JacksonJsonProvider(pcuApiTypedMapper);
+   }
     
 }

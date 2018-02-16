@@ -42,6 +42,10 @@ public class ESSearchProviderApiImpl extends PcuJaxrsServerBase implements PcuSe
       org.pcu.search.elasticsearch.api.Document esDoc = new org.pcu.search.elasticsearch.api.Document();
       esDoc.setProperties(doc.getProperties());
       try {
+         String docType = doc.getType();
+         if (docType == null) {
+            throw new RuntimeException("No type in pcu doc " + doc.getId()); // TODO better
+         }
          IndexResult res;
          // TODO rather unify using @BeanParam :
          if (doc.getId() != null) {

@@ -47,6 +47,11 @@ public class ExtractorProviderApiImpl implements PcuMetadataApi {
 		}
 	}
 
+   @Override
+   public PcuMetadataResult extract(String fileName, String contentType, InputStream input) {
+      return new Result(extractorService.putMagic(null, fileName, null, contentType, input));
+   }
+
 	class Result implements PcuMetadataResult {
 
 		final private Map<String, Object> metas;
