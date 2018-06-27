@@ -23,11 +23,7 @@ public class ExtractorProviderApiImpl implements PcuMetadataApi {
 
 	public ExtractorProviderApiImpl() {
 		final ExtractorManager extractorManager = new ExtractorManager();
-		try {
-			extractorManager.registerServices();
-		} catch (IOException | ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		extractorManager.registerServices();
 		extractorService = extractorManager.getService();
 	}
 

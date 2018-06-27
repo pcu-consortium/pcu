@@ -23,5 +23,8 @@ before_install:
   - kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic file --zookeeper localhost:2181
 before_script:
   - sleep 5
+script:
+  - mvn test -B
+  - mvn verify -B
 after_success:
   - mvn clean cobertura:cobertura coveralls:report

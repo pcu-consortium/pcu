@@ -1,7 +1,6 @@
 package org.pcu.features.connector.crawler;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -16,11 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.pcu.features.configuration.api.PcuComponent;
 import org.pcu.features.connector.PcuConnector;
-import org.pcu.providers.file.api.PcuFileApi;
-import org.pcu.providers.metadata.api.PcuMetadataApi;
 import org.pcu.providers.search.api.PcuDocument;
-import org.pcu.providers.search.api.PcuSearchApi;
-import org.pcu.providers.search.api.PcuSearchEsClientApi;
 import org.pcu.search.elasticsearch.api.BulkAction;
 import org.pcu.search.elasticsearch.api.BulkMessage;
 import org.pcu.search.elasticsearch.api.BulkResult;
@@ -31,9 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 
@@ -47,6 +39,7 @@ public class Crawler2 extends PcuComponent {
    protected String type;
    private String contentStore;
    /** 0 means no bulk, 2 allows to test bulk */
+   // FIXME bulk does not work well
    private int bulkSize = 2; // TODO default 1000
    
    /** changes between crawl sessions / job tasks */
@@ -190,9 +183,10 @@ public class Crawler2 extends PcuComponent {
             indexAction.set_index(index);
             indexAction.set_type(pcuDoc.getType());
             indexAction.set_id(pcuDoc.getId());
-            if (pcuDoc.getVersion() != null) {
-               indexAction.set_version(pcuDoc.getVersion());
-            }
+            // FIXME problem in ES
+//            if (pcuDoc.getVersion() != null) {
+//               indexAction.set_version(pcuDoc.getVersion());
+//            }
             indexBulkAction.getKindToAction().put("index", indexAction);
             bulkActions.add(indexBulkAction);
          }
@@ -200,6 +194,7 @@ public class Crawler2 extends PcuComponent {
          bulkMessage.setActions(bulkActions);
          try {
             BulkResult bulkRes = this.getConnector().getSearchEsApi().bulk(bulkMessage, null, null);
+            
             // TODO filter bulkRes and try to reindex failed ones !? ex. bad avro schema
             this.indexed += bulkRes.getItems().size();
          } catch (ESApiException ex) {

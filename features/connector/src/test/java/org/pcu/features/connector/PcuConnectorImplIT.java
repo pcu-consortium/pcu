@@ -75,9 +75,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -89,7 +89,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.zaxxer.hikari.HikariDataSource;
@@ -104,7 +103,7 @@ import com.zaxxer.hikari.HikariDataSource;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={PcuConnectorImplTest.JdbcConnectorTestConfiguration.class, PcuConnectorConfiguration.class, // client
+@ContextConfiguration(classes={PcuConnectorImplIT.JdbcConnectorTestConfiguration.class, PcuConnectorConfiguration.class, // client
       ESSearchProviderConfiguration.class, LocalFileProviderConfiguration.class, PcuModelConfiguration.class}, // server
       initializers = ConfigFileApplicationContextInitializer.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.DEFINED_PORT, properties="server.port=45665")
@@ -115,7 +114,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @ActiveProfiles("test") // TODO StarterProfiles.TEST ... in -common
 //@Sql({ "classpath:/sql/data.sql" }) // TODO move ; NOT "classpath:/sql/cleanup.sql" since not created by hibernate previously BUT THEN FAILS WHEN SEVERAL TESTS
 // NOO MOVED TO PcuConnectorConfiguration but using DataSourceInitializer since @Sql only works within tests
-public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
+public class PcuConnectorImplIT /*extends PcuSearchApiClientTest */{
    @LocalServerPort
    protected int serverPort;
 
@@ -256,7 +255,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       
       fileCrawler.crawlIteration();
       fileCrawler.crawlIteration();
-      fileCrawler.crawlIteration();
+      //fileCrawler.crawlIteration();
    }
    
    @Test
@@ -383,7 +382,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       JDBCCrawlBatchBase jdbcCrawlBatch = PcuConnector.buildDefaultPersonAvroDrivenJDBCCrawler(pcuConnector);
       Crawler2 crawler = jdbcCrawlBatch.getCrawler();
       jdbcCrawlBatch.setBatchSize(2); // to be able to test batching with 3 items
-
+      
       crawler.init();
       
       crawler.crawlIteration();
@@ -409,7 +408,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
    public void simulateCrawlFolder(FileCrawlBatch fileCrawlBatch, File folder) {
       this.recursiveCrawlFolder(fileCrawlBatch, folder, null); // , PcuConnectorImplTest::simulateCrawlFile
    }
-   protected static final Logger log = LoggerFactory.getLogger(PcuConnectorImplTest.class);
+   protected static final Logger log = LoggerFactory.getLogger(PcuConnectorImplIT.class);
    public void recursiveCrawlFolder(FileCrawlBatch fileCrawlBatch, File folder, FileFilter fileFilter) {
       for (File file : folder.listFiles()) {
          if (file.isFile()) {
@@ -518,7 +517,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       rangeParams.setLte(ZonedDateTime.ofInstant(Instant.ofEpochMilli(testFile.lastModified()), ZoneId.systemDefault()));
       List<Hit> hits = searchEsApi.searchInType(index, type, dateRangeMsg, null, null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
-      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+      assertTrue(hits.stream().anyMatch(hit -> pcuDoc.getId().equals(hit.get_id())));
       rangeParams.setLt(ZonedDateTime.parse("2016-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter));
       rangeParams.setGt(ZonedDateTime.parse("2015-01-01T00:00:01.000+0000", pcuApiDateTimeFormatter)); // not null because crawling samples write 0 date i.e. 1970
       hits = searchEsApi.searchInType(index, type, dateRangeMsg, null, null, null).getHits().getHits();
@@ -576,7 +575,7 @@ public class PcuConnectorImplTest /*extends PcuSearchApiClientTest */{
       userAuthorities.add("myproject_group");
       hits = searchEsApi.searchInType(index, type, rightsFilteredMsg , null, null, null).getHits().getHits();
       assertTrue(!hits.isEmpty());
-      assertTrue(pcuDoc.getId().equals(hits.get(0).get_id()));
+      assertTrue(hits.stream().anyMatch(hit -> pcuDoc.getId().equals(hit.get_id())));
       
       // X. simulate tailing a file :
       String testAppendContent = "\nand another test content";

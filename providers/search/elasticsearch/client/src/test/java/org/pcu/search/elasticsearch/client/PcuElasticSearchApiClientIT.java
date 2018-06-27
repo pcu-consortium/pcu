@@ -80,9 +80,9 @@ import com.eaio.uuid.UUID;
 @ContextConfiguration(classes=PcuElasticSearchClientApplication.class,
    initializers = ConfigFileApplicationContextInitializer.class)
 @ActiveProfiles("test")
-public class PcuElasticSearchApiClientTest {
+public class PcuElasticSearchApiClientIT {
 
-   protected static final Logger LOGGER = LoggerFactory.getLogger(PcuElasticSearchApiClientTest.class);
+   protected static final Logger LOGGER = LoggerFactory.getLogger(PcuElasticSearchApiClientIT.class);
    
    private boolean debug = true;
 

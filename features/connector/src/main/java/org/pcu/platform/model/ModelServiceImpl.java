@@ -85,7 +85,7 @@ public class ModelServiceImpl {
             // search API on this new index, and deletion of old index)
             
             if (forceBootstrap) { // delete if already there
-               searchEsApi.deleteMapping(index);
+            	searchEsApi.deleteMapping(index);
             } else {
                continue;
             }

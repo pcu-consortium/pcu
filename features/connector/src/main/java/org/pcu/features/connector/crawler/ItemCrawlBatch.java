@@ -41,8 +41,8 @@ public abstract class ItemCrawlBatch<T> extends CrawlBatch {
    
    /** TODO TODO REMOVE when Qwazr link extraction has been integrated */
    private Stack<List<String>> testLinksStack = new Stack<List<String>>() {{
-      push(Arrays.asList(new String[] { "http://localhost:9200/file/_search", "http://localhost:9200", "file:///etc/hosts" }));
-      push(Arrays.asList(new String[] { "file:./sample/20171206 POSS/PCU@POSS_20171206.pdf", "http://localhost:9200/file/_search" }));
+      push(Arrays.asList(new String[] { "http://localhost:9200/files/_search", "http://localhost:9200", "file:///etc/hosts" }));
+      push(Arrays.asList(new String[] { "file:./sample/20171206 POSS/PCU@POSS_20171206.pdf", "http://localhost:9200/files/_search" }));
    }};
    
    public ItemCrawlBatch(Crawler2 crawler) {
@@ -157,7 +157,6 @@ public abstract class ItemCrawlBatch<T> extends CrawlBatch {
                .map(pageContent -> pageContent.get("content")).filter(pcc -> pcc != null).flatMap(pcc -> ((List<String>) pcc).stream())
                .collect(Collectors.joining(" "));
          textContent = textContentTmp;
-         
       } catch (Exception e) { // WebApplicationException, ex. :
          // Caused by: org.apache.poi.hssf.record.RecordInputStream$LeftoverDataException: Initialisation of record 0x1D(SelectionRecord) left 2 bytes remaining still to be read.
          
@@ -181,6 +180,7 @@ public abstract class ItemCrawlBatch<T> extends CrawlBatch {
          if (log.isDebugEnabled()) {
             log.debug("Error extracting metadata from " + file, e);
          }
+
          // TODO remove log :
          //| main | 2017-12-01 19:53:15.736 | WARN  | PDSimpleFont:325 - No Unicode mapping for g367 (10) in font YNAHAD+Calibri
       }
@@ -195,7 +195,7 @@ public abstract class ItemCrawlBatch<T> extends CrawlBatch {
       // TODO void sample prop values
       List<CrawlBatch> nextCrawlBatches = new ArrayList<CrawlBatch>();
       if (metadataRes != null) {
-         
+      
          // add read doc meta :
          Map<String, Object> docMetadata = metadataRes.getMetas();
          if (docMetadata != null) {

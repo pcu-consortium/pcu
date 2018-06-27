@@ -1,10 +1,8 @@
 package org.pcu.applications.search;
 
-import org.pcu.features.connector.PcuConnectorConfiguration;
 import org.pcu.features.search.server.PcuSearchServerConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @author mdutoo
  */
 @Configuration
-@EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan(basePackageClasses={PcuEntrepriseSearchConfiguration.class,
       // NB. integrated big data components are brought (selected to be scanned) by conf in PcuEntrepriseSearchApplication
       // generic components are brought by features
