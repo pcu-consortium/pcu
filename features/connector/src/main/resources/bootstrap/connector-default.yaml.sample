@@ -1,11 +1,11 @@
 # default conf, taken out of logs when this file is not present
 components: !<java.util.ArrayList>
-- !<org.pcu.features.connector.Crawler2>
+- !<org.pcu.features.connector.crawler.Crawler2>
   index: "files"
   type: "file"
   contentStore: "fileCrawlerStore"
   toBeCrawledQeue:
-  - !<org.pcu.features.connector.FileCrawlBatch>
+  - !<org.pcu.features.connector.crawler.FileCrawlBatch>
     index: null
     lastCrawledFilePath: null
     lastCrawled: "sample"
@@ -14,12 +14,12 @@ components: !<java.util.ArrayList>
   indexed: 0
   roots: null
   suffixes: null
-- !<org.pcu.features.connector.Crawler2>
+- !<org.pcu.features.connector.crawler.Crawler2>
   index: "persons"
   type: null
   contentStore: "personCrawlerStore"
   toBeCrawledQeue:
-  - !<org.pcu.features.connector.AvroDrivenJDBCCrawlBatch>
+  - !<org.pcu.features.connector.crawler.AvroDrivenJDBCCrawlBatch>
     index: null
     jdbcProperties:
       jdbcUrl: "jdbc:h2:mem:jdbcConnectorTest;DATABASE_TO_UPPER=false;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE\"\

@@ -1,5 +1,8 @@
 package org.pcu.features.search.server;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -15,8 +18,11 @@ public class PcuSearchServerApplication {
    private static final String searchSpiPackage = "org.pcu.providers.search.elasticsearch.spi";
 
    public static void main(String[] args) {
-      SpringApplication.run(new Object[] { PcuSearchServerApplication.class, // PcuSearchClientPackage.class
-            searchSpiPackage}, args); // PcuSearchServerConfiguration.class
+	   SpringApplication app = new SpringApplication(PcuSearchServerApplication.class);
+	   Set<String> sources = new HashSet<>();
+	   sources.add(searchSpiPackage);
+	   app.setSources(sources);
+	   app.run(args);
    }
 
 }

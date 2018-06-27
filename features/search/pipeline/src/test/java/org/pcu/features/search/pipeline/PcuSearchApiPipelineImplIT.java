@@ -6,13 +6,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.LinkedHashMap;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pcu.features.connector.PcuConnectorConfiguration;
+import org.pcu.features.connector.crawler.FileCrawler;
 import org.pcu.providers.file.api.PcuFileApi;
 import org.pcu.providers.metadata.api.PcuMetadataApi;
 import org.pcu.providers.search.api.PcuDocument;
@@ -47,7 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //see https://docs.spring.io/spring-boot/docs/current/reference/html/howto-embedded-servlet-containers.html https://stackoverflow.com/questions/30312058/spring-boot-how-to-get-the-running-port
 //or with autoconf redefine cxf.jaxrs.client.address
 @ActiveProfiles("test")
-public class PcuSearchApiPipelineImplTest {
+public class PcuSearchApiPipelineImplIT {
    @LocalServerPort
    protected int serverPort;
    
@@ -61,26 +60,31 @@ public class PcuSearchApiPipelineImplTest {
    @Autowired @Qualifier("defaultMetadataExtractorApi")
    private PcuMetadataApi metadataExtractorApi;
    
-   /**
-    * doesn't work as is, because doc is validated against file avro schema
-    */
    @Test
-   @Ignore
-   public void test() {
-      String index = "files";
-      PcuDocument pcuDoc = new PcuDocument();
-      pcuDoc.setType("file");
-      pcuDoc.setId("myid"); // TODO gen
-      // props following file.avsc :
-      pcuDoc.setProperties(new LinkedHashMap<>());
-      LinkedHashMap<String, Object> file = new LinkedHashMap<>();
-      pcuDoc.getProperties().put("file", file);
-      file.put("name", "a.doc");
-      PcuIndexResult res = searchApi.index(index, pcuDoc);
-      assertNotNull(res);
-      // TODO check res
+   //@Ignore // FIXME ES & Kafka mandatory => is IT test
+   public void testSimulateCrawl() throws IOException {
+      // prepare file to crawl :
+      String testContent = "Spark ETL Kafka pipeline";
+      File testFile = this.createTestFile(testContent);
+      
+      // init crawler :
+      FileCrawler fileCrawler = new FileCrawler();
+      fileCrawler.setIndex("files"); // TODO test
+      fileCrawler.setType("file");
+      fileCrawler.setSearchEsApi(searchEsApi);
+      fileCrawler.setSearchApi(searchApi);
+      fileCrawler.setFileApi(fileApi);
+      fileCrawler.setMetadataExtractorApi(metadataExtractorApi);
+      fileCrawler.init();
       
       // TODO more, from ES client API test
+
+      // (upload content)
+      
+      // index crawled metadata :
+      PcuDocument pcuDoc = fileCrawler.buildPcuDocument(testFile, testContent, "NO_CONTENT_UPLOADED");
+      PcuIndexResult indexRes = searchApi.index(fileCrawler.getIndex(), pcuDoc);
+      assertNotNull(indexRes);
    }
    
    /**

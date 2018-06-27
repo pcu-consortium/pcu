@@ -6,14 +6,19 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-//@SpringBootApplication // NO else NoSuchBeanDefinitionException: No qualifying bean of type 'java.lang.Class<?>' available
+@SpringBootApplication
 public class PcuEntrepriseSearchApplication extends SpringApplication {
 
    private static final Log log = LogFactory.getLog(PcuEntrepriseSearchApplication.class);
    
-	public PcuEntrepriseSearchApplication(final Object... sources) {
+   public PcuEntrepriseSearchApplication() {
+	   // mandatory for spring
+   }
+   
+   public PcuEntrepriseSearchApplication(final Class<?>... sources) {
 		super(sources);
 	}
 
@@ -56,7 +61,7 @@ public class PcuEntrepriseSearchApplication extends SpringApplication {
       log.info("Choosing the following configured providers : " + providerSpiPackages);
       //Object found = context.getEnvironment().getProperty("pcu.providers[1]");
       //context.getEnvironment().getPropertySources().get("applicationConfigurationProperties")
-      Set<Object> sources = this.getSources(); // TODO Q copy ?
+      Set<String> sources = this.getSources(); // TODO Q copy ?
       sources.addAll(providerSpiPackages);
       this.setSources(sources);
    }

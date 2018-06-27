@@ -21,9 +21,9 @@ import org.pcu.search.elasticsearch.api.ElasticSearchClientApi;
 import org.pcu.search.elasticsearch.api.query.ESQueryMessage;
 import org.pcu.search.elasticsearch.api.query.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
@@ -48,7 +48,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 // see https://docs.spring.io/spring-boot/docs/current/reference/html/howto-embedded-servlet-containers.html https://stackoverflow.com/questions/30312058/spring-boot-how-to-get-the-running-port
 // or with autoconf redefine cxf.jaxrs.client.address
 @ActiveProfiles("test")
-public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientTest {
+public class MockElasticSearchApiClientTest extends PcuElasticSearchApiClientIT {
    
    public static final String PCU_ES_API_MOCK_PATH = "/search/elasticsearch/";
    

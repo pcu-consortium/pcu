@@ -74,3 +74,5 @@ browse to the UI at http://localhost:8080
 search "Entreprise Search"
 
 it should display the 3 files crawled in the sample/ directory.
+
+the API documentation is available at http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json

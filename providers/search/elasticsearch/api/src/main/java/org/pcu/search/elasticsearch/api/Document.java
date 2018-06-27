@@ -105,7 +105,7 @@ public class Document {
    }
    
    // TODO ?
-   private static ObjectMapper documentObjectMapper = new ObjectMapper(); // TODO custom ? or from PcuPlatformRestClientConfiguration !
+   private static ObjectMapper documentObjectMapper = new ObjectMapper(); // TODO custom ?
    public String toString() {
       try {
          return documentObjectMapper.writeValueAsString(this);

@@ -233,6 +233,7 @@ public interface ElasticSearchApi {
    // TODO TODO in open HTTP connection, which ES probably does like Solr https://cwiki.apache.org/confluence/display/solr/Using+SolrJ
    // TODO also /{index}/{type}/_bulk ?
    // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
+   // TODO application/x-ndjson
    @Path("/_bulk")
    @POST
    BulkResult bulk(@ApiParam(value = "document", required = true) BulkMessage doc,
@@ -244,6 +245,7 @@ public interface ElasticSearchApi {
    // with common options :
    // filter_path pattern https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
    // TODO transversal for all operations
+   // TODO swagger problem with POST and GET
    @Path("/_search")
    @POST
    @GET
@@ -257,6 +259,7 @@ public interface ElasticSearchApi {
    // with common options :
    // filter_path pattern https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html
    // TODO transversal for all operations
+// TODO swagger problem with POST and GET
    @Path("/{index}/{type}/_search")
    @POST
    @GET

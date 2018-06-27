@@ -49,7 +49,7 @@
          <artifactId>pcu-providers-search-elasticsearch-spi-impl</artifactId><!-- for ModelService ; TODO better or only test yet ?! -->
          <scope>test</scope>
       </dependency>
-      
+
       
         <!-- JDBC connector
         else java.sql.SQLException: No suitable driver, TODO better / shared dep -->
