@@ -1,29 +1,44 @@
 package org.pcu.connectors.collectors.filesystem;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import com.norconex.collector.core.CollectorConfigLoader;
 import com.norconex.collector.fs.FilesystemCollector;
 import com.norconex.collector.fs.FilesystemCollectorConfig;
-import com.norconex.collector.fs.crawler.FilesystemCrawlerConfig;
 
 @Component
 public class PcuFilesystemCollector {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemCollector.class);
+
+	/**
+	 * Add possibility to override default values
+	 */
+	private Resource norconexFilesystemConfigXml = new ClassPathResource("norconex-filesystem-config.xml");
+	/**
+	 * Add possibility to override default values
+	 */
+	private Resource norconexFilesystemConfigVariables = new ClassPathResource("norconex-filesystem-config.variables");
+
 	public void execute() {
-		FilesystemCollectorConfig collectorConfig = new FilesystemCollectorConfig();
-		collectorConfig.setId("MyFilesystemCollector");
-		collectorConfig.setLogsDir("/tmp/logs/");
-		//
-		FilesystemCrawlerConfig crawlerConfig = new FilesystemCrawlerConfig();
-		crawlerConfig.setId("MyFilesystemCrawler");
-		crawlerConfig.setStartPaths(
-		        new String[]{"/home/gafou/projets/innovation/pcu/sources/git-pcu-consortium/pcu/connectors"});
-		crawlerConfig.setCrawlDataStoreFactory(new PcuDatastoreFactory());
-		//
-		collectorConfig.setCrawlerConfigs(crawlerConfig);
-		 //
-		FilesystemCollector collector = new FilesystemCollector(collectorConfig);
-		collector.start(true);
+
+		try {
+			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(
+					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXml.getFile(),
+							norconexFilesystemConfigVariables.getFile());
+			FilesystemCollector collector = new FilesystemCollector(collectorConfig);
+			collector.start(true);
+		} catch (IOException e) {
+			LOGGER.error("Error while starting FileCrawler", e);
+			throw new RuntimeException(e);
+		}
+
 	}
-	
+
 }
