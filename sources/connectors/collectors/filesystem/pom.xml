@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>pcu-collectors-parent</artifactId>
+		<groupId>org.pcu-consortium.pcu</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>pcu-collectors-filesystem</artifactId>
+	<packaging>jar</packaging>
+
+	<name>PCU Collector Filesystem</name>
+	<description>PCU Collector Filesystem</description>
+
+
+	<dependencies>
+
+		<!-- Spring Boot Starters -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- collectors : -->
+		<dependency>
+			<groupId>com.norconex.collectors</groupId>
+			<artifactId>norconex-collector-filesystem</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
+		<!-- Indexer : -->
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-indexer-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-collectors-api</artifactId>
+		</dependency>
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+

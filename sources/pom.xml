@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.pcu-consortium.pcu</groupId>
+	<artifactId>pcu-consortium-parent</artifactId><!-- or pcu (better project 
+		name than pcu-parent) ? -->
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>PCU Consortium Parent POM</name>
+	<description>PCU Consortium Parent POM</description>
+
+
+	<!-- =================== -->
+	<!-- Project information -->
+	<!-- =================== -->
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>PCU Consortium</name>
+		<url>http://pcu-consortium.github.io</url>
+	</organization>
+
+	<url>https://github.com/pcu-consortium/pcu</url>
+	<mailingLists>
+		<!-- mailingList> <name>PCU Developers mailing list</name> <archive>https://groups.google.com/forum/?fromgroups#!forum/pcu-dev</archive> 
+			<post>pcu-dev@googlegroups.com</post> </mailingList -->
+		<!-- LATER : also users... -->
+	</mailingLists>
+	<scm>
+		<connection>scm:git:git://github.com/pcu-consortium/pcu.git</connection>
+		<developerConnection>scm:git:git@github.com:pcu-consortium/pcu.git</developerConnection>
+		<url>https://github.com/pcu-consortium/pcu</url>
+	</scm>
+	<ciManagement>
+		<system>travis (jenkins ??)</system>
+		<url>TODO</url>
+		<!-- notifiers></notifiers -->
+	</ciManagement>
+	<issueManagement>
+		<url>https://github.com/pcu-consortium/pcu/issues</url>
+		<system>Github Issues</system>
+	</issueManagement>
+	<!-- distributionManagement> <repository> <id>MyNexus</id> <name>MyNexus</name> 
+		<url>https://mynexus</url> </repository> <site> <id>local-site</id> <url>file:target/site/</url> 
+		</site> </distributionManagement -->
+
+	<developers>
+		<developer>
+			<id>mdutoo</id>
+			<name>Marc Dutoo</name>
+			<email>marc.dutoo@smile.fr</email>
+			<organization>Smile</organization>
+			<organizationUrl>http://www.smile.fr</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>gafou</id>
+			<name>Gaëlle Fournier</name>
+			<email>gaelle.fournier@smile.fr</email>
+			<organization>Smile</organization>
+			<organizationUrl>http://www.smile.fr</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<modules>
+		<module>connectors</module>
+	</modules>
+
+
+	<properties>
+		<!-- spring boot : -->
+		<spring-boot.version>2.0.2.RELEASE</spring-boot.version>
+		<spring.version>5.0.6.RELEASE</spring.version>
+
+		<!-- utils : -->
+		<jackson.version>2.9.6</jackson.version>
+
+		<!-- logs : -->
+		<slf4j.version>1.7.25</slf4j.version><!-- spring-boot & logback's ; 1.7.25 -->
+		<logback.version>1.2.3</logback.version><!-- spring-boot's ; 1.2.3 -->
+
+		<!-- build : -->
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding><!-- 
+			else [WARNING] File encoding has not been set, using platform encoding UTF-8, 
+			i.e. build is platform dependent -->
+		<org.jacoco.version>0.7.7.201606060606</org.jacoco.version>
+		<cobertura-plugin.version>2.7</cobertura-plugin.version>
+
+	</properties>
+
+
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Spring -->
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope><!-- same as parent -->
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+
+			<!-- Json -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<!-- logs -->
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>log4j-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+
+			<!-- Tests : -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring-boot.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- PCU : -->
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-collectors-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-indexer-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-indexer-elasticsearch</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId><!-- ?? -->
+				<!-- version>2.5</version -->
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${org.jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Cobertura & Coveralls.io -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-plugin.version}</version>
+				<configuration>
+					<format>xml</format>
+					<maxmem>256m</maxmem>
+					<aggregate>true</aggregate>
+					<instrumentation>
+						<!-- Exclude JPA meta-model generated classes (hibernate-jpamodelgen) -->
+						<ignores>
+							<ignore>**/*_.java</ignore>
+						</ignores>
+						<excludes>
+							<exclude>**/*_.class</exclude>
+						</excludes>
+					</instrumentation>
+					<check />
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- else 
+						error even if provide repository : ex. repository url 'http://dist.gemstone.com/maven/release' 
+						is invalid see http://stackoverflow.com/questions/28098566/maven-site-warning-the-repository-url-https-maven-repository-dev-java-net-no -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>
+
