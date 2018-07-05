@@ -6,7 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
+@ComponentScan(basePackages = { "org.pcu.connectors.collectors","org.pcu.connectors.indexer" })
 @SpringBootApplication
 public class PcuCollectorApplication {
 
@@ -17,8 +19,8 @@ public class PcuCollectorApplication {
 		SpringApplication app = new SpringApplication(PcuCollectorApplication.class);
 		app.setWebApplicationType(WebApplicationType.NONE); // no web server
 		ConfigurableApplicationContext context = app.run(args);
-		PcuAgent collector = context.getBean(PcuAgent.class);
-		collector.exectue();
+		PcuAgent agent = context.getBean(PcuAgent.class);
+		agent.exectue();
 		LOGGER.debug("Stop Application PcuCollectorApplication");
 	}
 

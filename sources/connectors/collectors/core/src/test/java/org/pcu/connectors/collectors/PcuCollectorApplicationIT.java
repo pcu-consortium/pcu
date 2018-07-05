@@ -3,13 +3,12 @@ package org.pcu.connectors.collectors;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-//import org.pcu.connectors.indexer.PcuIndexer;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes
-// = PcuCollectorApplication.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = PcuCollectorApplication.class)
 public class PcuCollectorApplicationIT {
+
 
 	// FIXME when something actually works YOLO
 	@Test

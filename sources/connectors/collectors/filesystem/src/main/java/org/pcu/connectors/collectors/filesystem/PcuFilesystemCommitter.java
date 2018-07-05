@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.pcu.connectors.indexer.PcuIndexer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,25 +25,26 @@ public class PcuFilesystemCommitter implements ICommitter {
 	@Autowired
 	private PcuIndexer pcuIndexer;
 
-	private List<JSONObject> addJSON = new ArrayList<>();
-	private List<JSONObject> removeJSON = new ArrayList<>();
+	private List<PcuFilesystemDocument> addJSON = new ArrayList<>();
+	private List<PcuFilesystemDocument> removeJSON = new ArrayList<>();
 
 	@Override
 	public void add(String reference, InputStream content, Properties metadata) {
 		LOGGER.debug("Add document with reference " + reference);
 		try {
-			JSONObject doc = new JSONObject();
-			doc.put("id", reference);
+			PcuFilesystemDocument doc = new PcuFilesystemDocument();
+
+			doc.setId(reference);
+			doc.setIndex("files");
+			doc.setType("file");
 
 			StringWriter writer = new StringWriter();
 			metadata.storeToJSON(writer);
-			doc.put("metadata", writer.toString());
-
-			doc.put("command", "add");
+			doc.setMetadata(writer.toString().getBytes());
 
 			addJSON.add(doc);
 
-		} catch (IOException | JSONException e) {
+		} catch (IOException e) {
 			throw new CommitterException("Cannot create Json document to add for reference: " + reference, e);
 		}
 
@@ -54,27 +53,29 @@ public class PcuFilesystemCommitter implements ICommitter {
 	@Override
 	public void remove(String reference, Properties metadata) {
 		LOGGER.debug("Remove document with reference " + reference);
-		try {
-			JSONObject doc = new JSONObject();
-			doc.put("id", reference);
-			removeJSON.add(doc);
-
-		} catch (/* IOException | */ JSONException e) {
-			throw new CommitterException("Cannot create Json document to remove for reference: " + reference, e);
-		}
-
+		PcuFilesystemDocument doc = new PcuFilesystemDocument();
+		doc.setId(reference);
+		doc.setIndex("files");
+		doc.setType("file");
+		removeJSON.add(doc);
 	}
 
 	@Override
 	public void commit() {
-		
+
 		LOGGER.debug("Commit documents");
 		// send to PCU, but for now log
 		LOGGER.info("Commit added documents");
 		addJSON.forEach(doc -> LOGGER.info(doc.toString()));
+		addJSON.forEach(doc -> {
+			pcuIndexer.createDocument(doc.getMetadata(), doc.getIndex(), doc.getType(), doc.getId());
+		});
 		addJSON.clear();
 		LOGGER.info("Commit removed documents");
 		removeJSON.forEach(doc -> LOGGER.info(doc.toString()));
+		removeJSON.forEach(doc -> {
+			pcuIndexer.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
+		});
 		removeJSON.clear();
 
 	}
@@ -82,5 +83,5 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void setPcuIndexer(PcuIndexer pcuIndexer) {
 		this.pcuIndexer = pcuIndexer;
 	}
-	
+
 }

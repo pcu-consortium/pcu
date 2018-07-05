@@ -3,10 +3,12 @@ package org.pcu.connectors.collectors.filesystem;
 import java.io.IOException;
 
 import org.pcu.connectors.collectors.PcuCollector;
+import org.pcu.connectors.collectors.PcuCollectorException;
 import org.pcu.connectors.indexer.PcuIndexer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -23,35 +25,34 @@ public class PcuFilesystemCollector implements PcuCollector {
 
 	@Autowired
 	private PcuIndexer pcuIndexer;
-	
-	/**
-	 * Add possibility to override default values
-	 */
-	private Resource norconexFilesystemConfigXml = new ClassPathResource("norconex-filesystem-config.xml");
-	/**
-	 * Add possibility to override default values
-	 */
-	private Resource norconexFilesystemConfigVariables = new ClassPathResource("norconex-filesystem-config.variables");
+
+	@Value("${norconex.filesystem.config.xml.path:norconex-filesystem-config.xml}")
+	private String norconexFilesystemConfigXml;
+
+	@Value("${norconex.filesystem.config.variables.path:norconex-filesystem-config.variables}")
+	private String norconexFilesystemConfigVariables;
 
 	@Override
-	public void execute() {
-
+	public void execute() throws PcuCollectorException {
+		LOGGER.debug("Execution start");
 		try {
+			Resource norconexFilesystemConfigXmlResource = new ClassPathResource(norconexFilesystemConfigXml);
+			Resource norconexFilesystemConfigVariablesResource = new ClassPathResource(
+					norconexFilesystemConfigVariables);
+
 			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(
-					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXml.getFile(),
-							norconexFilesystemConfigVariables.getFile());
-			for(ICrawlerConfig crawlerConfig :collectorConfig.getCrawlerConfigs()){
-				if(crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
-					((PcuFilesystemCommitter)crawlerConfig.getCommitter()).setPcuIndexer(pcuIndexer);
+					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXmlResource.getFile(),
+							norconexFilesystemConfigVariablesResource.getFile());
+			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
+				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
+					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuIndexer(pcuIndexer);
 				}
 			}
 			FilesystemCollector collector = new FilesystemCollector(collectorConfig);
 			collector.start(true);
 		} catch (IOException e) {
-			LOGGER.error("Error while starting FileCrawler", e);
-			throw new RuntimeException(e);
+			throw new PcuCollectorException("Error while starting FileCrawler", e);
 		}
-
 	}
 
 }
