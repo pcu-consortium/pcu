@@ -1,4 +1,4 @@
-package org.pcu.connectors.collectors;
+package org.pcu.connectors.collectors.api;
 
 import java.io.IOException;
 

@@ -8,20 +8,15 @@
 		<groupId>org.pcu-consortium.pcu</groupId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>pcu-collectors-filesystem</artifactId>
+	<artifactId>pcu-collectors-norconex</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>PCU Collector Filesystem</name>
-	<description>PCU Collector Filesystem</description>
+	<name>PCU Collector Norconex</name>
+	<description>PCU Collector Norconex</description>
 
 
 	<dependencies>
 
-		<!-- spring : -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
 
 		<!-- collectors : -->
 		<dependency>
@@ -29,6 +24,29 @@
 			<artifactId>norconex-collector-filesystem</artifactId>
 			<version>2.8.0</version>
 
+			<exclusions>
+				<exclusion>
+					<!-- We will get these classes somewhere else -->
+					<groupId>de.l3s.boilerpipe</groupId>
+					<artifactId>boilerpipe</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- edu.ucar:jj2000:5.3 not available in standard repos -->
+					<groupId>edu.ucar</groupId>
+					<artifactId>jj2000</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.norconex.collectors</groupId>
+					<artifactId>norconex-importer</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.norconex.collectors</groupId>
+			<artifactId>norconex-importer</artifactId>
+			<version>2.8.0</version>
 			<exclusions>
 				<exclusion>
 					<!-- We will get these classes somewhere else -->
@@ -64,16 +82,6 @@
 			<version>5.2</version>
 		</dependency>
 
-		<!-- PCU : -->
-		<dependency>
-			<groupId>org.pcu-consortium.pcu</groupId>
-			<artifactId>pcu-indexer-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.pcu-consortium.pcu</groupId>
-			<artifactId>pcu-collectors-api</artifactId>
-		</dependency>
-
 		<!-- osgi : -->
 		<dependency>
 			<groupId>org.osgi</groupId>
@@ -101,8 +109,9 @@
 									<artifactId>luaj-jse</artifactId>
 									<version>3.0.1</version>
 									<outputDirectory>
-										${project.build.directory}/luaj-jse
+										${project.build.directory}/luajjse
 									</outputDirectory>
+									<includes>*</includes>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -142,12 +151,12 @@
 						<configuration>
 							<tasks>
 								<delete>
-									<fileset dir="${project.build.directory}/luaj-jse"
+									<fileset dir="${project.build.directory}/luajjse"
 										includes="*.class" />
 								</delete>
 								<jar
-									destfile="${project.build.directory}/luaj-jse-3.0.1-fixed.jar">
-									<fileset dir="${project.build.directory}/luaj-jse" />
+									destfile="${project.build.directory}/luaj-jse-3.0.1.jar">
+									<fileset dir="${project.build.directory}/luajjse" />
 								</jar>
 							</tasks>
 						</configuration>
@@ -166,7 +175,7 @@
 										includes="*.class" />
 								</delete>
 								<jar
-									destfile="${project.build.directory}/jj2000-5.2-fixed.jar">
+									destfile="${project.build.directory}/jj2000-5.2.jar">
 									<fileset dir="${project.build.directory}/jj2000" />
 								</jar>
 							</tasks>
@@ -183,14 +192,15 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-					
-						<Bundle-ClassPath>.,{maven-dependencies},jj2000-5.2-fixed.jar,luaj-jse-3.0.1-fixed.jar</Bundle-ClassPath>
-						<Include-Resource>{maven-resources},{maven-dependencies},${project.build.directory}/jj2000-5.2-fixed.jar,${project.build.directory}/luaj-jse-3.0.1-fixed.jar</Include-Resource>
 
-						<Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator>
+						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+						<Include-Resource>{maven-resources},{maven-dependencies}</Include-Resource>
+
+						<!-- <Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator> -->
 						<!-- <Import-Package>com.norconex.collectors</Import-Package> -->
-						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>org.pcu.connectors.collectors.filesystem</Export-Package>
+						<!-- <Export-Package>my.test</Export-Package> -->
+						<!-- <Import-Package>*;resolution:=optional</Import-Package> -->
+						<!-- <Export-Package>org.pcu.connectors.collectors.filesystem</Export-Package> -->
 						<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!org.osgi.framework|!org.pcu.connectors.collectors.api</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>

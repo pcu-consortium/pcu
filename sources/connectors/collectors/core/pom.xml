@@ -10,6 +10,7 @@
 	</parent>
 	<artifactId>pcu-collectors-core</artifactId>
 	<!-- <packaging>jar</packaging> -->
+	<packaging>bundle</packaging>
 
 	<name>PCU Collector Core</name>
 	<description>PCU Collector Core</description>
@@ -17,20 +18,19 @@
 
 	<dependencies>
 		<!-- Spring Boot Starters -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework.boot</groupId> -->
+		<!-- <artifactId>spring-boot-starter-web</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework.boot</groupId> -->
+		<!-- <artifactId>spring-boot-starter-test</artifactId> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-api</artifactId>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-indexer-api</artifactId>
@@ -40,33 +40,73 @@
 		<!-- <artifactId>pcu-collectors-filesystem</artifactId> -->
 		<!-- </dependency> -->
 
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
+			<!-- <plugin> -->
+			<!-- <groupId>org.springframework.boot</groupId> -->
+			<!-- <artifactId>spring-boot-maven-plugin</artifactId> -->
+			<!-- <version>${spring-boot.version}</version> -->
+			<!-- <configuration> added -->
+			<!-- <layout>ZIP</layout> to use PropertiesLaunchar -->
+			<!-- </configuration> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <goals> -->
+			<!-- <goal>repackage</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-compiler-plugin</artifactId> -->
+			<!-- <version>3.1</version> -->
+			<!-- <configuration> -->
+			<!-- <source>${java.version}</source> -->
+			<!-- <target>${java.version}</target> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
-				<configuration>  <!-- added -->
-					<layout>ZIP</layout> <!-- to use PropertiesLaunchar -->
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<instructions>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+
+						<!-- Qualified name of the class that exposes the activator iface. -->
+						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
+						<Embed-Dependency>
+							pcu-collectors-api;scope=compile
+						</Embed-Dependency>
+
+						<!-- One important thing to note: since you are not exporting the package 
+							"com.baeldung.osgi.sample.activator", you should at least add it to the Private-Package 
+							instruction. Otherwise, the classes inside the package will not be copied 
+							to your bundle, as the default value of this instruction is empty. -->
+
+						<Private-Package>org.pcu.connectors.collectors.core</Private-Package>
+
+					</instructions>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 

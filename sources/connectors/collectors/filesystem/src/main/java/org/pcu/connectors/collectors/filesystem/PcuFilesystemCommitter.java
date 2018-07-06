@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.pcu.connectors.indexer.PcuIndexer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.norconex.committer.core.CommitterException;
 import com.norconex.committer.core.ICommitter;
@@ -22,8 +21,9 @@ public class PcuFilesystemCommitter implements ICommitter {
 	/** Default committer directory */
 	public static final String DEFAULT_DIRECTORY = "pcu-committer-json";
 
-	@Autowired
-	private PcuIndexer pcuIndexer;
+	// FIXME add the indexer service
+	//@Autowired
+	//private PcuIndexer pcuIndexer;
 
 	private List<PcuFilesystemDocument> addJSON = new ArrayList<>();
 	private List<PcuFilesystemDocument> removeJSON = new ArrayList<>();
@@ -68,20 +68,20 @@ public class PcuFilesystemCommitter implements ICommitter {
 		LOGGER.info("Commit added documents");
 		addJSON.forEach(doc -> LOGGER.info(doc.toString()));
 		addJSON.forEach(doc -> {
-			pcuIndexer.createDocument(doc.getMetadata(), doc.getIndex(), doc.getType(), doc.getId());
+			//pcuIndexer.createDocument(doc.getMetadata(), doc.getIndex(), doc.getType(), doc.getId());
 		});
 		addJSON.clear();
 		LOGGER.info("Commit removed documents");
 		removeJSON.forEach(doc -> LOGGER.info(doc.toString()));
 		removeJSON.forEach(doc -> {
-			pcuIndexer.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
+			//pcuIndexer.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
 		});
 		removeJSON.clear();
 
 	}
 
 	public void setPcuIndexer(PcuIndexer pcuIndexer) {
-		this.pcuIndexer = pcuIndexer;
+		//this.pcuIndexer = pcuIndexer;
 	}
 
 }
