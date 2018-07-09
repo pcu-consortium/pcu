@@ -13,6 +13,8 @@ public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 	private BundleContext ctx;
 	private ServiceReference serviceReference;
 
+	private PcuCollector pcuCollector;
+	
 	public void start(BundleContext ctx) {
 		System.out.println("Start of activator.");
 		this.ctx = ctx;

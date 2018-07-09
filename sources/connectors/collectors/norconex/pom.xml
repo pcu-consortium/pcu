@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>pcu-collectors-parent</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-collectors-norconex</artifactId>
 	<packaging>bundle</packaging>
@@ -17,70 +17,38 @@
 
 	<dependencies>
 
-
 		<!-- collectors : -->
+
 		<dependency>
 			<groupId>com.norconex.collectors</groupId>
 			<artifactId>norconex-collector-filesystem</artifactId>
 			<version>2.8.0</version>
-
+			<!-- Excluded because they contains classes in default package which is 
+				forbidden by OSGI maven-bundle-plugin > Embed-Dependency/Embed-Transitive -->
 			<exclusions>
 				<exclusion>
-					<!-- We will get these classes somewhere else -->
-					<groupId>de.l3s.boilerpipe</groupId>
-					<artifactId>boilerpipe</artifactId>
+					<groupId>org.luaj</groupId>
+					<artifactId>luaj-jse</artifactId>
 				</exclusion>
 				<exclusion>
-					<!-- edu.ucar:jj2000:5.3 not available in standard repos -->
-					<groupId>edu.ucar</groupId>
-					<artifactId>jj2000</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.norconex.collectors</groupId>
-					<artifactId>norconex-importer</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-
-		<dependency>
-			<groupId>com.norconex.collectors</groupId>
-			<artifactId>norconex-importer</artifactId>
-			<version>2.8.0</version>
-			<exclusions>
-				<exclusion>
-					<!-- We will get these classes somewhere else -->
-					<groupId>de.l3s.boilerpipe</groupId>
-					<artifactId>boilerpipe</artifactId>
-				</exclusion>
-				<exclusion>
-					<!-- edu.ucar:jj2000:5.3 not available in standard repos -->
 					<groupId>edu.ucar</groupId>
 					<artifactId>jj2000</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-
-		<!-- From here, in fact, later version, but earlier xerces than we need -->
-		<dependency>
-			<groupId>com.syncthemall</groupId>
-			<artifactId>boilerpipe</artifactId>
-			<version>1.2.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xercesImpl</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- Use older version of edu.ucar:jj2000 -->
-		<dependency>
-			<groupId>edu.ucar</groupId>
-			<artifactId>jj2000</artifactId>
-			<version>5.2</version>
-		</dependency>
+		<!-- mondatory ? -->
+		<!-- <dependency> -->
+		<!-- <groupId>edu.ucar</groupId> -->
+		<!-- <artifactId>jj2000</artifactId> -->
+		<!-- <version>5.2</version> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.luaj</groupId> -->
+		<!-- <artifactId>luaj-jse</artifactId> -->
+		<!-- <version>3.0.1</version> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
 
 		<!-- osgi : -->
 		<dependency>
@@ -109,9 +77,8 @@
 									<artifactId>luaj-jse</artifactId>
 									<version>3.0.1</version>
 									<outputDirectory>
-										${project.build.directory}/luajjse
+										${project.build.directory}/luaj-jse
 									</outputDirectory>
-									<includes>*</includes>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -140,6 +107,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<!-- Rewrite because they contains classes in default package which is 
+					forbidden by OSGI maven-bundle-plugin > Embed-Dependency/Embed-Transitive -->
 				<executions>
 					<execution>
 						<!-- Remove classes from the root package and re jar -->
@@ -151,12 +120,12 @@
 						<configuration>
 							<tasks>
 								<delete>
-									<fileset dir="${project.build.directory}/luajjse"
+									<fileset dir="${project.build.directory}/luaj-jse"
 										includes="*.class" />
 								</delete>
 								<jar
-									destfile="${project.build.directory}/luaj-jse-3.0.1.jar">
-									<fileset dir="${project.build.directory}/luajjse" />
+									destfile="${project.build.directory}/luaj-jse-3.0.1-fixed.jar">
+									<fileset dir="${project.build.directory}/luaj-jse" />
 								</jar>
 							</tasks>
 						</configuration>
@@ -175,7 +144,7 @@
 										includes="*.class" />
 								</delete>
 								<jar
-									destfile="${project.build.directory}/jj2000-5.2.jar">
+									destfile="${project.build.directory}/jj2000-5.2-fixed.jar">
 									<fileset dir="${project.build.directory}/jj2000" />
 								</jar>
 							</tasks>
@@ -189,19 +158,269 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<_noee>true</_noee>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-
-						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
-						<Include-Resource>{maven-resources},{maven-dependencies}</Include-Resource>
-
 						<!-- <Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator> -->
-						<!-- <Import-Package>com.norconex.collectors</Import-Package> -->
-						<!-- <Export-Package>my.test</Export-Package> -->
-						<!-- <Import-Package>*;resolution:=optional</Import-Package> -->
-						<!-- <Export-Package>org.pcu.connectors.collectors.filesystem</Export-Package> -->
-						<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!org.osgi.framework|!org.pcu.connectors.collectors.api</Embed-Dependency>
+						<Bundle-ClassPath>.,{maven-dependencies},jj2000-5.2-fixed.jar,luaj-jse-3.0.1-fixed.jar</Bundle-ClassPath>
+						<Include-Resource>{maven-resources},{maven-dependencies},${project.build.directory}/jj2000-5.2-fixed.jar,${project.build.directory}/luaj-jse-3.0.1-fixed.jar</Include-Resource>
+
+						<!-- <Private-Package>org.pcu.connectors.collectors.filesystem</Private-Package> -->
+						<Export-Package>
+							android.util,
+							com.google.inject,
+							com.ibm.icu.lang,
+							com.ibm.icu.text,
+							com.ibm.uvm.tools,
+							com.jcraft.jsch,
+							com.mchange.v2.c3p0,
+							com.sun.javadoc,
+							com.sun.jdmk.comm,
+							com.sun.msv.grammar,
+							com.sun.msv.grammar.trex,
+							com.sun.msv.grammar.xmlschema,
+							com.sun.msv.reader,
+							com.sun.msv.reader.trex.ng,
+							com.sun.msv.reader.util,
+							com.sun.msv.reader.xmlschema,
+							com.sun.msv.util,
+							com.sun.msv.verifier,
+							com.sun.msv.verifier.regexp,
+							com.sun.msv.verifier.regexp.xmlschema,
+							com.sun.tools.javadoc,
+							com.sun.xml.bind.marshaller,
+							com.sun.xml.fastinfoset.stax,
+							com.sun.xml.internal.bind.marshaller,
+							com.typesafe.config,
+							com.werken.xpath,
+							com.zaxxer.hikari,
+							commonj.work,
+							io.netty.bootstrap,
+							io.netty.buffer,
+							io.netty.channel,
+							io.netty.channel.nio,
+							io.netty.channel.socket,
+							io.netty.channel.socket.nio,
+							io.netty.handler.ssl,
+							io.netty.handler.timeout,
+							io.netty.util.concurrent,
+							javax.activation,
+							javax.cache,
+							javax.cache.configuration,
+							javax.cache.spi,
+							javax.crypto,
+							javax.crypto.interfaces,
+							javax.crypto.spec,
+							javax.imageio,
+							javax.imageio.event,
+							javax.imageio.metadata,
+							javax.imageio.plugins.jpeg,
+							javax.imageio.spi,
+							javax.imageio.stream,
+							javax.jmdns,
+							javax.jms,
+							javax.management,
+							javax.management.openmbean,
+							javax.naming,
+							javax.naming.directory,
+							javax.naming.ldap,
+							javax.naming.spi,
+							javax.net,
+							javax.net.ssl,
+							javax.print,
+							javax.print.attribute,
+							javax.print.attribute.standard,
+							javax.script,
+							javax.security.auth,
+							javax.security.auth.callback,
+							javax.security.auth.login,
+							javax.security.auth.x500,
+							javax.security.sasl,
+							javax.servlet,
+							javax.servlet.annotation,
+							javax.servlet.descriptor,
+							javax.servlet.http,
+							javax.servlet.jsp,
+							javax.sound.midi,
+							javax.sound.sampled,
+							javax.sql,
+							javax.sql.rowset.serial,
+							javax.swing,
+							javax.swing.border,
+							javax.swing.event,
+							javax.swing.filechooser,
+							javax.swing.table,
+							javax.swing.text,
+							javax.swing.text.html,
+							javax.swing.tree,
+							javax.tools,
+							javax.transaction,
+							javax.transaction.xa,
+							javax.validation,
+							javax.validation.bootstrap,
+							javax.validation.executable,
+							javax.validation.spi,
+							javax.wsdl,
+							javax.wsdl.extensions,
+							javax.xml.bind,
+							javax.xml.bind.annotation,
+							javax.xml.bind.annotation.adapters,
+							javax.xml.bind.attachment,
+							javax.xml.bind.helpers,
+							javax.xml.crypto,
+							javax.xml.crypto.dom,
+							javax.xml.crypto.dsig,
+							javax.xml.crypto.dsig.dom,
+							javax.xml.crypto.dsig.keyinfo,
+							javax.xml.crypto.dsig.spec,
+							javax.xml.ws,
+							jcifs.smb,
+							junit.framework,
+							net.sf.cglib.proxy,
+							oracle.sql,
+							org.apache.aries.blueprint,
+							org.apache.aries.blueprint.mutable,
+							org.apache.aries.blueprint.services,
+							org.apache.avalon.framework.logger,
+							org.apache.bcel.classfile,
+							org.apache.bcel.generic,
+							org.apache.commons.digester,
+							org.apache.commons.digester.substitution,
+							org.apache.commons.digester.xmlrules,
+							org.apache.commons.jexl2,
+							org.apache.crimson.jaxp,
+							org.apache.ctakes.typesystem.type.refsem,
+							org.apache.ctakes.typesystem.type.textsem,
+							org.apache.cxf.ws.policy,
+							org.apache.cxf.ws.policy.builder.jaxb,
+							org.apache.cxf.wsdl,
+							org.apache.geronimo.osgi.registry.api,
+							org.apache.hadoop.conf,
+							org.apache.hadoop.fs,
+							org.apache.hadoop.fs.permission,
+							org.apache.jackrabbit.webdav,
+							org.apache.jackrabbit.webdav.client.methods,
+							org.apache.jackrabbit.webdav.property,
+							org.apache.jackrabbit.webdav.version,
+							org.apache.jackrabbit.webdav.xml,
+							org.apache.jcp.xml.dsig.internal.dom,
+							org.apache.log,
+							org.apache.log.format,
+							org.apache.log.output.io,
+							org.apache.lucene.analysis,
+							org.apache.lucene.analysis.standard,
+							org.apache.lucene.document,
+							org.apache.lucene.index,
+							org.apache.lucene.queryParser,
+							org.apache.lucene.search,
+							org.apache.lucene.store,
+							org.apache.lucene.util,
+							org.apache.neethi,
+							org.apache.oro.text.perl,
+							org.apache.tools.ant,
+							org.apache.tools.ant.taskdefs,
+							org.apache.tools.ant.types,
+							org.apache.uima,
+							org.apache.uima.analysis_engine,
+							org.apache.uima.cas,
+							org.apache.uima.cas.impl,
+							org.apache.uima.fit.util,
+							org.apache.uima.jcas,
+							org.apache.uima.jcas.cas,
+							org.apache.uima.resource,
+							org.apache.uima.util,
+							org.apache.xml.resolver,
+							org.apache.xml.resolver.helpers,
+							org.apache.xml.resolver.readers,
+							org.apache.xml.resolver.tools,
+							org.apache.xml.security,
+							org.apache.xml.security.c14n,
+							org.apache.xml.security.utils,
+							org.brotli.dec,
+							org.cyberneko.html.xercesbridge,
+							org.eclipse.core.runtime,
+							org.etsi.uri.x01903.v14,
+							org.hibernate,
+							org.hibernate.cache,
+							org.hibernate.cache.access,
+							org.hibernate.cfg,
+							org.hibernate.impl,
+							org.hibernate.stat,
+							org.hibernate.transaction,
+							org.ietf.jgss,
+							org.jaxen,
+							org.jaxen.saxpath,
+							org.jaxen.util,
+							org.jboss.logging,
+							org.jboss.naming,
+							org.jboss.system,
+							org.jdom,
+							org.jdom.input,
+							org.jdom.output,
+							org.joda.convert,
+							org.junit,
+							org.junit.internal,
+							org.junit.runner,
+							org.junit.runner.notification,
+							org.locationtech.jts.geom,
+							org.locationtech.jts.io,
+							org.osgi.framework,
+							org.osgi.service.blueprint.container,
+							org.osgi.service.blueprint.reflect,
+							org.osgi.service.cm,
+							org.osgi.service.jdbc,
+							org.osgi.service.log,
+							org.osgi.util.tracker,
+							org.quartz.jobs,
+							org.relaxng.datatype,
+							org.seasar.framework.container,
+							org.seasar.framework.container.factory,
+							org.seasar.framework.log,
+							org.springframework.aop,
+							org.springframework.aop.framework,
+							org.springframework.aop.support,
+							org.springframework.beans,
+							org.springframework.beans.factory,
+							org.springframework.beans.factory.config,
+							org.springframework.beans.factory.support,
+							org.springframework.beans.factory.wiring,
+							org.springframework.beans.factory.xml,
+							org.springframework.context,
+							org.springframework.context.annotation,
+							org.springframework.context.event,
+							org.springframework.context.support,
+							org.springframework.core,
+							org.springframework.core.io,
+							org.springframework.core.io.support,
+							org.springframework.core.type,
+							org.springframework.core.type.classreading,
+							org.springframework.util,
+							org.springframework.web.context,
+							org.springframework.web.context.support,
+							org.sqlite,
+							org.terracotta.toolkit,
+							org.terracotta.toolkit.atomic,
+							org.terracotta.toolkit.builder,
+							org.terracotta.toolkit.cluster,
+							org.terracotta.toolkit.collections,
+							org.terracotta.toolkit.concurrent.locks,
+							org.terracotta.toolkit.config,
+							org.terracotta.toolkit.internal,
+							org.terracotta.toolkit.internal.concurrent.locks,
+							org.terracotta.toolkit.rejoin,
+							org.terracotta.toolkit.search,
+							org.terracotta.toolkit.search.attribute,
+							org.terracotta.toolkit.store,
+							org.xerial.snappy,
+							sun.misc,
+							sun.reflect.generics.reflectiveObjects,
+							sun.security.action,
+							weblogic.jdbc.jts,
+							weblogic.jdbc.vendor.oracle,
+							*
+						</Export-Package>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>

@@ -5,6 +5,8 @@ import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.pcu.connectors.collectors.api.PcuCollector;
@@ -20,14 +22,16 @@ import com.norconex.collector.core.crawler.ICrawlerConfig;
 import com.norconex.collector.fs.FilesystemCollector;
 import com.norconex.collector.fs.FilesystemCollectorConfig;
 
-public class PcuFilesystemCollector implements PcuCollector, BundleActivator {
+public class PcuFilesystemCollector implements PcuCollector, BundleActivator, ServiceListener {
+
+	private BundleContext ctx;
+	private ServiceReference serviceReference;
 
 	private ServiceReference<PcuCollector> reference;
 	private ServiceRegistration<PcuCollector> registration;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemCollector.class);
 
-	// FIXME add as service
 	private PcuIndexer pcuIndexer;
 
 	private String norconexFilesystemConfigXml = "norconex-filesystem-config.xml";
@@ -63,13 +67,36 @@ public class PcuFilesystemCollector implements PcuCollector, BundleActivator {
 		registration = context.registerService(PcuCollector.class, new PcuFilesystemCollector(),
 				new Hashtable<String, String>());
 		reference = registration.getReference();
-		
+
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		System.out.println("Unregistering service.");
 		registration.unregister();
+	}
+
+	@Override
+	public void serviceChanged(ServiceEvent serviceEvent) {
+		System.out.println("serviceChanged.");
+		int type = serviceEvent.getType();
+		switch (type) {
+		case (ServiceEvent.REGISTERED):
+			System.out.println("Notification of service registered.");
+			serviceReference = serviceEvent.getServiceReference();
+			pcuIndexer = (PcuIndexer) (ctx.getService(serviceReference));
+			System.out.println("service is there");
+			// pcuCollector.execute();
+			break;
+		case (ServiceEvent.UNREGISTERING):
+			System.out.println("Notification of service unregistered.");
+			ctx.ungetService(serviceEvent.getServiceReference());
+			pcuIndexer = null;
+			break;
+		default:
+			break;
+		}
+
 	}
 
 }

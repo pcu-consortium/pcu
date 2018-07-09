@@ -6,10 +6,9 @@
 	<parent>
 		<artifactId>pcu-collectors-parent</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-collectors-core</artifactId>
-	<!-- <packaging>jar</packaging> -->
 	<packaging>bundle</packaging>
 
 	<name>PCU Collector Core</name>
@@ -17,16 +16,6 @@
 
 
 	<dependencies>
-		<!-- Spring Boot Starters -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.boot</groupId> -->
-		<!-- <artifactId>spring-boot-starter-web</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.boot</groupId> -->
-		<!-- <artifactId>spring-boot-starter-test</artifactId> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-api</artifactId>
@@ -35,10 +24,6 @@
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-indexer-api</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.pcu-consortium.pcu</groupId> -->
-		<!-- <artifactId>pcu-collectors-filesystem</artifactId> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.osgi</groupId>
@@ -56,30 +41,6 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<!-- <plugin> -->
-			<!-- <groupId>org.springframework.boot</groupId> -->
-			<!-- <artifactId>spring-boot-maven-plugin</artifactId> -->
-			<!-- <version>${spring-boot.version}</version> -->
-			<!-- <configuration> added -->
-			<!-- <layout>ZIP</layout> to use PropertiesLaunchar -->
-			<!-- </configuration> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <goals> -->
-			<!-- <goal>repackage</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-compiler-plugin</artifactId> -->
-			<!-- <version>3.1</version> -->
-			<!-- <configuration> -->
-			<!-- <source>${java.version}</source> -->
-			<!-- <target>${java.version}</target> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -89,20 +50,9 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-
-						<!-- Qualified name of the class that exposes the activator iface. -->
 						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
-						<Embed-Dependency>
-							pcu-collectors-api;scope=compile|runtime
-						</Embed-Dependency>
-
-						<!-- One important thing to note: since you are not exporting the package 
-							"com.baeldung.osgi.sample.activator", you should at least add it to the Private-Package 
-							instruction. Otherwise, the classes inside the package will not be copied 
-							to your bundle, as the default value of this instruction is empty. -->
-
+						<Embed-Dependency>pcu-collectors-api;scope=compile|runtime</Embed-Dependency>
 						<Private-Package>org.pcu.connectors.collectors.core</Private-Package>
-
 					</instructions>
 				</configuration>
 			</plugin>

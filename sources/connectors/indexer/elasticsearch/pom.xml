@@ -6,10 +6,10 @@
 	<parent>
 		<artifactId>pcu-connectors-parent</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-indexer-elasticsearch</artifactId>
-	<packaging>jar</packaging>
+	<packaging>bundle</packaging>
 
 	<name>PCU Indexer Elasticsearch</name>
 	<description>PCU Indexer Elasticsearch</description>
@@ -25,17 +25,121 @@
 			<artifactId>pcu-indexer-api</artifactId>
 		</dependency>
 
-		<!-- Spring Boot Starters -->
+		<!-- osgi : -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<_noee>true</_noee>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Bundle-Activator>org.pcu.connectors.indexer.elasticsearch.PcuESIndexer</Bundle-Activator>
+						<Private-Package>org.pcu.connectors.indexer.elasticsearch</Private-Package>
+						<Import-Package>org.pcu.connectors.indexer.api,*</Import-Package>
+						<Export-Package>
+							com.conversantmedia.util.concurrent,
+							com.fasterxml.jackson.dataformat.xml,
+							com.fasterxml.jackson.dataformat.xml.annotation,
+							com.fasterxml.jackson.dataformat.xml.util,
+							com.google.protobuf,
+							com.google.protobuf.nano,
+							com.jcraft.jzlib,
+							com.lmax.disruptor,
+							com.lmax.disruptor.dsl,
+							com.ning.compress,
+							com.ning.compress.lzf,
+							com.ning.compress.lzf.util,
+							io.netty.internal.tcnative,
+							javax.activation,
+							javax.annotation.processing,
+							javax.crypto,
+							javax.crypto.spec,javax.jms,
+							javax.lang.model,javax.lang.model.element,
+							javax.lang.model.util,
+							javax.mail,javax.mail.internet,
+							javax.mail.util,
+							javax.management,
+							javax.naming,javax.naming.directory,
+							javax.naming.ldap,javax.net,
+							javax.net.ssl,
+							javax.persistence,
+							javax.script,javax.security.auth,
+							javax.security.auth.x500,
+							javax.security.cert,
+							javax.servlet,
+							javax.servlet.http,
+							javax.sql,javax.tools,
+							javax.xml.bind,
+							javax.xml.datatype,
+							javax.xml.namespace,
+							javax.xml.parsers,
+							javax.xml.stream,
+							javax.xml.transform,
+							javax.xml.transform.dom,
+							javax.xml.transform.stream,
+							javax.xml.validation,
+							lzma.sdk,
+							lzma.sdk.lzma,
+							net.jpountz.lz4,
+							net.jpountz.xxhash,
+							org.apache.avalon.framework.logger,
+							org.apache.commons.compress.compressors,
+							org.apache.commons.compress.utils,org.ap
+							ache.commons.csv,
+							org.apache.kafka.clients.producer,
+							org.apache.log,org.apache.log4j,
+							org.apache.tomcat.jni,
+							org.bouncycastle.asn1.x500,
+							org.bouncycastle.cert,
+							org.bouncycastle.cert.jcajce,
+							org.bouncycastle.jce.provider,
+							org.bouncycastle.operator,
+							org.bouncycastle.operator.jcajce,org.
+							codehaus.stax2,org.conscrypt,
+							org.eclipse.jetty.alpn,
+							org.eclipse.jetty.npn,
+							org.fusesource.jansi,
+							org.ietf.jgss,
+							org.jboss.logging,
+							org.jboss.marshalling,
+							org.jctools.queues,org.joda.convert,
+							org.noggit,
+							org.osgi.framework,
+							org.osgi.framework.wiring,
+							org.osgi.service.log,
+							org.osgi.util.tracker,
+							org.slf4j,
+							org.slf4j.helpers,
+							org.w3c.dom,
+							org.w3c.dom.bootstrap,
+							org.w3c.dom.ls,
+							org.xml.sax,
+							org.xml.sax.helpers,
+							org.zeromq,
+							sun.misc,
+							sun.security.util,
+							sun.security.x509,
+							org.pcu.connectors.indexer.api</Export-Package>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
 
