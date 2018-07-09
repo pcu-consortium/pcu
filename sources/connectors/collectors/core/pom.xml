@@ -93,7 +93,7 @@
 						<!-- Qualified name of the class that exposes the activator iface. -->
 						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
 						<Embed-Dependency>
-							pcu-collectors-api;scope=compile
+							pcu-collectors-api;scope=compile|runtime
 						</Embed-Dependency>
 
 						<!-- One important thing to note: since you are not exporting the package 

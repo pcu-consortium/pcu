@@ -18,7 +18,13 @@ public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 		this.ctx = ctx;
 		try {
 			ctx.addServiceListener(this, "(objectclass=" + PcuCollector.class.getName() + ")");
+			PcuCollector pcuCollector = (PcuCollector) ctx.getServiceReference(PcuCollector.class);
+			System.out.println("has pcu collector ?");
+			if(pcuCollector != null){
+				System.out.println("yes it does");	
+			}
 		} catch (InvalidSyntaxException ise) {
+			System.out.println("InvalidSyntaxException.");
 			ise.printStackTrace();
 		}
 	}
@@ -33,6 +39,7 @@ public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 
 	@Override
 	public void serviceChanged(ServiceEvent serviceEvent) {
+		System.out.println("serviceChanged.");
 		int type = serviceEvent.getType();
 		switch (type) {
 		case (ServiceEvent.REGISTERED):

@@ -63,6 +63,7 @@ public class PcuFilesystemCollector implements PcuCollector, BundleActivator {
 		registration = context.registerService(PcuCollector.class, new PcuFilesystemCollector(),
 				new Hashtable<String, String>());
 		reference = registration.getReference();
+		
 	}
 
 	@Override
