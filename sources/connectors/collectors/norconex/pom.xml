@@ -162,13 +162,12 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<!-- <Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator> -->
-						<Bundle-ClassPath>.,{maven-dependencies},jj2000-5.2-fixed.jar,luaj-jse-3.0.1-fixed.jar</Bundle-ClassPath>
-						<Include-Resource>{maven-resources},{maven-dependencies},${project.build.directory}/jj2000-5.2-fixed.jar,${project.build.directory}/luaj-jse-3.0.1-fixed.jar</Include-Resource>
-
-						<!-- <Private-Package>org.pcu.connectors.collectors.filesystem</Private-Package> -->
+ 						<!--  <Bundle-ClassPath>.,{maven-dependencies},jj2000-5.2-fixed.jar,luaj-jse-3.0.1-fixed.jar</Bundle-ClassPath>  --> 
+						<Include-Resource>{maven-resources},{maven-dependencies},${project.build.directory}/jj2000,${project.build.directory}/luaj-jse</Include-Resource>
+						
 						<Export-Package>
 							android.util,
+							colorspace,
 							com.google.inject,
 							com.ibm.icu.lang,
 							com.ibm.icu.text,
@@ -196,6 +195,7 @@
 							com.werken.xpath,
 							com.zaxxer.hikari,
 							commonj.work,
+							icc,
 							io.netty.bootstrap,
 							io.netty.buffer,
 							io.netty.channel,
@@ -276,6 +276,19 @@
 							javax.xml.crypto.dsig.spec,
 							javax.xml.ws,
 							jcifs.smb,
+							jj2000.j2k,
+							jj2000.j2k.codestream,
+							jj2000.j2k.codestream.reader,
+							jj2000.j2k.decoder,
+							jj2000.j2k.encoder,
+							jj2000.j2k.entropy,
+							jj2000.j2k.fileformat,
+							jj2000.j2k.image,
+							jj2000.j2k.io,
+							jj2000.j2k.quantization,
+							jj2000.j2k.roi,
+							jj2000.j2k.util,
+							jj2000.j2k.wavelet,
 							junit.framework,
 							net.sf.cglib.proxy,
 							oracle.sql,
@@ -420,7 +433,16 @@
 							weblogic.jdbc.vendor.oracle,
 							*
 						</Export-Package>
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						 
+						<Embed-Dependency>
+						*;scope=!runtime;type=!pom;inline=true
+						</Embed-Dependency>
+						<!--  
+						<Embed-Dependency>
+						${project.build.directory}/luaj-jse-3.0.1-fixed.jar;inline=true,
+						*;scope=!runtime;type=!pom;inline=true
+						</Embed-Dependency>
+						 -->
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>

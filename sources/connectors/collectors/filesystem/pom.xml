@@ -30,7 +30,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
-			<artifactId>pcu-indexer-api</artifactId>
+			<artifactId>pcu-platform-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -42,6 +42,20 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- Transitive pcu-plateform-client dependency -->
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-core</artifactId>
+			<version>9.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-gson</artifactId>
+			<version>9.7.0</version>
 		</dependency>
 
 	</dependencies>
@@ -61,8 +75,16 @@
 						<Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator>
 						<Private-Package>org.pcu.connectors.collectors.filesystem</Private-Package>
 						<Import-Package>org.pcu.connectors.collectors.api,*</Import-Package>
-						<Export-Package>org.pcu.connectors.collectors.api</Export-Package>
-						<Embed-Dependency>pcu-indexer-api;scope=compile|runtime</Embed-Dependency>
+						<Export-Package>
+							org.pcu.connectors.collectors.api,
+							*
+						</Export-Package>
+						<Embed-Dependency>
+							pcu-platform-client;scope=compile|runtime,
+							feign-core;scope=compile|runtime,
+							feign-gson;scope=compile|runtime,
+							spring-code;scope=compile|runtime
+						</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>

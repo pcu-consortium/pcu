@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.pcu.connectors.indexer.PcuIndexer;
+import org.pcu.platform.client.PcuPlatformClient;
 
 import com.norconex.committer.core.CommitterException;
 import com.norconex.committer.core.ICommitter;
@@ -80,7 +80,7 @@ public class PcuFilesystemCommitter implements ICommitter {
 
 	}
 
-	public void setPcuIndexer(PcuIndexer pcuIndexer) {
+	public void setPcuIndexer(PcuPlatformClient pcuIndexer) {
 		//this.pcuIndexer = pcuIndexer;
 	}
 

@@ -11,7 +11,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.pcu.connectors.collectors.api.PcuCollector;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
-import org.pcu.connectors.indexer.PcuIndexer;
+import org.pcu.platform.client.PcuPlatformClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -32,12 +32,16 @@ public class PcuFilesystemCollector implements PcuCollector, BundleActivator, Se
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemCollector.class);
 
-	private PcuIndexer pcuIndexer;
+	private PcuPlatformClient pcuIndexer;
 
 	private String norconexFilesystemConfigXml = "norconex-filesystem-config.xml";
 
 	private String norconexFilesystemConfigVariables = "norconex-filesystem-config.variables";
 
+	public PcuFilesystemCollector() {
+		LOGGER.debug("init bean");
+	}
+	
 	@Override
 	public void execute() throws PcuCollectorException {
 		LOGGER.debug("Execution start");
@@ -84,7 +88,7 @@ public class PcuFilesystemCollector implements PcuCollector, BundleActivator, Se
 		case (ServiceEvent.REGISTERED):
 			System.out.println("Notification of service registered.");
 			serviceReference = serviceEvent.getServiceReference();
-			pcuIndexer = (PcuIndexer) (ctx.getService(serviceReference));
+			pcuIndexer = (PcuPlatformClient) (ctx.getService(serviceReference));
 			System.out.println("service is there");
 			// pcuCollector.execute();
 			break;
