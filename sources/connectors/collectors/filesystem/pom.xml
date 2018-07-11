@@ -57,8 +57,8 @@
 			<artifactId>feign-gson</artifactId>
 			<version>9.7.0</version>
 		</dependency>
-
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -72,19 +72,15 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
+						<Import-Package>org.osgi.framework,org.pcu.connectors.collectors.api,org.slf4j</Import-Package>
+						<Export-Service>org.pcu.connectors.collectors.api.PcuCollector</Export-Service>
 						<Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator>
-						<Private-Package>org.pcu.connectors.collectors.filesystem</Private-Package>
-						<Import-Package>org.pcu.connectors.collectors.api,*</Import-Package>
-						<Export-Package>
-							org.pcu.connectors.collectors.api,
-							*
-						</Export-Package>
+						<!-- 
 						<Embed-Dependency>
 							pcu-platform-client;scope=compile|runtime,
-							feign-core;scope=compile|runtime,
-							feign-gson;scope=compile|runtime,
 							spring-code;scope=compile|runtime
 						</Embed-Dependency>
+						 -->
 					</instructions>
 				</configuration>
 			</plugin>

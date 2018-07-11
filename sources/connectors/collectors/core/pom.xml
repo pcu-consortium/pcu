@@ -51,8 +51,10 @@
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
-						<Embed-Dependency>pcu-collectors-api;scope=compile|runtime</Embed-Dependency>
-						<Private-Package>org.pcu.connectors.collectors.core</Private-Package>
+						<Import-Service>org.pcu.connectors.collectors.api.PcuCollector</Import-Service>
+						<Import-Package>org.pcu.connectors.collectors.api</Import-Package>
+<!-- 						<Embed-Dependency>pcu-collectors-api;scope=compile|runtime</Embed-Dependency> -->
+<!-- 						<Private-Package>org.pcu.connectors.collectors.core</Private-Package> -->
 					</instructions>
 				</configuration>
 			</plugin>

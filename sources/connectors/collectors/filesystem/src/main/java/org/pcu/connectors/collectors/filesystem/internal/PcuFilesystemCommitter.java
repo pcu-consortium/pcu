@@ -1,4 +1,4 @@
-package org.pcu.connectors.collectors.filesystem;
+package org.pcu.connectors.collectors.filesystem.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
