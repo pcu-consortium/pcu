@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class PcuCollectorException extends Exception {
 
-	public PcuCollectorException(String message, IOException cause) {
+	public PcuCollectorException(String message, Exception cause) {
 		super(message, cause);
 	}
 

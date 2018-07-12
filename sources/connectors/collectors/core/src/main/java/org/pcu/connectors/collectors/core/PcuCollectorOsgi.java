@@ -7,23 +7,40 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.pcu.connectors.collectors.api.PcuCollector;
+import org.pcu.connectors.collectors.api.PcuCollectorException;
 
 public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 
 	private BundleContext ctx;
-	private ServiceReference serviceReference;
+	private ServiceReference<PcuCollector> serviceReference;
 
-	private PcuCollector pcuCollector;
-	
-	public void start(BundleContext ctx) {
+	public void start(BundleContext bundleContext) {
 		System.out.println("Start of activator.");
-		this.ctx = ctx;
+		this.ctx = bundleContext;
 		try {
 			ctx.addServiceListener(this, "(objectclass=" + PcuCollector.class.getName() + ")");
-			PcuCollector pcuCollector = (PcuCollector) ctx.getServiceReference(PcuCollector.class);
-			System.out.println("has pcu collector ?");
-			if(pcuCollector != null){
-				System.out.println("yes it does");	
+			if (ctx.getServiceReference(PcuCollector.class) != null) {
+				serviceReference = ctx.getServiceReference(PcuCollector.class);
+				if (serviceReference != null) {
+					System.out.println(serviceReference.getClass().getName());
+				} else {
+					System.out.println(" no serviceReference");
+					return;
+				}
+				PcuCollector pcuCollector = ctx.getService(serviceReference);
+				System.out.println("has pcu collector ?");
+				if (pcuCollector != null) {
+					System.out.println("yes it does");
+					try {
+						pcuCollector.execute();
+						System.out.println("did the thing");
+					} catch (PcuCollectorException e) {
+						System.out.println("something bad happened");
+						e.printStackTrace();
+					}
+				}
+			} else {
+				System.out.println("nope");
 			}
 		} catch (InvalidSyntaxException ise) {
 			System.out.println("InvalidSyntaxException.");
@@ -46,10 +63,16 @@ public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 		switch (type) {
 		case (ServiceEvent.REGISTERED):
 			System.out.println("Notification of service registered.");
-			serviceReference = serviceEvent.getServiceReference();
+			serviceReference = (ServiceReference<PcuCollector>) serviceEvent.getServiceReference();
 			PcuCollector pcuCollector = (PcuCollector) (ctx.getService(serviceReference));
 			System.out.println("service is there");
-			// pcuCollector.execute();
+			try {
+				pcuCollector.execute();
+				System.out.println("did the thing");
+			} catch (PcuCollectorException e) {
+				System.out.println("something bad happened");
+				e.printStackTrace();
+			}
 			break;
 		case (ServiceEvent.UNREGISTERING):
 			System.out.println("Notification of service unregistered.");

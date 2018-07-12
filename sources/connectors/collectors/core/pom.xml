@@ -20,23 +20,11 @@
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.pcu-consortium.pcu</groupId>
-			<artifactId>pcu-indexer-api</artifactId>
-		</dependency>
-
+		<!-- osgi : -->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
@@ -47,14 +35,13 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<_noee>true</_noee>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
 						<Import-Service>org.pcu.connectors.collectors.api.PcuCollector</Import-Service>
-						<Import-Package>org.pcu.connectors.collectors.api</Import-Package>
-<!-- 						<Embed-Dependency>pcu-collectors-api;scope=compile|runtime</Embed-Dependency> -->
-<!-- 						<Private-Package>org.pcu.connectors.collectors.core</Private-Package> -->
+						<Import-Package>org.osgi.framework,org.pcu.connectors.collectors.api</Import-Package>
+						<Bundle-Activator>org.pcu.connectors.collectors.core.PcuCollectorOsgi</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

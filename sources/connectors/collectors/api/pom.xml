@@ -10,11 +10,17 @@
 	<artifactId>pcu-collectors-api</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>PCU Collector Core</name>
-	<description>PCU Collector APIT</description>
+	<name>PCU Collector API</name>
+	<description>PCU Collector API</description>
 
 
 	<dependencies>
+		<!-- osgi : -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>

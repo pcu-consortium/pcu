@@ -16,13 +16,6 @@
 
 
 	<dependencies>
-
-		<!-- spring : -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
-
 		<!-- PCU : -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -72,15 +65,21 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Import-Package>org.osgi.framework,org.pcu.connectors.collectors.api,org.slf4j</Import-Package>
+						<Import-Package>
+							org.osgi.framework,
+							org.pcu.connectors.collectors.api,
+							com.norconex.collector.core,
+							com.norconex.collector.core.crawler,
+							com.norconex.collector.fs,
+							org.apache.commons.io,
+							org.slf4j
+						</Import-Package>
 						<Export-Service>org.pcu.connectors.collectors.api.PcuCollector</Export-Service>
-						<Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollector</Bundle-Activator>
-						<!-- 
+						<Bundle-Activator>org.pcu.connectors.collectors.filesystem.PcuFilesystemCollectorOsgi</Bundle-Activator>
 						<Embed-Dependency>
-							pcu-platform-client;scope=compile|runtime,
-							spring-code;scope=compile|runtime
+							pcu-platform-client;scope=compile|runtime
 						</Embed-Dependency>
-						 -->
+						
 					</instructions>
 				</configuration>
 			</plugin>

@@ -44,6 +44,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+
 		<!-- Transitive norconex -->
 		<dependency>
 			<groupId>com.norconex.collectors</groupId>
@@ -861,6 +862,22 @@
 			<version>3.5</version>
 			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.2</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		
+		<!-- xalan or xerces ???? -->
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>serializer</artifactId>
+			<version>2.7.2</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
@@ -1110,6 +1127,9 @@
 							jj2000.j2k.wavelet.synthesis,
 							junit.framework,
 							net.sf.cglib.proxy,
+							com.norconex.collector.core,
+							com.norconex.collector.core.crawler,
+							com.norconex.collector.fs,
 							oracle.sql,
 							org.apache.aries.blueprint,
 							org.apache.aries.blueprint.mutable,
@@ -1120,6 +1140,7 @@
 							org.apache.commons.digester,
 							org.apache.commons.digester.substitution,
 							org.apache.commons.digester.xmlrules,
+							org.apache.commons.io,
 							org.apache.commons.jexl2,
 							org.apache.crimson.jaxp,
 							org.apache.ctakes.typesystem.type.refsem,
@@ -1166,6 +1187,7 @@
 							org.apache.xml.resolver.helpers,
 							org.apache.xml.resolver.readers,
 							org.apache.xml.resolver.tools,
+							org.apache.xml.serializer,
 							org.apache.xml.security,
 							org.apache.xml.security.c14n,
 							org.apache.xml.security.utils,
@@ -1388,7 +1410,8 @@
 							commons-vfs2,
 							commons-httpclient,
 							commons-net,
-							org.osgi.core
+							xalan,
+							serializer
 						</Embed-Dependency>
 						<!-- <Embed-Transitive>true</Embed-Transitive> -->
 					</instructions>
