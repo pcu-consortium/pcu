@@ -863,21 +863,26 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
+		<!-- xalan or xerces ???? -->
+		<!-- <dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
 			<version>2.7.2</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		
-		<!-- xalan or xerces ???? -->
 		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>serializer</artifactId>
 			<version>2.7.2</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>xerces</groupId> -->
+<!-- 			<artifactId>xercesImpl</artifactId> -->
+<!-- 			<version>2.12.0</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
+
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
@@ -1102,6 +1107,7 @@
 							javax.xml.crypto.dsig.dom,
 							javax.xml.crypto.dsig.keyinfo,
 							javax.xml.crypto.dsig.spec,
+							javax.xml.validation,
 							javax.xml.ws,
 							jcifs.smb,
 							jj2000.j2k,
@@ -1130,6 +1136,7 @@
 							com.norconex.collector.core,
 							com.norconex.collector.core.crawler,
 							com.norconex.collector.fs,
+							com.norconex.commons.lang.config,
 							oracle.sql,
 							org.apache.aries.blueprint,
 							org.apache.aries.blueprint.mutable,
@@ -1183,17 +1190,19 @@
 							org.apache.uima.jcas.cas,
 							org.apache.uima.resource,
 							org.apache.uima.util,
+							org.apache.xalan.processor,
 							org.apache.xml.resolver,
 							org.apache.xml.resolver.helpers,
 							org.apache.xml.resolver.readers,
 							org.apache.xml.resolver.tools,
-							org.apache.xml.serializer,
 							org.apache.xml.security,
 							org.apache.xml.security.c14n,
 							org.apache.xml.security.utils,
+							org.apache.xml.serializer,
 							org.brotli.dec,
 							org.cyberneko.html.xercesbridge,
 							org.eclipse.core.runtime,
+							org.eclipse.wst.xml.xpath2.processor,
 							org.etsi.uri.x01903.v14,
 							org.hibernate,
 							org.hibernate.cache,
@@ -1228,6 +1237,7 @@
 							org.osgi.util.tracker,
 							org.quartz.jobs,
 							org.relaxng.datatype,
+							org.slf4j,
 							org.seasar.framework.container,
 							org.seasar.framework.container.factory,
 							org.seasar.framework.log,
@@ -1268,6 +1278,7 @@
 							org.terracotta.toolkit.store,
 							org.xerial.snappy,
 							sun.misc,
+							sun.io,
 							sun.reflect.generics.reflectiveObjects,
 							sun.security.action,
 							weblogic.jdbc.jts,
@@ -1410,8 +1421,6 @@
 							commons-vfs2,
 							commons-httpclient,
 							commons-net,
-							xalan,
-							serializer
 						</Embed-Dependency>
 						<!-- <Embed-Transitive>true</Embed-Transitive> -->
 					</instructions>

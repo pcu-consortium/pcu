@@ -1,5 +1,6 @@
 package org.pcu.connectors.collectors.filesystem;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -15,13 +16,16 @@ public class PcuFilesystemCollectorOsgi implements BundleActivator {
 
 	private ServiceReference<PcuCollector> reference;
 	private ServiceRegistration<PcuCollector> registration;
-	
+
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		System.out.println("Registering service.");
 		this.ctx = bundleContext;
 		PcuFilesystemCollector pcuFilesystemCollector = new PcuFilesystemCollector(this.ctx, new PcuPlatformClient());
-		registration = ctx.registerService(PcuCollector.class, pcuFilesystemCollector, new Hashtable<String, String>());
+		Dictionary<String, String> dictionary = new Hashtable<String, String>();
+		dictionary.put("org.apache.xalan.processor.TransformerFactoryImpl",
+				"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+		registration = ctx.registerService(PcuCollector.class, pcuFilesystemCollector, dictionary);
 		reference = registration.getReference();
 	}
 

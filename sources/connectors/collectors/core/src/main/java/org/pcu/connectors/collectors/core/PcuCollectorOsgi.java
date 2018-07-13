@@ -29,6 +29,8 @@ public class PcuCollectorOsgi implements BundleActivator, ServiceListener {
 				}
 				PcuCollector pcuCollector = ctx.getService(serviceReference);
 				System.out.println("has pcu collector ?");
+				System.out.println(serviceReference.getProperty("org.apache.xalan.processor.TransformerFactoryImpl"));
+
 				if (pcuCollector != null) {
 					System.out.println("yes it does");
 					try {

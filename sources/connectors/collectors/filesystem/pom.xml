@@ -72,6 +72,8 @@
 							com.norconex.collector.core.crawler,
 							com.norconex.collector.fs,
 							org.apache.commons.io,
+							javax.xml.transform,
+							javax.xml.validation,
 							org.slf4j
 						</Import-Package>
 						<Export-Service>org.pcu.connectors.collectors.api.PcuCollector</Export-Service>
