@@ -96,7 +96,7 @@
 		<logback.version>1.2.3</logback.version><!-- spring-boot's ; 1.2.3 -->
 
 		<!-- build : -->
-		<java.version>10</java.version>
+		<java.version>8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding><!-- 
 			else [WARNING] File encoding has not been set, using platform encoding UTF-8, 
@@ -225,7 +225,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.5.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>

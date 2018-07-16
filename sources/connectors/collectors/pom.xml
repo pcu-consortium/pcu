@@ -18,6 +18,7 @@
 		<module>core</module>
 		<module>filesystem</module>
 		<module>norconex</module>
+		<module>norconex-full</module>
 	</modules>
 
 </project>
