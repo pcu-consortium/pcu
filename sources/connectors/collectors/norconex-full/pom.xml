@@ -44,14 +44,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.osgi</groupId> -->
-<!-- 			<artifactId>org.osgi.annotation</artifactId> -->
-<!-- 			<version>6.0.0</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
-
-
 		<!-- Transitive norconex -->
 		<dependency>
 			<groupId>com.norconex.collectors</groupId>
@@ -64,6 +56,12 @@
 			<artifactId>norconex-commons-lang</artifactId>
 			<version>1.14.0</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.opengis.cite.xerces</groupId>
+					<artifactId>xercesImpl-xsd11</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -125,16 +123,29 @@
 			<version>4.1</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.opengis.cite.xerces</groupId> -->
+		<!-- <artifactId>xercesImpl-xsd11</artifactId> -->
+		<!-- <version>2.12-beta-r1667115</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <groupId>xml-apis</groupId> -->
+		<!-- <artifactId>xml-apis</artifactId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+
 		<dependency>
-			<groupId>org.opengis.cite.xerces</groupId>
-			<artifactId>xercesImpl-xsd11</artifactId>
-			<version>2.12-beta-r1667115</version>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
+			<version>2.12.0_1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
+			<version>1.2_5</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- <dependency> -->
@@ -147,6 +158,12 @@
 			<artifactId>org.eclipse.wst.xml.xpath2.processor</artifactId>
 			<version>1.1.5-738bb7b85d</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.opengis.cite.xerces</groupId>
+					<artifactId>xercesImpl-xsd11</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>edu.princeton.cup</groupId>
@@ -1050,7 +1067,8 @@
 							javax.imageio.metadata,
 							javax.imageio.plugins.jpeg,
 							javax.imageio.spi,
-							javax.imageio.stream
+							javax.imageio.stream,
+							org.apache.xerces.jaxp.validation
 						</Import-Package>
 						<Export-Package>
 							android.util,
@@ -1092,7 +1110,6 @@
 							io.netty.handler.ssl,
 							io.netty.handler.timeout,
 							io.netty.util.concurrent,
-							org.apache.xerces.jaxp.validation,
 							javax.cache,
 							javax.cache.configuration,
 							javax.cache.spi,
@@ -3916,7 +3933,6 @@
 							commons-configuration,
 							log4j,
 							commons-collections4,
-							xercesImpl-xsd11,
 							org.eclipse.wst.xml.xpath2.processor,
 							java-cup,
 							json,
@@ -4043,13 +4059,6 @@
 							hamcrest-core
 						</Embed-Dependency>
 						<!-- <Embed-Transitive>true</Embed-Transitive> -->
-						<Require-Capability>
-							osgi.extender;
-							filter:="(osgi.extender=osgi.serviceloader.registrar)"
-						</Require-Capability>
-						<Provide-Capability>
-							osgi.serviceloader;
-							osgi.serviceloader=javax.xml.validation.SchemaFactory</Provide-Capability>
 					</instructions>
 				</configuration>
 			</plugin>

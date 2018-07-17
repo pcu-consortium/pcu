@@ -13,7 +13,8 @@ public class PcuFilesystemCollectorOsgi implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		System.out.println("Start.");
 		
-		SchemaFactory.newInstance(XMLConfigurationUtil.W3C_XML_SCHEMA_NS_URI_1_1);
+		System.setProperty("jaxp.debug", "true");
+		SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.0");
 		PcuFilesystemCollector pcuFilesystemCollector = new PcuFilesystemCollector(bundleContext);
 		pcuFilesystemCollector.execute();
 	}

@@ -1,5 +1,7 @@
 package org.pcu.connectors.collectors.norconex;
 
+import javax.xml.validation.SchemaFactory;
+
 import org.osgi.framework.BundleContext;
 import org.pcu.connectors.collectors.norconex.internal.PcuFilesystemNorconexCollector;
 import org.slf4j.Logger;
