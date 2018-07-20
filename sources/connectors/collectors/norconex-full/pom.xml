@@ -14,7 +14,6 @@
 	<name>PCU Collector Norconex Full</name>
 	<description>PCU Collector Norconex Full</description>
 
-
 	<dependencies>
 
 		<!-- collectors : -->
@@ -56,12 +55,6 @@
 			<artifactId>norconex-commons-lang</artifactId>
 			<version>1.14.0</version>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.opengis.cite.xerces</groupId>
-					<artifactId>xercesImpl-xsd11</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -123,47 +116,38 @@
 			<version>4.1</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.opengis.cite.xerces</groupId>
+			<artifactId>xercesImpl-xsd11</artifactId>
+			<version>2.12-beta-r1667115</version>
+			<scope>compile</scope>
+		</dependency>
+
+
 		<!-- <dependency> -->
-		<!-- <groupId>org.opengis.cite.xerces</groupId> -->
-		<!-- <artifactId>xercesImpl-xsd11</artifactId> -->
-		<!-- <version>2.12-beta-r1667115</version> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <groupId>xml-apis</groupId> -->
-		<!-- <artifactId>xml-apis</artifactId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
+		<!-- <groupId>org.apache.servicemix.bundles</groupId> -->
+		<!-- <artifactId>org.apache.servicemix.bundles.xerces</artifactId> -->
+		<!-- <version>2.12.0_1</version> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.servicemix.bundles</groupId> -->
+		<!-- <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId> -->
+		<!-- <version>1.2_5</version> -->
+		<!-- <scope>provided</scope> -->
 		<!-- </dependency> -->
 
 		<dependency>
-			<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-			<version>2.12.0_1</version>
-			<scope>provided</scope>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
-			<version>1.2_5</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- <dependency> -->
-		<!-- <groupId>xml-apis</groupId> -->
-		<!-- <artifactId>xml-apis</artifactId> -->
-		<!-- <version>1.4.01</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.opengis.cite.eclipse.webtools.sse</groupId>
 			<artifactId>org.eclipse.wst.xml.xpath2.processor</artifactId>
 			<version>1.1.5-738bb7b85d</version>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.opengis.cite.xerces</groupId>
-					<artifactId>xercesImpl-xsd11</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>edu.princeton.cup</groupId>
@@ -902,19 +886,12 @@
 			<version>1.3</version>
 		</dependency>
 
-		<!-- xalan or xerces ???? -->
-		<!-- <dependency> -->
-		<!-- <groupId>xalan</groupId> -->
-		<!-- <artifactId>xalan</artifactId> -->
-		<!-- <version>2.7.2</version> -->
-		<!-- <scope>compile</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>xerces</groupId> -->
-		<!-- <artifactId>xercesImpl</artifactId> -->
-		<!-- <version>2.12.0</version> -->
-		<!-- <scope>compile</scope> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.2</version>
+			<scope>compile</scope>
+		</dependency>
 
 	</dependencies>
 	<build>
@@ -1027,6 +1004,17 @@
 						<Import-Package>
 							org.osgi.framework,
 							org.osgi.resource,
+							javax.management,
+							javax.management.openmbean,
+							javax.imageio,
+							javax.imageio.event,
+							javax.imageio.metadata,
+							javax.imageio.plugins.jpeg,
+							javax.imageio.spi,
+							javax.imageio.stream
+						</Import-Package>
+						<Export-Package>
+							org.pcu.connectors.collectors.norconex.internal,
 							javax.xml.bind,
 							javax.xml.bind.annotation,
 							javax.xml.bind.annotation.adapters,
@@ -1062,15 +1050,9 @@
 							javax.xml.transform.dom,
 							javax.xml.transform.stream,
 							javax.xml.xpath,
-							javax.imageio,
-							javax.imageio.event,
-							javax.imageio.metadata,
-							javax.imageio.plugins.jpeg,
-							javax.imageio.spi,
-							javax.imageio.stream,
-							org.apache.xerces.jaxp.validation
-						</Import-Package>
-						<Export-Package>
+							org.apache.xerces.jaxp.validation,
+							org.apache.xerces.impl,
+							org.apache.xalan.processor,
 							android.util,
 							colorspace,
 							com.google.inject,
@@ -1118,8 +1100,6 @@
 							javax.crypto.spec,
 							javax.jmdns,
 							javax.jms,
-							javax.management,
-							javax.management.openmbean,
 							javax.naming,
 							javax.naming.directory,
 							javax.naming.ldap,
@@ -1187,6 +1167,7 @@
 							net.sf.cglib.proxy,
 							com.norconex.collector.core,
 							com.norconex.collector.core.crawler,
+							com.norconex.collector.core.data.store.impl.mvstore,
 							com.norconex.collector.fs,
 							com.norconex.commons.lang.config,
 							oracle.sql,
@@ -1243,6 +1224,10 @@
 							org.apache.uima.resource,
 							org.apache.uima.util,
 							org.apache.xalan.processor,
+							org.apache.xalan.transformer,
+							org.apache.xalan.templates,
+							org.apache.xpath,
+							org.apache.xml.utils,
 							org.apache.xml.resolver,
 							org.apache.xml.resolver.helpers,
 							org.apache.xml.resolver.readers,
@@ -1251,6 +1236,7 @@
 							org.apache.xml.security.c14n,
 							org.apache.xml.security.utils,
 							org.apache.xml.serializer,
+							org.apache.xml.serializer.utils,
 							org.brotli.dec,
 							org.cyberneko.html.xercesbridge,
 							org.eclipse.core.runtime,
@@ -4056,7 +4042,9 @@
 							commons-httpclient,
 							commons-net,
 							junit,
-							hamcrest-core
+							hamcrest-core,
+							xercesImpl-xsd11,
+							xml-apis
 						</Embed-Dependency>
 						<!-- <Embed-Transitive>true</Embed-Transitive> -->
 					</instructions>

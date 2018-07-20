@@ -7,32 +7,32 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<fscollector id="${collectorid}">
+<fscollector id="PcuFilesystemCollector">
 
-	<logsDir>${workdir}/logs</logsDir>
-	<progressDir>${workdir}/progress</progressDir>
+	<logsDir>/tmp/workdir/logs</logsDir>
+	<progressDir>/tmp/workdir/progress</progressDir>
 
 	<crawlerDefaults>
-		<workDir>${workdir}</workDir>
+		<workDir>/tmp/workdir</workDir>
 		<startPaths>
-			<path>${path}</path>
+			<path>/home/gafou/projets/innovation/pcu/sources/git-pcu-consortium/pcu/applications/search/dist/sample</path>
 		</startPaths>
 
 		<numThreads>2</numThreads>
 
 		<keepDownloads>false</keepDownloads>
 
-		<crawlDataStoreFactory class="${dataStoreFactory}" />
+		<crawlDataStoreFactory class="com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory" />
 
-		<committer class="${committer}">
-			<directory>${workdir}/crawledFiles</directory>
+		<committer class="org.pcu.connectors.collectors.norconex.internal.PcuFilesystemCommitter">
+			<directory>/tmp/workdir/crawledFiles</directory>
 		</committer>
 
 	</crawlerDefaults>
 
 
 	<crawlers>
-		<crawler id="${crawlerid}">
+		<crawler id="PcuFilesystemCrawler">
 		</crawler>
 	</crawlers>
 
