@@ -17,5 +17,6 @@
 		<module>api</module>
 		<module>core</module>
 		<module>filesystem</module>
+		<module>agent</module>
 	</modules>
 </project>

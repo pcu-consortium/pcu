@@ -15,6 +15,10 @@ public class PcuFilesystemCollector implements PcuCollector {
 
 	private PcuPlatformClient pcuIndexer;
 
+	public PcuFilesystemCollector() {
+		super();
+	}
+	
 	public PcuFilesystemCollector(PcuPlatformClient pcuIndexer) {
 		super();
 		this.pcuIndexer = pcuIndexer;
@@ -31,5 +35,9 @@ public class PcuFilesystemCollector implements PcuCollector {
 		pcuFilesystemNorconexCollector.execute(pcuIndexer);
 	}
 
-}
+	@Override
+	public String getId() {
+		return PcuFilesystemCollector.class.getName();
+	}
 
+}

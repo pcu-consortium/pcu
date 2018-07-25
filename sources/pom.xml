@@ -1,60 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.pcu-consortium.pcu</groupId>
-    <artifactId>pcu-consortium-parent</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.pcu-consortium.pcu</groupId>
+	<artifactId>pcu-consortium-parent</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <name>PCU Parent POM</name>
-    <description>PCU Parent POM</description>
-    
+	<name>PCU Parent POM</name>
+	<description>PCU Parent POM</description>
 
-    <!-- =================== -->
-    <!-- Project information -->
-    <!-- =================== -->
-    <licenses>
-        <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
 
-    <organization>
-        <name>PCU Consortium</name>
-        <url>http://pcu-consortium.github.io</url>
-    </organization>
+	<!-- =================== -->
+	<!-- Project information -->
+	<!-- =================== -->
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
 
-    <url>https://github.com/pcu-consortium/pcu</url>
-    
-    <scm>
-        <connection>scm:git:git://github.com/pcu-consortium/pcu.git</connection>
-        <developerConnection>scm:git:git@github.com:pcu-consortium/pcu.git</developerConnection>
-        <url>https://github.com/pcu-consortium/pcu</url>
-    </scm>
-    <ciManagement>
-        <system>travis (jenkins ??)</system>
-        <url>TODO</url>
-        <!-- notifiers></notifiers -->
-    </ciManagement>
-    <issueManagement>
-        <url>https://github.com/pcu-consortium/pcu/issues</url>
-        <system>Github Issues</system>
-    </issueManagement>
+	<organization>
+		<name>PCU Consortium</name>
+		<url>http://pcu-consortium.github.io</url>
+	</organization>
 
-    <developers>
-        <developer>
-            <id>mdutoo</id>
-            <name>Marc Dutoo</name>
-            <email>marc.dutoo@smile.fr</email>
-            <organization>Smile</organization>
-            <organizationUrl>http://www.smile.fr</organizationUrl>
-            <roles>
-                <role>Architect</role>
-                <role>Developer</role>
-            </roles>
-        </developer>
-        <developer>
+	<url>https://github.com/pcu-consortium/pcu</url>
+
+	<scm>
+		<connection>scm:git:git://github.com/pcu-consortium/pcu.git</connection>
+		<developerConnection>scm:git:git@github.com:pcu-consortium/pcu.git</developerConnection>
+		<url>https://github.com/pcu-consortium/pcu</url>
+	</scm>
+	<ciManagement>
+		<system>travis (jenkins ??)</system>
+		<url>TODO</url>
+		<!-- notifiers></notifiers -->
+	</ciManagement>
+	<issueManagement>
+		<url>https://github.com/pcu-consortium/pcu/issues</url>
+		<system>Github Issues</system>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>mdutoo</id>
+			<name>Marc Dutoo</name>
+			<email>marc.dutoo@smile.fr</email>
+			<organization>Smile</organization>
+			<organizationUrl>http://www.smile.fr</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
 			<id>gafou</id>
 			<name>Gaëlle Fournier</name>
 			<email>gaelle.fournier@smile.fr</email>
@@ -65,29 +67,29 @@
 				<role>Developer</role>
 			</roles>
 		</developer>
-    </developers>
+	</developers>
 
-    <modules>
-        <module>connectors</module>
-        <module>platform</module>
-    </modules>
-    
-    <properties>
-        
+	<modules>
+		<module>connectors</module>
+		<module>platform</module>
+	</modules>
+
+	<properties>
+
 		<jackson.version>2.9.4</jackson.version>
 
-        <!-- logging : -->
-        <slf4j.version>1.7.25</slf4j.version><!-- spring-boot & logback's ; 1.7.25 -->
-        <logback.version>1.2.3</logback.version><!-- spring-boot's ; 1.2.3 -->
-        
-        <!-- build : -->
-        <java.version>10</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+		<!-- logging : -->
+		<slf4j.version>1.7.25</slf4j.version><!-- spring-boot & logback's ; 1.7.25 -->
+		<logback.version>1.2.3</logback.version><!-- spring-boot's ; 1.2.3 -->
 
-    <dependencyManagement>
-        <dependencies>
+		<!-- build : -->
+		<java.version>10</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
 
 			<!-- libs -->
 			<dependency>
@@ -121,6 +123,23 @@
 			</dependency>
 			<dependency>
 				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-collectors-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-collectors-agent</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
+				<artifactId>pcu-collectors-filesystem</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.pcu-consortium.pcu</groupId>
 				<artifactId>pcu-indexer-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -131,21 +150,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.pcu-consortium.pcu</groupId>
-				<artifactId>pcu-collectors-filesystem</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.pcu-consortium.pcu</groupId>
-				<artifactId>pcu-collectors-norconex</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.pcu-consortium.pcu</groupId>
 				<artifactId>pcu-platform-client</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
-    </dependencyManagement>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
@@ -154,6 +163,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.0.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>3.1.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
