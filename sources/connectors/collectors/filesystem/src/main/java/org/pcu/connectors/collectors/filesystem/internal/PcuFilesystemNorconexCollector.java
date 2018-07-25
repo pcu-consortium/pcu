@@ -22,16 +22,18 @@ public class PcuFilesystemNorconexCollector {
 
 	private String norconexFilesystemConfigXml = "/config/norconex-filesystem-config.xml";
 	private String norconexFilesystemConfigVariables = "/config/norconex-filesystem-config.variables";
-	
+
 	public void execute(PcuPlatformClient pcuIndexer) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
 		try {
-			File norconexFilesystemConfigXmlFile = generateTmpFileFromBundleFile(
-					norconexFilesystemConfigXml, "norconex-filesystem-config", "xml");
+			File norconexFilesystemConfigXmlFile = generateTmpFileFromBundleFile(norconexFilesystemConfigXml,
+					"norconex-filesystem-config", "xml");
 			File norconexFilesystemConfigVariablesFile = generateTmpFileFromBundleFile(
 					norconexFilesystemConfigVariables, "norconex-filesystem-config", "variables");
 
-			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXmlFile, norconexFilesystemConfigVariablesFile);
+			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(
+					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXmlFile,
+							norconexFilesystemConfigVariablesFile);
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
 				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
 					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuIndexer(pcuIndexer);
@@ -44,12 +46,12 @@ public class PcuFilesystemNorconexCollector {
 		}
 	}
 
-	private File generateTmpFileFromBundleFile(String sourceFile, String targetFilename, String targetFileext) throws PcuCollectorException {
+	private File generateTmpFileFromBundleFile(String sourceFile, String targetFilename, String targetFileext)
+			throws PcuCollectorException {
 		try {
 			File tmpFile = File.createTempFile(targetFilename, targetFileext);
-			// TODO replace with good code
-			//InputStream is = bundleContext.getBundle().getEntry(sourceFile).openStream();
-			//FileUtils.copyInputStreamToFile(is, tmpFile);
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream(sourceFile);
+			FileUtils.copyInputStreamToFile(is, tmpFile);
 			return tmpFile;
 		} catch (IOException e) {
 			throw new PcuCollectorException("Could not copye bundle file to temp file", e);
