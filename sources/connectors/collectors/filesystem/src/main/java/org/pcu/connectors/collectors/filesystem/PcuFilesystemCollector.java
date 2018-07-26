@@ -1,8 +1,7 @@
 package org.pcu.connectors.collectors.filesystem;
 
-import javax.xml.validation.SchemaFactory;
-
 import org.pcu.connectors.collectors.api.PcuCollector;
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
 import org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemNorconexCollector;
 import org.pcu.platform.client.PcuPlatformClient;
@@ -13,26 +12,27 @@ public class PcuFilesystemCollector implements PcuCollector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemCollector.class);
 
-	private PcuPlatformClient pcuIndexer;
-
 	public PcuFilesystemCollector() {
 		super();
 	}
-	
-	public PcuFilesystemCollector(PcuPlatformClient pcuIndexer) {
-		super();
-		this.pcuIndexer = pcuIndexer;
-	}
 
 	@Override
-	public void execute() throws PcuCollectorException {
+	public void execute(PcuPlatformClient pcuPlatformClient, PcuCollectorConfig config) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
 		System.out.println("Execution start");
+
+		if (pcuPlatformClient == null) {
+			throw new PcuCollectorException("pcuPlatformClient is mandatory");
+		}
+		if (config == null) {
+			throw new PcuCollectorException("config is mandatory");
+		}
 		PcuFilesystemNorconexCollector pcuFilesystemNorconexCollector = new PcuFilesystemNorconexCollector();
-		System.out.println(SchemaFactory.class.isLocalClass());
-		System.out.println(SchemaFactory.class.toString());
-		System.out.println("is context there ?");
-		pcuFilesystemNorconexCollector.execute(pcuIndexer);
+		pcuFilesystemNorconexCollector.execute(pcuPlatformClient, config);
+
+		LOGGER.debug("Execution end");
+		System.out.println("Execution end");
+
 	}
 
 	@Override
