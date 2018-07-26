@@ -26,7 +26,6 @@
 			<artifactId>pcu-collectors-api</artifactId>
 		</dependency>
 
-
 		<!-- collectors : -->
 		<dependency>
 			<groupId>com.norconex.collectors</groupId>

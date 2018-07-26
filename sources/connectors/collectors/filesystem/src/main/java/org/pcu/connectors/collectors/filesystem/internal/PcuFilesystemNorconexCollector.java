@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
 import org.pcu.platform.client.PcuPlatformClient;
 import org.slf4j.Logger;
@@ -20,23 +21,24 @@ public class PcuFilesystemNorconexCollector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemNorconexCollector.class);
 
-	private String norconexFilesystemConfigXml = "/config/norconex-filesystem-config.xml";
-	private String norconexFilesystemConfigVariables = "/config/norconex-filesystem-config.variables";
+	private static final String EXTERNAL_CONFIG_XML_KEY = "norconexfilesystem.config.xml";
+	private static final String EXTERNAL_CONFIG_VARIABLES_KEY = "norconexfilesystem.config.variables";
 
-	public void execute(PcuPlatformClient pcuIndexer) throws PcuCollectorException {
+	private static final String INTERNAL_CONFIG_XML_PATH = "config/norconex-filesystem-config.xml";
+	private static final String INTERNAL_CONFIG_VARIABLES_PATH = "config/norconex-filesystem-config.variables";
+
+	public void execute(PcuPlatformClient pcuPlatformclient, PcuCollectorConfig config) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
 		try {
-			File norconexFilesystemConfigXmlFile = generateTmpFileFromBundleFile(norconexFilesystemConfigXml,
-					"norconex-filesystem-config", "xml");
-			File norconexFilesystemConfigVariablesFile = generateTmpFileFromBundleFile(
-					norconexFilesystemConfigVariables, "norconex-filesystem-config", "variables");
+			File norconexFilesystemConfigXmlFile = loadConfigXml(config);
+			File norconexFilesystemConfigVariablesFile = loadConfigVariables(config);
 
 			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(
 					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXmlFile,
 							norconexFilesystemConfigVariablesFile);
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
 				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
-					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuIndexer(pcuIndexer);
+					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuPlatformClient(pcuPlatformclient);
 				}
 			}
 			FilesystemCollector collector = new FilesystemCollector(collectorConfig);
@@ -46,11 +48,28 @@ public class PcuFilesystemNorconexCollector {
 		}
 	}
 
+	private File loadConfigXml(PcuCollectorConfig config) throws PcuCollectorException {
+		if (config.any().get(EXTERNAL_CONFIG_XML_KEY) != null) {
+			return new File(config.any().get(EXTERNAL_CONFIG_XML_KEY));
+		} else {
+			return generateTmpFileFromBundleFile(INTERNAL_CONFIG_XML_PATH, "norconex-filesystem-config", ".xml");
+		}
+	}
+
+	private File loadConfigVariables(PcuCollectorConfig config) throws PcuCollectorException {
+		if (config.any().get(EXTERNAL_CONFIG_VARIABLES_KEY) != null) {
+			return new File(config.any().get(EXTERNAL_CONFIG_VARIABLES_KEY));
+		} else {
+			return generateTmpFileFromBundleFile(INTERNAL_CONFIG_VARIABLES_PATH, "norconex-filesystem-config",
+					".variables");
+		}
+	}
+
 	private File generateTmpFileFromBundleFile(String sourceFile, String targetFilename, String targetFileext)
 			throws PcuCollectorException {
 		try {
 			File tmpFile = File.createTempFile(targetFilename, targetFileext);
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream(sourceFile);
+			InputStream is = PcuFilesystemNorconexCollector.class.getClassLoader().getResourceAsStream(sourceFile);
 			FileUtils.copyInputStreamToFile(is, tmpFile);
 			return tmpFile;
 		} catch (IOException e) {
