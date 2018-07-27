@@ -21,11 +21,11 @@ public class PcuFilesystemNorconexCollector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemNorconexCollector.class);
 
-	private static final String EXTERNAL_CONFIG_XML_KEY = "norconexfilesystem.config.xml";
-	private static final String EXTERNAL_CONFIG_VARIABLES_KEY = "norconexfilesystem.config.variables";
+	public static final String EXTERNAL_CONFIG_XML_KEY = "norconexfilesystem.config.xml";
+	public static final String EXTERNAL_CONFIG_VARIABLES_KEY = "norconexfilesystem.config.variables";
 
-	private static final String INTERNAL_CONFIG_XML_PATH = "config/norconex-filesystem-config.xml";
-	private static final String INTERNAL_CONFIG_VARIABLES_PATH = "config/norconex-filesystem-config.variables";
+	private static final String INTERNAL_CONFIG_XML_PATH = "config/internal-norconex-filesystem-config.xml";
+	private static final String INTERNAL_CONFIG_VARIABLES_PATH = "config/internal-norconex-filesystem-config.variables";
 
 	public void execute(PcuPlatformClient pcuPlatformclient, PcuCollectorConfig config) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
@@ -36,6 +36,10 @@ public class PcuFilesystemNorconexCollector {
 			FilesystemCollectorConfig collectorConfig = (FilesystemCollectorConfig) new CollectorConfigLoader(
 					FilesystemCollectorConfig.class).loadCollectorConfig(norconexFilesystemConfigXmlFile,
 							norconexFilesystemConfigVariablesFile);
+			if (collectorConfig == null) {
+				throw new PcuCollectorException("Collector configuration could not be instanciated");
+			}
+
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
 				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
 					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuPlatformClient(pcuPlatformclient);

@@ -1,0 +1,6 @@
+collectorid=PcuFilesystemCollector
+crawlerid=PcuFilesystemCrawler
+workdir=${workdir}
+path=${targetPath}
+dataStoreFactory=com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory
+committer=org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemCommitter
