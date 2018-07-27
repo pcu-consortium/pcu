@@ -18,11 +18,13 @@
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-core</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-filesystem</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 

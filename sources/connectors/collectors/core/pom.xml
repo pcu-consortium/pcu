@@ -19,10 +19,12 @@
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-api</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-platform-client</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
