@@ -1,4 +1,4 @@
-package org.pcu.platform.server.ingest.rest;
+package org.pcu.platform.server.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;

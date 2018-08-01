@@ -1,45 +1,69 @@
 package org.pcu.connectors.indexer.elasticsearch;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Hashtable;
+import java.io.IOException;
 
-import org.elasticsearch.action.DocWriteResponse.Result;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.pcu.connectors.indexer.PcuIndexer;
+import org.pcu.connectors.indexer.PcuIndexerException;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.core.Delete;
+import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
 
 public class PcuESIndexer implements PcuIndexer {
 
+	private JestClient client;
 
-	private TransportClient client;
-
-	public PcuESIndexer() throws UnknownHostException {
-		client = new PreBuiltTransportClient(Settings.EMPTY);
-		// FIXME configurable host and port
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+	public PcuESIndexer() {
+		JestClientFactory factory = new JestClientFactory();
+		factory.setHttpClientConfig(new HttpClientConfig.Builder("http://localhost:9200").multiThreaded(true).build());
+		client = factory.getObject();
 	}
 
 	@Override
-	public boolean createDocument(byte[] document, String index, String type, String id) {
-		IndexResponse response = client.prepareIndex(index, type, id).setSource(document, XContentType.JSON).get();
-		return Result.CREATED.equals(response.getResult());
+	public boolean createDocument(byte[] document, String index, String type, String id) throws PcuIndexerException {
+		try {
+			Index query = new Index.Builder(document).index(index).type(type).build();
+			JestResult result = client.execute(query);
+			return result.isSucceeded();
+		} catch (IOException e) {
+			throw new PcuIndexerException(e);
+		}
 	}
 
 	@Override
-	public boolean deleteDocument(String index, String type, String id) {
-		DeleteResponse response = client.prepareDelete(index, type, id).get();
-		return Result.DELETED.equals(response.getResult());
+	public boolean deleteDocument(String index, String type, String id) throws PcuIndexerException {
+		try {
+			Delete query = new Delete.Builder(id).index(index).type(type).build();
+			JestResult result = client.execute(query);
+			return result.isSucceeded();
+		} catch (IOException e) {
+			throw new PcuIndexerException(e);
+		}
+	}
+
+	@Override
+	public boolean createIndex(String index) throws PcuIndexerException {
+		try {
+			CreateIndex query = new CreateIndex.Builder(index).build();
+			JestResult result = client.execute(query);
+			return result.isSucceeded();
+		} catch (IOException e) {
+			throw new PcuIndexerException(e);
+		}
 	}
 
 	@Override
 	public void close() throws Exception {
 		client.close();
+	}
+
+	@Override
+	public String getIndexerId() {
+		return "ES5";
 	}
 
 }
