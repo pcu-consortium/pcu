@@ -16,7 +16,6 @@ public class PcuPlatformServerApplication extends SpringApplication {
 
 	public static void main(final String... args) {
 		SpringApplication.run(PcuPlatformServerApplication.class, args);
-		//new PcuPlatformServerApplication(PcuPlatformServerConfiguration.class).run(args);
 	}
 
 }

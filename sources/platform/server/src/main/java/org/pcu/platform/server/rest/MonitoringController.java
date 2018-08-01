@@ -1,4 +1,4 @@
-package org.pcu.platform.server.ingest.rest;
+package org.pcu.platform.server.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
