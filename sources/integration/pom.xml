@@ -16,6 +16,7 @@
 
 	<modules>
 		<module>test-collector-filesystem</module>
+		<module>test-indexer-es</module>
 	</modules>
 
 </project>
