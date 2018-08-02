@@ -8,8 +8,6 @@ package org.pcu.connectors.indexer;
  */
 public interface PcuIndexer extends AutoCloseable {
 
-	String getIndexerId();
-
 	boolean createIndex(String index) throws PcuIndexerException;
 
 	boolean createDocument(byte[] document, String index, String type, String id) throws PcuIndexerException;

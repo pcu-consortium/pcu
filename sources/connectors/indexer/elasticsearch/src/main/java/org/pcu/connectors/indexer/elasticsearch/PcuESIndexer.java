@@ -2,8 +2,12 @@ package org.pcu.connectors.indexer.elasticsearch;
 
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.pcu.connectors.indexer.PcuIndexer;
 import org.pcu.connectors.indexer.PcuIndexerException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
@@ -13,13 +17,18 @@ import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
 
+@Component
 public class PcuESIndexer implements PcuIndexer {
+
+	@Autowired
+	private PcuESIndexerConfig pcuESIndexerConfig;
 
 	private JestClient client;
 
-	public PcuESIndexer() {
+	@PostConstruct
+	public void init() {
 		JestClientFactory factory = new JestClientFactory();
-		factory.setHttpClientConfig(new HttpClientConfig.Builder("http://localhost:9200").multiThreaded(true).build());
+		factory.setHttpClientConfig(new HttpClientConfig.Builder(pcuESIndexerConfig.getUrl()).multiThreaded(true).build());
 		client = factory.getObject();
 	}
 
@@ -59,11 +68,6 @@ public class PcuESIndexer implements PcuIndexer {
 	@Override
 	public void close() throws Exception {
 		client.close();
-	}
-
-	@Override
-	public String getIndexerId() {
-		return "ES5";
 	}
 
 }
