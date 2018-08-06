@@ -1,10 +1,17 @@
 language: java
 jdk:
   - openjdk10
+services:
+  - elasticsearch
+env:
+  matrix:
+- ELASTICSEARCH=6.3.2
 before_install:
+# elasticsearch : see https://docs.travis-ci.com/user/database-setup/#ElasticSearch
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH}.deb && sudo dpkg -i --force-confnew elasticsearch-${ELASTICSEARCH}.deb && sudo service elasticsearch restart
   - cd sources
 before_script:
-  - sleep 5
+  - sleep 10
 script:
   - mvn test -B
   - mvn verify -B

@@ -8,24 +8,27 @@
 		<groupId>org.pcu-consortium.pcu</groupId>
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>pcu-indexer-elasticsearch</artifactId>
+	<artifactId>pcu-indexer-core</artifactId>
 	<packaging>jar</packaging>
 
-	<name>PCU Indexer Elasticsearch</name>
-	<description>PCU Indexer Elasticsearch</description>
+	<name>PCU Indexer Core</name>
+	<description>PCU Indexer Core</description>
 
 	<dependencies>
 		<dependency>
-			<groupId>io.searchbox</groupId>
-			<artifactId>jest</artifactId>
-			<version>5.3.3</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-indexer-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-indexer-elasticsearch</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
-
 
 </project>
