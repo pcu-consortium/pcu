@@ -11,7 +11,6 @@
 	<artifactId>pcu-integration-test-indexer-es</artifactId>
 
 	<name>PCU Integration test : indexer es</name>
-	<description>PCU Integration test : indexer es</description>
 
 	<dependencies>
 		<dependency>
@@ -28,17 +27,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>pl.allegro.tech</groupId>
-			<artifactId>embedded-elasticsearch</artifactId>
-			<version>2.4.2</version>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-integration-common</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<!-- mandatory for embedded-elasticsearch -->
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.2</version>
-			<scope>test</scope>
+			<type>test-jar</type>
 		</dependency>
 
 		<dependency>

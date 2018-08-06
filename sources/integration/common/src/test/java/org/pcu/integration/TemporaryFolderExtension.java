@@ -1,4 +1,4 @@
-package org.pcu.connectors.collectors;
+package org.pcu.integration;
 
 import java.io.File;
 import java.io.IOException;

@@ -15,6 +15,7 @@
 	<description>PCU Integration tests</description>
 
 	<modules>
+		<module>common</module>
 		<module>test-collector-filesystem</module>
 		<module>test-indexer-es</module>
 	</modules>
