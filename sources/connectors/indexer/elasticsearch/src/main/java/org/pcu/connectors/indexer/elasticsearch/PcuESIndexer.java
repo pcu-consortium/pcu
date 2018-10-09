@@ -12,6 +12,7 @@ import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.DeleteIndex;
 
 public class PcuESIndexer implements PcuIndexer {
 
@@ -55,6 +56,18 @@ public class PcuESIndexer implements PcuIndexer {
 			throw new PcuIndexerException(e);
 		}
 	}
+
+	@Override
+	public boolean deleteIndex(String index) throws PcuIndexerException {
+		try {
+			DeleteIndex query = new DeleteIndex.Builder(index).build();
+			JestResult result = client.execute(query);
+			return result.isSucceeded();
+		} catch (IOException e) {
+			throw new PcuIndexerException(e);
+		}
+	}
+
 
 	@Override
 	public void close() throws Exception {

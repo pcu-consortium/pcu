@@ -15,17 +15,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class PcuESIndexerIT {
 
 	@Test
-	public void indexerOnElasticsearch6Ok() throws IOException, InterruptedException {
+	public void indexerOnElasticsearchOK() throws IOException, InterruptedException {
 
 		PcuIndexer pcuIndexer = new PcuESIndexer.Builder("http://localhost:9200/").build();
 
 		assertThat(pcuIndexer).isNotNull();
-		System.out.println("DO THE THING");
 
+		
 		assertThatCode(() -> {
-			pcuIndexer.createIndex("testIndex");
+			boolean createdIndex = pcuIndexer.createIndex("test");
+			assertThat(createdIndex).isTrue();
 		}).doesNotThrowAnyException();
-
+		
 		assertThatCode(() -> {
 			JsonFactory JSONFACTORY = new JsonFactory();
 			ObjectMapper objectMapper = new ObjectMapper(JSONFACTORY);
@@ -35,17 +36,14 @@ public class PcuESIndexerIT {
 			object.put("field3", "test");
 
 			byte[] result = objectMapper.writeValueAsBytes(object);
-			pcuIndexer.createDocument(result, "testIndex", "myType", "id_0");
+			boolean createdDocument = pcuIndexer.createDocument(result, "test", "myType", "id_0");
+			assertThat(createdDocument).isTrue();
 		}).doesNotThrowAnyException();
-		System.out.println("this is the end");
-	}
-
-	@Test
-	public void indexerOnElasticsearch5Ok() throws IOException {
-	}
-
-	@Test
-	public void indexerOnElasticsearch2Ok() throws IOException {
+		
+		assertThatCode(() -> {
+			boolean deletedIndex = pcuIndexer.deleteIndex("test");
+			assertThat(deletedIndex).isTrue();
+		}).doesNotThrowAnyException();
 	}
 
 }
