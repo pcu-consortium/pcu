@@ -21,6 +21,10 @@ public class PcuESIndexerIT {
 
 		assertThat(pcuIndexer).isNotNull();
 
+		// temp test
+		assertThatCode(() -> {
+			pcuIndexer.deleteIndex("test");
+		}).doesNotThrowAnyException();
 		
 		assertThatCode(() -> {
 			boolean createdIndex = pcuIndexer.createIndex("test");
@@ -34,9 +38,8 @@ public class PcuESIndexerIT {
 			object.put("field1", 10);
 			object.put("field2", true);
 			object.put("field3", "test");
-
-			byte[] result = objectMapper.writeValueAsBytes(object);
-			boolean createdDocument = pcuIndexer.createDocument(result, "test", "myType", "id_0");
+			
+			boolean createdDocument = pcuIndexer.createDocument(object, "test", "myType", "id_0");
 			assertThat(createdDocument).isTrue();
 		}).doesNotThrowAnyException();
 		

@@ -1,5 +1,7 @@
 package org.pcu.connectors.indexer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * PCU indexer : connector containing all services to manage indexes.
  * 
@@ -12,7 +14,7 @@ public interface PcuIndexer extends AutoCloseable {
 	
 	boolean deleteIndex(String index) throws PcuIndexerException;
 
-	boolean createDocument(byte[] document, String index, String type, String id) throws PcuIndexerException;
+	boolean createDocument(JsonNode document, String index, String type, String id) throws PcuIndexerException;
 
 	boolean deleteDocument(String index, String type, String id) throws PcuIndexerException;
 
