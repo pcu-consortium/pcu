@@ -1,9 +1,8 @@
 package org.pcu.platform.server.rest;
 
-import javax.annotation.PostConstruct;
-
 import org.pcu.connectors.indexer.PcuIndexerException;
 import org.pcu.platform.server.service.IndexService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,18 +13,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class IndexController {
 
+	@Autowired
 	private IndexService indexService;
-	
-	@PostConstruct
-	public void init() {
-		
-	}
 
 	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.POST)
-	public ResponseEntity<Void> ingest(@PathVariable String indexId) {
+	public ResponseEntity<Void> createIndex(@PathVariable String indexId) {
 		try {
 			indexService.createIndex(indexId);
 			return new ResponseEntity<>(HttpStatus.CREATED);
+		} catch (PcuIndexerException e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> deleteIndex(@PathVariable String indexId) {
+		try {
+			indexService.deleteIndex(indexId);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (PcuIndexerException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
