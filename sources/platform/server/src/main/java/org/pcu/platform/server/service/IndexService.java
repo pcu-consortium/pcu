@@ -12,8 +12,16 @@ public class IndexService {
 	private PcuIndexer pcuIndexer;
 
 	public void createIndex(String indexId) throws PcuIndexerException {
-		if (!pcuIndexer.createIndex(indexId)) {
+		boolean created = pcuIndexer.createIndex(indexId);
+		if (!created) {
 			throw new PcuIndexerException("could not create index");
+		}
+	}
+
+	public void deleteIndex(String indexId) throws PcuIndexerException {
+		boolean deleted = pcuIndexer.deleteIndex(indexId);
+		if (!deleted) {
+			throw new PcuIndexerException("could not delete index");
 		}
 	}
 

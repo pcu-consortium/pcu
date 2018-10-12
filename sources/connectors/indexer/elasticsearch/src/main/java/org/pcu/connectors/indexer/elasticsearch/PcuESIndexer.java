@@ -17,6 +17,7 @@ import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
+import io.searchbox.params.Parameters;
 
 public class PcuESIndexer implements PcuIndexer {
 
@@ -34,7 +35,8 @@ public class PcuESIndexer implements PcuIndexer {
 	public boolean createDocument(JsonNode document, String index, String type, String id) throws PcuIndexerException {
 		try {
 			JsonObject objectFromString = jsonParser.parse(document.toString()).getAsJsonObject();
-			Index query = new Index.Builder(objectFromString).index(index).type(type).build();
+			Index query = new Index.Builder(objectFromString).setParameter(Parameters.OP_TYPE, "create").index(index)
+					.type(type).id(id).build();
 			JestResult result = client.execute(query);
 			return result.isSucceeded();
 		} catch (IOException e) {

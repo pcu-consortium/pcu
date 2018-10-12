@@ -3,7 +3,7 @@ package org.pcu.platform.server.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class IngestRequest {
+public class CreateDocumentRequest {
 	
 	@JsonProperty("index")
 	private String index;
