@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MonitoringController {
+public class MonitoringResource {
 
 	@RequestMapping(path = "/status", method = RequestMethod.GET)
 	public ResponseEntity<Void> status() {

@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class IndexController {
+@RequestMapping(path = "/indexes")
+public class IndexResource {
 
 	@Autowired
 	private IndexService indexService;
 
-	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.POST)
+	@RequestMapping(path = "/{indexId}", method = RequestMethod.POST)
 	public ResponseEntity<Void> createIndex(@PathVariable String indexId) {
 		try {
 			indexService.createIndex(indexId);
@@ -26,7 +27,7 @@ public class IndexController {
 		}
 	}
 
-	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/{indexId}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteIndex(@PathVariable String indexId) {
 		try {
 			indexService.deleteIndex(indexId);

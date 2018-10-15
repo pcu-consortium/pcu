@@ -2,6 +2,7 @@ package org.pcu.connectors.index.elasticsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -69,11 +70,11 @@ public class PcuESIndexIT {
 			boolean deletedDocument = pcuIndex.deleteDocument(indexName, "myType", "id_0");
 			assertThat(deletedDocument).isTrue();
 		}).doesNotThrowAnyException();
+		
 
-		assertThatCode(() -> {
-			JsonNode document = pcuIndex.getDocument(indexName, "myType", "id_0");
-			assertThat(document.get("found").asBoolean()).isFalse();
-		}).doesNotThrowAnyException();
+		assertThatThrownBy(() -> {
+			pcuIndex.getDocument(indexName, "myType", "id_0");
+		}).isInstanceOf(PcuIndexException.class).hasMessageContaining("404");
 
 		assertThatCode(() -> {
 			boolean deletedIndex = pcuIndex.deleteIndex(indexName);

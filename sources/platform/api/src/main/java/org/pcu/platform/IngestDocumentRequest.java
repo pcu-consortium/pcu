@@ -1,9 +1,9 @@
-package org.pcu.platform.server.model;
+package org.pcu.platform;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class CreateDocumentRequest extends DocumentRequest {
+public class IngestDocumentRequest extends DocumentRequest {
 	@JsonProperty("document")
 	private JsonNode document;
 

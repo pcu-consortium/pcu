@@ -11,8 +11,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pcu.platform.server.model.CreateDocumentRequest;
-import org.pcu.platform.server.model.DocumentRequest;
+import org.pcu.platform.DocumentRequest;
+import org.pcu.platform.IngestDocumentRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -43,36 +43,34 @@ public class PcuPlatformServerIT {
 		String documentId = UUID.randomUUID().toString();
 		String type = UUID.randomUUID().toString();
 
-		final ObjectMapper mapper = new ObjectMapper();
-		final ObjectNode document = mapper.createObjectNode();
+		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.CREATED.value());
+		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+		ObjectNode document = new ObjectMapper().createObjectNode();
 		document.put("author", "testAuthor");
-
-		post("/index/" + indexId).then().assertThat().statusCode(HttpStatus.CREATED.value());
-		post("/index/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-		CreateDocumentRequest createRequest = new CreateDocumentRequest();
+		IngestDocumentRequest createRequest = new IngestDocumentRequest();
 		createRequest.setId(documentId);
 		createRequest.setType(type);
 		createRequest.setIndex(indexId);
 		createRequest.setDocument(document);
+		given().body(createRequest).contentType(ContentType.JSON).when().post("/ingest").then().assertThat()
+				.statusCode(HttpStatus.CREATED.value());
+		given().body(createRequest).contentType(ContentType.JSON).when().post("/ingest").then().assertThat()
+				.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 		DocumentRequest deleteRequest = new DocumentRequest();
 		deleteRequest.setId(documentId);
 		deleteRequest.setType(type);
 		deleteRequest.setIndex(indexId);
-
-		given().body(createRequest).contentType(ContentType.JSON).when().post("/document").then().assertThat()
-				.statusCode(HttpStatus.CREATED.value());
-		given().body(createRequest).contentType(ContentType.JSON).when().post("/document").then().assertThat()
-				.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-		given().body(deleteRequest).contentType(ContentType.JSON).when().delete("/document").then().assertThat()
+		given().contentType(ContentType.JSON).when()
+				.delete("/indexes/" + indexId + "/types/" + type + "/documents/" + documentId).then().assertThat()
 				.statusCode(HttpStatus.NO_CONTENT.value());
-		given().body(deleteRequest).contentType(ContentType.JSON).when().delete("/document").then().assertThat()
+		given().contentType(ContentType.JSON).when()
+				.delete("/indexes/" + indexId + "/types/" + type + "/documents/" + documentId).then().assertThat()
 				.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-		delete("/index/" + indexId).then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
-		delete("/index/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		delete("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
+		delete("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Before

@@ -63,7 +63,11 @@ public class PcuESIndex implements PcuIndex {
 		try {
 			Get get = new Get.Builder(index, id).type(type).build();
 			JestResult result = client.execute(get);
-			return JsonHandler.tranform(result.getJsonObject());
+			if (result.isSucceeded()) {
+				return JsonHandler.tranform(result.getJsonObject());
+			} else {
+				throw new PcuIndexException(result.getErrorMessage());
+			}
 		} catch (IOException e) {
 			throw new PcuIndexException(e);
 		}
