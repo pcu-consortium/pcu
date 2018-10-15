@@ -16,6 +16,6 @@
 
 	<modules>
 		<module>collectors</module>
-		<module>indexer</module>
+		<module>index</module>
 	</modules>
 </project>
