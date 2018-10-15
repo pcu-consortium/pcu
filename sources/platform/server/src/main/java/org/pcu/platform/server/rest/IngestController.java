@@ -1,8 +1,8 @@
 package org.pcu.platform.server.rest;
 
-import org.pcu.connectors.indexer.PcuIndexerException;
+import org.pcu.connectors.index.PcuIndexException;
 import org.pcu.platform.server.model.CreateDocumentRequest;
-import org.pcu.platform.server.model.DeleteDocumentRequest;
+import org.pcu.platform.server.model.DocumentRequest;
 import org.pcu.platform.server.service.IngestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,17 +24,17 @@ public class IngestController {
 		try {
 			ingestService.createDocument(ingestRequest);
 			return new ResponseEntity<>(HttpStatus.CREATED);
-		} catch (PcuIndexerException e) {
+		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@RequestMapping(path = "/document", method = RequestMethod.DELETE, consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<Void> deleteDocument(@RequestBody DeleteDocumentRequest deleteRequest) {
+	public ResponseEntity<Void> deleteDocument(@RequestBody DocumentRequest deleteRequest) {
 		try {
 			ingestService.deleteDocument(deleteRequest);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} catch (PcuIndexerException e) {
+		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

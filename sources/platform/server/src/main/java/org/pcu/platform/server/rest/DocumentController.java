@@ -1,36 +1,40 @@
 package org.pcu.platform.server.rest;
 
 import org.pcu.connectors.index.PcuIndexException;
-import org.pcu.platform.server.service.IndexService;
+import org.pcu.platform.server.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @RestController
-public class IndexController {
+@RequestMapping(path = "/documents")
+public class DocumentController {
 
 	@Autowired
-	private IndexService indexService;
+	private DocumentService documentService;
 
-	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.POST)
-	public ResponseEntity<Void> createIndex(@PathVariable String indexId) {
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<JsonNode> createIndex(@RequestBody JsonNode searchQuery) {
 		try {
-			indexService.createIndex(indexId);
+			documentService.search(searchQuery);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@RequestMapping(path = "/index/{indexId}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteIndex(@PathVariable String indexId) {
+	@RequestMapping(path = "/{indexId}/{documentId}", method = RequestMethod.GET)
+	public ResponseEntity<JsonNode> deleteIndex(@PathVariable String indexId, @PathVariable String documentId) {
 		try {
-			indexService.deleteIndex(indexId);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			JsonNode document = documentService.get(indexId, documentId);
+			return new ResponseEntity<JsonNode>(document, HttpStatus.OK);
 		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

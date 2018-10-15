@@ -3,9 +3,9 @@ package org.pcu.platform.server;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.pcu.connectors.indexer.PcuIndexer;
-import org.pcu.connectors.indexer.PcuIndexerConfiguration;
-import org.pcu.connectors.indexer.PcuIndexerFactory;
+import org.pcu.connectors.index.PcuIndex;
+import org.pcu.connectors.index.PcuIndexConfiguration;
+import org.pcu.connectors.index.PcuIndexFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,24 +24,24 @@ public class PcuPlatformServerConfiguration {
 	private Environment env;
 
 	@Bean
-	public PcuIndexer pcuIndexer() {
+	public PcuIndex pcuIndex() {
 		try {
-			String pcuIndexerType = env.getProperty("pcu.indexer.type");
-			String pcuIndexerFile = env.getProperty("pcu.indexer.file");
+			String pcuIndexType = env.getProperty("pcu.index.type");
+			String pcuIndexFile = env.getProperty("pcu.index.file");
 
-			if (pcuIndexerType == null) {
-				throw new IllegalArgumentException("pcu.indexer.type property is mandatory");
+			if (pcuIndexType == null) {
+				throw new IllegalArgumentException("pcu.index.type property is mandatory");
 			}
-			if (pcuIndexerFile == null) {
-				throw new IllegalArgumentException("pcu.indexer.file property is mandatory");
+			if (pcuIndexFile == null) {
+				throw new IllegalArgumentException("pcu.index.file property is mandatory");
 			}
 
 			ObjectMapper mapper = new ObjectMapper();
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream(pcuIndexerFile);
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream(pcuIndexFile);
 			JsonNode configuration = mapper.readTree(is);
-			PcuIndexerConfiguration pcuIndexerConfiguration = new PcuIndexerConfiguration(pcuIndexerType,
+			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexType,
 					configuration);
-			return PcuIndexerFactory.createIndexer(pcuIndexerConfiguration);
+			return PcuIndexFactory.createIndex(pcuIndexConfiguration);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration");
 		}

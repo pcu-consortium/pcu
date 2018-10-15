@@ -1,7 +1,7 @@
 package org.pcu.platform.server.service;
 
-import org.pcu.connectors.indexer.PcuIndexer;
-import org.pcu.connectors.indexer.PcuIndexerException;
+import org.pcu.connectors.index.PcuIndex;
+import org.pcu.connectors.index.PcuIndexException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 public class IndexService {
 
 	@Autowired
-	private PcuIndexer pcuIndexer;
+	private PcuIndex pcuIndex;
 
-	public void createIndex(String indexId) throws PcuIndexerException {
-		boolean created = pcuIndexer.createIndex(indexId);
+	public void createIndex(String indexId) throws PcuIndexException {
+		boolean created = pcuIndex.createIndex(indexId);
 		if (!created) {
-			throw new PcuIndexerException("could not create index");
+			throw new PcuIndexException("could not create index");
 		}
 	}
 
-	public void deleteIndex(String indexId) throws PcuIndexerException {
-		boolean deleted = pcuIndexer.deleteIndex(indexId);
+	public void deleteIndex(String indexId) throws PcuIndexException {
+		boolean deleted = pcuIndex.deleteIndex(indexId);
 		if (!deleted) {
-			throw new PcuIndexerException("could not delete index");
+			throw new PcuIndexException("could not delete index");
 		}
 	}
 
