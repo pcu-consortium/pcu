@@ -1,4 +1,4 @@
-package org.pcu.platform.server.model;
+package org.pcu.platform;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

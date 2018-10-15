@@ -11,10 +11,15 @@
 	<artifactId>pcu-platform-client</artifactId>
 	<packaging>jar</packaging>
 
-	<name>PCU Platform Client POM</name>
-	<description>PCU Platform Client POM</description>
+	<name>PCU Platform Client</name>
+	<description>PCU Platform Client</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-platform-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>io.github.openfeign</groupId>
 			<artifactId>feign-core</artifactId>

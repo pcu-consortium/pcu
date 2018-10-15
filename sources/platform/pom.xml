@@ -15,8 +15,9 @@
 	<description>PCU Platform Parent POM</description>
 
 	<modules>
-		<module>server</module>
+		<module>api</module>
 		<module>client</module>
+		<module>server</module>
 	</modules>
 
 </project>

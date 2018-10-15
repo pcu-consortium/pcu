@@ -18,7 +18,16 @@ public class PcuPlatformErrorDecoder implements ErrorDecoder {
 	@Override
 	public Exception decode(String methodKey, Response response) {
 		try {
-			return (Exception) decoder.decode(response, PcuPlatformClientException.class);
+			Object result = decoder.decode(response, PcuPlatformClientException.class);
+			if (result == null) {
+				if (response.status() < 500) {
+					return new PcuPlatformClientException("Client error " + response.status());
+				} else {
+					return new PcuPlatformClientException("Server error " + response.status());
+				}
+			} else {
+				return (Exception) result;
+			}
 		} catch (IOException fallbackToDefault) {
 			return defaultDecoder.decode(methodKey, response);
 		}
