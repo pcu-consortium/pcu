@@ -33,7 +33,7 @@ public class PcuCollectorService {
 
 	public void execute() {
 		if (config == null) {
-			throw new IllegalStateException("Mission collector configuration");
+			throw new IllegalStateException("Missing collector configuration");
 		}
 
 		try {

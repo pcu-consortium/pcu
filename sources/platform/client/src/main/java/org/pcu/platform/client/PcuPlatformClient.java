@@ -27,7 +27,7 @@ public interface PcuPlatformClient {
 
 	@RequestLine("POST ingest")
 	@Headers("Content-Type: application/json")
-	void ingest(IngestDocumentRequest inesgtDocumentRequest);
+	void ingest(IngestDocumentRequest ingestDocumentRequest);
 
 	@RequestLine("GET indexes/{indexId}/types/{type}/documents/{documentId}")
 	JsonNode getDocument(@Param("indexId") String indexId, @Param("type") String type,

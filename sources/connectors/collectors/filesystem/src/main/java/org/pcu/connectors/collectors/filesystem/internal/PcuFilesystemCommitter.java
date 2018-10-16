@@ -8,8 +8,10 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.pcu.platform.IngestDocumentRequest;
 import org.pcu.platform.client.PcuPlatformClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.norconex.committer.core.CommitterException;
 import com.norconex.committer.core.ICommitter;
 import com.norconex.commons.lang.map.Properties;
@@ -38,7 +40,7 @@ public class PcuFilesystemCommitter implements ICommitter {
 
 			StringWriter writer = new StringWriter();
 			metadata.storeToJSON(writer);
-			doc.setMetadata(writer.toString().getBytes());
+			doc.setMetadata(new ObjectMapper().readTree(writer.toString()));
 
 			addJSON.add(doc);
 
@@ -66,17 +68,20 @@ public class PcuFilesystemCommitter implements ICommitter {
 		LOGGER.info("Commit added documents");
 		addJSON.forEach(doc -> LOGGER.info(doc.toString()));
 		addJSON.forEach(doc -> {
-			// pcuIndexer.createDocument(doc.getMetadata(), doc.getIndex(), doc.getType(),
-			// doc.getId());
+			IngestDocumentRequest ingestDocumentRequest = new IngestDocumentRequest();
+			ingestDocumentRequest.setId(doc.getId());
+			ingestDocumentRequest.setIndex(doc.getIndex());
+			ingestDocumentRequest.setType(doc.getType());
+			ingestDocumentRequest.setDocument(doc.getMetadata());
+			pcuPlatformclient.ingest(ingestDocumentRequest);
 		});
 		addJSON.clear();
 		LOGGER.info("Commit removed documents");
 		removeJSON.forEach(doc -> LOGGER.info(doc.toString()));
 		removeJSON.forEach(doc -> {
-			// pcuIndexer.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
+			pcuPlatformclient.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
 		});
 		removeJSON.clear();
-
 	}
 
 	public void setPcuPlatformClient(PcuPlatformClient pcuPlatformclient) {
