@@ -6,20 +6,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.pcu.platform.IngestDocumentRequest;
 import org.pcu.platform.client.PcuPlatformClient;
 import org.pcu.platform.client.PcuPlatformClientException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
 		"pcu.index.file=pcuindex.json" }, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class PcuPlatformClientOnServerIT {
@@ -40,7 +40,7 @@ public class PcuPlatformClientOnServerIT {
 
 		PcuPlatformClient pcuPlatformClient = PcuPlatformClient.connect("http://localhost:" + port);
 
-		String indexId = UUID.randomUUID().toString();
+		String indexId = "pcu-index-test" + UUID.randomUUID().toString();
 		String documentId = UUID.randomUUID().toString();
 		String type = UUID.randomUUID().toString();
 

@@ -7,9 +7,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.junit.After;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.pcu.connectors.index.PcuIndex;
 import org.pcu.connectors.index.PcuIndexException;
@@ -22,7 +22,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class PcuESIndexIT {
 
 	private static PcuIndex pcuIndex;
-	private String indexName;
+	private String indexId;
+	private String type;
+	private String documentId;
 
 	@BeforeAll
 	public static void beforeClass() {
@@ -31,7 +33,9 @@ public class PcuESIndexIT {
 
 	@BeforeEach
 	public void before() {
-		indexName = UUID.randomUUID().toString();
+		indexId = "pcu-index-test" + UUID.randomUUID().toString();
+		type = UUID.randomUUID().toString();
+		documentId = UUID.randomUUID().toString();
 	}
 
 	@Test
@@ -41,11 +45,11 @@ public class PcuESIndexIT {
 
 		// temp test
 		assertThatCode(() -> {
-			pcuIndex.deleteIndex(indexName);
+			pcuIndex.deleteIndex(indexId);
 		}).doesNotThrowAnyException();
 
 		assertThatCode(() -> {
-			boolean createdIndex = pcuIndex.createIndex(indexName);
+			boolean createdIndex = pcuIndex.createIndex(indexId);
 			assertThat(createdIndex).isTrue();
 		}).doesNotThrowAnyException();
 
@@ -57,35 +61,34 @@ public class PcuESIndexIT {
 			object.put("field2", true);
 			object.put("field3", "test");
 
-			boolean createdDocument = pcuIndex.createDocument(object, indexName, "myType", "id_0");
+			boolean createdDocument = pcuIndex.createDocument(object, indexId, type, documentId);
 			assertThat(createdDocument).isTrue();
 		}).doesNotThrowAnyException();
 
 		assertThatCode(() -> {
-			JsonNode document = pcuIndex.getDocument(indexName, "myType", "id_0");
-			assertThat(document.get("_id").asText()).isEqualTo("id_0");
+			JsonNode document = pcuIndex.getDocument(indexId, type, documentId);
+			assertThat(document.get("_id").asText()).isEqualTo(documentId);
 		}).doesNotThrowAnyException();
 
 		assertThatCode(() -> {
-			boolean deletedDocument = pcuIndex.deleteDocument(indexName, "myType", "id_0");
+			boolean deletedDocument = pcuIndex.deleteDocument(indexId, type, documentId);
 			assertThat(deletedDocument).isTrue();
 		}).doesNotThrowAnyException();
-		
 
 		assertThatThrownBy(() -> {
-			pcuIndex.getDocument(indexName, "myType", "id_0");
+			pcuIndex.getDocument(indexId, type, documentId);
 		}).isInstanceOf(PcuIndexException.class).hasMessageContaining("404");
 
 		assertThatCode(() -> {
-			boolean deletedIndex = pcuIndex.deleteIndex(indexName);
+			boolean deletedIndex = pcuIndex.deleteIndex(indexId);
 			assertThat(deletedIndex).isTrue();
 		}).doesNotThrowAnyException();
 	}
 
-	@After
+	@AfterEach
 	public void after() {
 		try {
-			pcuIndex.deleteIndex(indexName);
+			pcuIndex.deleteIndex(indexId);
 		} catch (PcuIndexException e) {
 			// quiet
 		}
