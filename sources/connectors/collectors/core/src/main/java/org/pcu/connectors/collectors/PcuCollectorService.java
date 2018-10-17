@@ -41,7 +41,6 @@ public class PcuCollectorService {
 			Iterator<PcuCollector> collectors = loader.iterator();
 			while (collectors.hasNext()) {
 				PcuCollector collector = collectors.next();
-				System.out.println(collector.getId());
 				collector.execute(pcuPlatformClient, config);
 			}
 		} catch (ServiceConfigurationError serviceError) {

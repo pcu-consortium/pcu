@@ -1,9 +1,13 @@
 package org.pcu.connectors.collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.noContent;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.noContent;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -28,6 +32,7 @@ import org.pcu.integration.TemporaryFolderExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.common.base.Charsets;
 
 import ru.lanwen.wiremock.ext.WiremockResolver;
@@ -45,11 +50,14 @@ public class PcuAgentTest {
 	public void norconexCollectorOnSampleOk(@Wiremock WireMockServer server, @WiremockUri String uri)
 			throws IOException, URISyntaxException {
 
+		// wiremock stub
 		assertThat(server.isRunning()).isTrue();
-		configureMock(server);
+		server.stubFor(post("/ingest").willReturn(ok()));
+		server.stubFor(delete(urlPathMatching("/indexes/(.*)")).willReturn(noContent()));
 
+		// pcu agent configuration
 		String confFileName = UUID.randomUUID().toString();
-		File confFile = temporaryFolder.newFile(confFileName+ ".json");
+		File confFile = temporaryFolder.newFile(confFileName + ".json");
 		String workdirFolderName = UUID.randomUUID().toString();
 		File workdir = temporaryFolder.newFolder(workdirFolderName);
 		File sampleFolder = createTemporaryFolderWithSample();
@@ -66,6 +74,7 @@ public class PcuAgentTest {
 		config.set(PcuFilesystemNorconexCollector.EXTERNAL_CONFIG_VARIABLES_KEY, variablesFilePath);
 		mapper.writeValue(confFile, config);
 
+		// first run pcu agent
 		String[] args = new String[] { confFile.getAbsolutePath() };
 		PcuAgent.main(args);
 
@@ -77,17 +86,20 @@ public class PcuAgentTest {
 		assertThat(workdirFileNames).contains(workdir.getAbsolutePath() + "/progress");
 
 		Files.delete(Paths.get(sampleFolder.getAbsolutePath() + "/20171206 POSS/PCU@POSS_20171206.pdf"));
-		
-		PcuAgent.main(args);
-		
-		// TODO assert on not found
-	}
 
-	private void configureMock(WireMockServer server) {
-		server.stubFor(post("/ingest").willReturn(ok()));
-		// TODO find valid matching regex
-		server.stubFor(delete("/indexes/").willReturn(noContent()));
+		// second run pcu agent after deleting a file
+		PcuAgent.main(args);	
 
+		// check stub calls
+		List<LoggedRequest> ingestRequests = server.findAll(postRequestedFor(urlMatching("/ingest")));
+		List<LoggedRequest> deleteRequests = server.findAll(deleteRequestedFor(urlPathMatching("/indexes/(.*)")));
+		
+		assertThat(ingestRequests).hasSize(3);
+		assertThat(ingestRequests.get(0).getUrl()).isEqualTo("/ingest");
+		assertThat(ingestRequests.get(1).getUrl()).isEqualTo("/ingest");
+		assertThat(ingestRequests.get(2).getUrl()).isEqualTo("/ingest");
+		assertThat(deleteRequests).hasSize(1);
+		assertThat(deleteRequests.get(0).getUrl()).matches("/indexes/files/types/file/documents/(.*)POSS_20171206.pdf");
 	}
 
 	private String createTempVariables(String workdir, String targetPath) throws IOException {
