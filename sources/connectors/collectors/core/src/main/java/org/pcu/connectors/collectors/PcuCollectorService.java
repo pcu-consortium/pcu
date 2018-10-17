@@ -10,11 +10,15 @@ import org.pcu.connectors.collectors.api.PcuCollector;
 import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
 import org.pcu.platform.client.PcuPlatformClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PcuCollectorService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PcuCollectorService.class);
 
 	private ServiceLoader<PcuCollector> loader;
 	private static PcuCollectorService service;
@@ -51,9 +55,11 @@ public class PcuCollectorService {
 	}
 
 	public void init(String collectorConfig) {
+		LOGGER.debug("Init collector configuration");
 		ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
 		try {
 			config = objectMapper.readValue(new File(collectorConfig), PcuCollectorConfig.class);
+			LOGGER.debug("Configuration " + config.toString());
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration file", e);
 		}

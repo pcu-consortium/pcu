@@ -53,17 +53,25 @@ public class PcuFilesystemNorconexCollector {
 	}
 
 	private File loadConfigXml(PcuCollectorConfig config) throws PcuCollectorException {
+		LOGGER.debug("Loading xml configuration");
 		if (config.any().get(EXTERNAL_CONFIG_XML_KEY) != null) {
+			LOGGER.debug("Loading xml configuration : using external configuration");
 			return new File(config.any().get(EXTERNAL_CONFIG_XML_KEY));
 		} else {
+			LOGGER.debug("Loading xml configuration : using internal configuration");
 			return generateTmpFileFromBundleFile(INTERNAL_CONFIG_XML_PATH, "norconex-filesystem-config", ".xml");
 		}
 	}
 
 	private File loadConfigVariables(PcuCollectorConfig config) throws PcuCollectorException {
+		LOGGER.debug("Loading variables configuration");
 		if (config.any().get(EXTERNAL_CONFIG_VARIABLES_KEY) != null) {
+			LOGGER.debug("Loading variables configuration : using external configuration");
+			System.out.println("Loading variables configuration : using external configuration");
 			return new File(config.any().get(EXTERNAL_CONFIG_VARIABLES_KEY));
 		} else {
+			LOGGER.debug("Loading variables configuration : using internal configuration");
+			System.out.println("Loading variables configuration : using internal configuration");
 			return generateTmpFileFromBundleFile(INTERNAL_CONFIG_VARIABLES_PATH, "norconex-filesystem-config",
 					".variables");
 		}

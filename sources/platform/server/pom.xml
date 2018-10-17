@@ -67,6 +67,7 @@
 					<executable>true</executable>
 					<layout>ZIP</layout>
 					<classifier>exec</classifier>
+					<finalName>${project.artifactId}</finalName>
 				</configuration>
 				<executions>
 					<execution>

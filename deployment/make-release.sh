@@ -16,7 +16,11 @@ echo -e "${INFO} Release folder:${RELEASE_FOLDER}"
 echo -e "${INFO} Build sources"
 cd ${SOURCES_FOLDER}
 mvn clean install -o -DskipTests
+cd provided/agent-filesystem-norconex
+mvn clean install -o -DskipTests
 cd ${DEPLOYMENT_FOLDER}
+
+
 
 echo -e "${INFO} Generate release folder"
 rm -rf ${RELEASE_FOLDER}
@@ -25,7 +29,7 @@ cp -rf ${DEPLOYMENT_FOLDER}/scripts ${RELEASE_FOLDER}/scripts
 cp -rf ${DEPLOYMENT_FOLDER}/config ${RELEASE_FOLDER}/config
 cp -rf ${SOURCES_FOLDER}/provided/dist ${RELEASE_FOLDER}
 cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}
-cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-*.jar ${RELEASE_FOLDER}/pcu-platform-server.jar
+cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/pcu-platform-server.jar
 
 echo -e "${INFO} PCU entreprise search release : END"
 

@@ -38,9 +38,11 @@ public class PcuPlatformServerConfiguration {
 
 			ObjectMapper mapper = new ObjectMapper();
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream(pcuIndexFile);
+			if (is == null) {
+				throw new IllegalArgumentException("Could not find file " + pcuIndexFile);
+			}
 			JsonNode configuration = mapper.readTree(is);
-			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexType,
-					configuration);
+			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexType, configuration);
 			return PcuIndexFactory.createIndex(pcuIndexConfiguration);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration");
