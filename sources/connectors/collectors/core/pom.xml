@@ -14,7 +14,6 @@
 	<name>PCU Collector Core</name>
 	<description>PCU Collector Core</description>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -25,6 +24,11 @@
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-platform-client</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>
