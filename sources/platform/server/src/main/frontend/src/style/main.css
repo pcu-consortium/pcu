@@ -1,0 +1,738 @@
+.cancelSearchBtn, .searchBar__searchFilter ul li:after, .btnLogin, .colRight__wrapper, .loginOverlay, .btn, .btn--small {
+    -webkit-transition: 0.3s all ease-in-out;
+    -o-transition: 0.3s all ease-in-out;
+    transition: 0.3s all ease-in-out;
+  }
+  
+  .testblue {
+    color: blue;
+  }
+  
+  body {
+    margin: 0;
+  }
+  
+  .app, .appWrapper {
+    min-height: calc(100vh);
+  }
+  
+  /* FOOTER */
+  div.footer {
+    background: #FAFAFA;
+    height: 55px;
+  }
+  
+  .footer__wrapper {
+    display: flex;
+    height: 100%;
+  }
+  
+  ul.footer__list {
+    display: flex;
+    margin-bottom: 0;
+    height: 100%;
+    padding-left: 100px;
+  }
+  
+  ul.footer__list li {
+    display: flex;
+    margin: auto 60px auto 0;
+    list-style: none;
+  }
+  
+  ul.footer__list li a {
+    color: #5C5C5C;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 17px;
+  }
+  
+  /* Search Bar & Menu */
+  .resultsNumbers {
+    color: #5C5C5C;
+    font-family: 'Lato';
+    font-size: 13px;
+    line-height: 16px;
+    padding-left: 20px;
+    display: block;
+    width: 100%;
+  }
+  
+  .resultsNumbers + .resultsItem {
+    margin-top: 10px;
+  }
+  
+  .searchBar__wrapperSearch, .searchBar__wrapperSearch--large {
+    display: flex;
+    width: 100%;
+    background: #00537A;
+    height: 51px;
+    color: white;
+  }
+  
+  .searchBar__wrapperSearch--large {
+    height: 155px;
+  }
+  
+  .searchBar__wrapperSearch--large .searchBar__menuList {
+    display: none;
+  }
+  
+  .searchBar__wrapperSearch--large .searchBar__loginArea {
+    display: flex;
+  }
+  
+  .searchBar__wrapperSearch--large .searchBar__bar input {
+    min-height: 51px;
+    line-height: 48px;
+    border: 1px solid #E4E1E1;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+  }
+  
+  .searchBar__wrapperSearch--large .searchBar__logo img {
+    width: 60px;
+    margin: auto 10px auto 20px;
+  }
+  
+  .searchBar__bar {
+    display: flex;
+    height: 51px;
+    margin: auto 0;
+    position: relative;
+  }
+  
+  .searchBar__bar button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    height: 52px;
+    width: 40px;
+  }
+  
+  .searchBar__bar button:focus {
+    outline: none;
+  }
+  
+  .searchBar__bar button img {
+    width: 75%;
+    height: auto;
+  }
+  
+  .searchBar__bar button + button {
+    right: 50px;
+  }
+  
+  .searchBar__bar button + button img {
+    width: 80%;
+  }
+  
+  .cancelSearchBtn {
+    visibility: hidden;
+    opacity: 0;
+  }
+  
+  .cancelSearchBtn.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .searchBar__bar input {
+    margin: auto;
+    border-radius: 5px;
+    border: 1px solid #E4E1E1;
+    min-width: 425px;
+    padding: 1px 10px;
+    line-height: 26px;
+    min-height: 30px;
+    color: black;
+  }
+  
+  .searchBar__bar--large input {
+    line-height: 47px;
+    min-height: 51px;
+  }
+  
+  .searchBar__menuList {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    padding-right: 25px;
+  }
+  
+  .searchBar__menuList ul {
+    display: flex;
+    color: white;
+    margin: 0;
+  }
+  
+  .searchBar__menuList ul li {
+    margin: auto 10px;
+    list-style: none;
+  }
+  
+  .searchBar__menuList ul li a {
+    color: white;
+    font-weight: bold;
+  }
+  
+  .searchBar__logo {
+    display: flex;
+    min-width: 100px;
+  }
+  
+  .searchBar__logo img {
+    width: 45px;
+    height: auto;
+    margin: auto 20px auto 20px;
+    display: flex;
+  }
+  
+  .searchBar__searchFilter {
+    background: #FAFAFA;
+    padding-left: 80px;
+    width: 100%;
+    display: flex;
+  }
+  
+  .searchBar__searchFilter__wrapper {
+    width: 50%;
+    display: flex;
+  }
+  
+  .selectSortFilter__wrapper {
+    display: flex;
+    margin-right: 0;
+    margin-left: auto;
+  }
+  
+  .selectSortFilter__wrapper > div {
+    display: flex;
+  }
+  
+  .selectSortFilter__wrapper > div > * {
+    margin: auto;
+  }
+  
+  .selectSortFilter__wrapper > div > *:focus {
+    outline: none;
+  }
+  
+  .searchBar__searchFilter ul {
+    display: flex;
+    padding: 20px 20px 0px 20px;
+    margin-bottom: 0;
+  }
+  
+  .searchBar__searchFilter ul li {
+    list-style: none;
+    display: flex;
+    margin-right: 30px;
+    color: #6F6F6F;
+    font-family: 'Lato';
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 19px;
+    padding-bottom: 20px;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .searchBar__searchFilter ul li:after {
+    content: "";
+    display: block;
+    width: 100%;
+    bottom: 0;
+    background-color: #7EC455;
+    height: 5px;
+    position: absolute;
+    opacity: 0;
+  }
+  
+  .searchBar__searchFilter ul li:hover:after {
+    opacity: 1;
+  }
+  
+  .searchBar__loginArea {
+    display: flex;
+    padding: 20px;
+    display: none;
+    margin: auto 0 auto auto;
+  }
+  
+  .btnLogin {
+    height: 45px;
+    min-width: 120px;
+    border-radius: 5px;
+    background-color: #7EC455;
+    color: white;
+    text-transform: uppercase;
+    font-family: 'Lato';
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+  }
+  
+  .btnLogin img {
+    margin: -2px 9px auto 0;
+  }
+  
+  .btnLogin:hover, .btnLogin:active, .btnLogin:focus {
+    background-color: #93d36b;
+  }
+  
+  /* RESULTS DISPLAY */
+  .results {
+    padding-left: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 0;
+  }
+  
+  .results__colLeft,
+  .results__colRight {
+    display: flex;
+    width: 50%;
+    flex-wrap: wrap;
+    padding-top: 25px;
+  }
+  
+  .resultsItem {
+    padding: 15px 20px;
+    max-width: 100%;
+  }
+  
+  .resultsItem__title, .resultsItem__title a {
+    color: #00537A;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 19px;
+  }
+  
+  .resultsItem__date {
+    color: #5C5C5C;
+  }
+  
+  .resultsItem__description {
+    margin-top: 9px;
+    color: #6F6F6F;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 19px;
+    cursor: pointer;
+  }
+  
+  .resultsItem__extraInformations {
+    margin-top: 10px;
+    color: #44722A;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 17px;
+    word-wrap: break-word;
+  }
+  
+  .resultsItem__extraInformations > span {
+    display: inline;
+  }
+  
+  .resultsItem__filtersMenu, .resultsItem__filtersMenu a {
+    margin-top: 10px;
+    color: #00537A;
+    font-family: Lato;
+    font-size: 14px;
+    line-height: 17px;
+  }
+  
+  .resultsItem__filtersMenu span:hover, .resultsItem__filtersMenu a:hover, .resultsItem__filtersMenu a span:hover, .resultsItem__filtersMenu a a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .colRight__wrapper {
+    padding-top: 25px;
+    margin-top: -25px;
+    border-left: 1px solid #E9E9E9;
+    padding: 30px;
+    position: relative;
+    width: 100%;
+    visibility: hidden;
+    opacity: 0;
+  }
+  
+  .colRight__wrapper.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .document__title {
+    color: #5C5C5C;
+    font-family: 'Lato';
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 0;
+  }
+  
+  .closeDocumentBtn {
+    background: none;
+    border: none;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 45px;
+    height: 25px;
+  }
+  
+  .closeDocumentBtn:focus {
+    outline: none;
+  }
+  
+  .closeDocumentBtn img {
+    width: 65%;
+  }
+  
+  .document__content {
+    border: 1px solid #979797;
+    width: 80%;
+    margin: 30px auto 0 auto;
+    display: block;
+  }
+  
+  .document__content img {
+    width: 100%;
+    height: auto;
+  }
+  
+  .loginOverlay {
+    background: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+  }
+  
+  .loginOverlay.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .loginOverlay__btnBack {
+    position: absolute;
+    top: 35px;
+    left: 35px;
+  }
+  
+  .loginOverlay__btnBack img {
+    display: flex;
+    margin: 3px 10px 0 0;
+  }
+  
+  .loginOverlay__wrapperGlobal {
+    width: 475px;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .loginOverlay__title {
+    margin-top: 120px;
+    color: #6F6F6F;
+    font-family: 'Lato';
+    font-size: 38px;
+    font-weight: bold;
+  }
+  
+  .loginOverlay__wrapper {
+    margin-top: 30px;
+    background: #FAFAFA;
+    padding: 0 70px 45px 70px;
+  }
+  
+  .loginOverlay__logoPCU {
+    margin: 0 auto;
+    display: block;
+    width: 206px;
+    height: 206px;
+    margin-bottom: 20px;
+  }
+  
+  .loginOverlay__form label {
+    display: block;
+    width: 100%;
+    color: #6F6F6F;
+    font-family: 'Lato';
+    font-size: 16px;
+    line-height: 19px;
+    margin-bottom: 12px;
+    font-weight: 100;
+  }
+  
+  .loginOverlay__form input {
+    display: block;
+    width: 100%;
+    border: 1px solid #E4E1E1;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    line-height: 48px;
+    min-height: 51px;
+    padding: 0 20px;
+  }
+  
+  .loginOverlay__form input[type="submit"] {
+    width: auto;
+    margin: 40px auto 0 auto;
+  }
+  
+  .loginOverlay__form input + label {
+    margin-top: 35px;
+  }
+  
+  .loginOverlay__forgotPassword {
+    color: #00537A;
+    font-family: 'Lato';
+    font-size: 16px;
+    line-height: 19px;
+    margin-top: 10px;
+    display: block;
+  }
+  
+  /* ABOVE MOBILE */
+  @media screen and (min-width: 1280px) {
+    div.footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .appWrapper {
+      position: relative;
+      padding-bottom: 90px;
+    }
+  }
+  
+  /* BELOW MOBILE */
+  @media screen and (max-width: 1279px) {
+    .searchBar__wrapperSearch--large .searchBar__logo img {
+      margin: auto 20px auto 20px;
+    }
+    .searchBar__wrapperSearch--large {
+      padding: 0 20px 25px 20px;
+    }
+    .searchBar__wrapperSearch, .searchBar__wrapperSearch--large {
+      height: 100px;
+      position: relative;
+    }
+    .searchBar__bar {
+      height: 52px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -26px;
+      width: 80%;
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+    .searchBar__bar input {
+      height: 52px;
+      line-height: 52px;
+      width: 100%;
+      margin: 0 auto;
+      min-width: 0;
+    }
+    .searchBar__menuList {
+      visibility: hidden;
+      display: none;
+    }
+    .searchBar__logo {
+      width: 100%;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .searchBar__logo img {
+      width: 55px;
+      margin-top: 15px;
+    }
+    .searchBar__searchFilter__wrapper {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .searchBar__searchFilter {
+      padding-left: 0;
+    }
+    .searchBar__searchFilter ul {
+      padding: 40px 15px 0px 15px;
+      justify-content: center;
+      margin-right: -30px;
+    }
+    .selectSortFilter__wrapper {
+      background: white;
+      width: 100%;
+      padding: 25px;
+    }
+    .selectSortFilter__wrapper > div {
+      margin-left: auto;
+    }
+    ul.footer__list {
+      padding: 0 10%;
+    }
+    ul.footer__list li {
+      margin: auto 20px auto 0;
+    }
+    .results {
+      padding: 0 10%;
+    }
+    .searchBar__loginArea {
+      padding: 0;
+    }
+    .results__colLeft,
+    .results__colRight {
+      width: 100%;
+    }
+    .results__colLeft {
+      padding-top: 0;
+    }
+    .colRight__wrapper {
+      border-left: 0;
+    }
+    div.footer {
+      position: fixed;
+      top: 72px;
+      bottom: 0;
+      left: -100%;
+      right: auto;
+      background: #00537A;
+      height: auto;
+      border-top: 2px solid #0076ad;
+      width: 100%;
+      -webkit-transition: 0.3s all ease-in-out;
+      -o-transition: 0.3s all ease-in-out;
+      transition: 0.3s all ease-in-out;
+    }
+    div.footer.show {
+      left: 0;
+    }
+    ul.footer__list {
+      display: block;
+      padding: 40px 25px;
+    }
+    ul.footer__list li {
+      margin-bottom: 25px;
+    }
+    ul.footer__list li a {
+      color: white;
+    }
+    .loginOverlay__title {
+      padding-left: 35px;
+    }
+    .loginOverlay__wrapperGlobal {
+      width: 100%;
+    }
+    .loginOverlay__wrapper {
+      padding: 0 35px 45px 35px;
+      display: block;
+      width: 100%;
+    }
+    .loginOverlay__logoPCU {
+      width: 75%;
+      height: auto;
+    }
+  }
+  
+  .btn, .btn--small {
+    border-radius: 5px;
+    text-transform: uppercase;
+    border: none;
+    font-weight: bold;
+    display: flex;
+  }
+  
+  .btn--small {
+    padding: 13px 24px;
+  }
+  
+  .btn.green, .green.btn--small {
+    background-color: #7EC455;
+    color: white;
+  }
+  
+  .btn.green:hover, .green.btn--small:hover, .btn.green:active, .green.btn--small:active, .btn.green:focus, .green.btn--small:focus {
+    background-color: #92cd70;
+  }
+  
+  select.selectSortFilter {
+    background: none;
+    border: none;
+    color: #5C5C5C;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 17px;
+  }
+  
+  .searchBar__toggleFooter {
+    width: 58px;
+    height: 50px;
+    margin: auto 0;
+    line-height: 0;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    display: none;
+  }
+  
+  .searchBar__toggleFooter img.suppr {
+    margin: 0 4px;
+  }
+  
+  .searchBar__toggleFooter.openFooter img.burger {
+    display: inline;
+  }
+  
+  .searchBar__toggleFooter.openFooter img.suppr {
+    display: none;
+  }
+  
+  .searchBar__toggleFooter.closeFooter img.burger {
+    display: none;
+  }
+  
+  .searchBar__toggleFooter.closeFooter img.suppr {
+    display: inline;
+  }
+  
+  .searchBar__toggleFooter:focus {
+    outline: none;
+  }
+  
+  /* MOBILE */
+  @media screen and (max-width: 1280px) {
+    .searchBar__toggleFooter {
+      display: block;
+    }
+    .btnLogin {
+      background: none;
+      min-width: 0;
+      height: 50px;
+      width: 50px;
+      line-height: 50px;
+    }
+    .btnLogin span {
+      display: none;
+    }
+    .btnLogin img {
+      width: 22px;
+      height: auto;
+      margin: 0;
+    }
+    .btnLogin:hover, .btnLogin:focus, .btnLogin:active {
+      background: none;
+    }
+  }
+   
+  
+   /*# sourceMappingURL= main.css.map */

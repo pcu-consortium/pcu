@@ -93,20 +93,42 @@
 						</goals>
 						<configuration>
 							<arguments>install</arguments>
-							<installDirectory>target</installDirectory>
 						</configuration>
 					</execution>
 					<execution>
-						<id>webpack build</id>
+						<id>npm build</id>
 						<goals>
-							<goal>webpack</goal>
+							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>-d --display-modules</arguments>
+							<arguments>run build</arguments>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>Copy frontend build to target</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/public</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/frontend/build</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
