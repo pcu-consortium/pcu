@@ -59,6 +59,17 @@ public class PcuPlatformServerIT {
 		given().body(createRequest).contentType(ContentType.JSON).when().post("/ingest").then().assertThat()
 				.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
+		ObjectNode searchRequest = new ObjectMapper().createObjectNode();
+		ObjectNode esQuery = new ObjectMapper().createObjectNode();
+		esQuery.set("query", new ObjectMapper().createObjectNode());
+		searchRequest.put("index", indexId);
+		searchRequest.put("type", type);
+		searchRequest.set("query", esQuery);
+
+		// TODO check result
+		given().contentType(ContentType.JSON).body(searchRequest).when().post("/search").then().assertThat()
+				.statusCode(HttpStatus.OK.value());
+
 		DocumentRequest deleteRequest = new DocumentRequest();
 		deleteRequest.setId(documentId);
 		deleteRequest.setType(type);

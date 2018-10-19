@@ -19,7 +19,6 @@ public class PcuFilesystemCollector implements PcuCollector {
 	@Override
 	public void execute(PcuPlatformClient pcuPlatformClient, PcuCollectorConfig config) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
-		System.out.println("Execution start");
 
 		if (pcuPlatformClient == null) {
 			throw new PcuCollectorException("pcuPlatformClient is mandatory");
@@ -31,7 +30,6 @@ public class PcuFilesystemCollector implements PcuCollector {
 		pcuFilesystemNorconexCollector.execute(pcuPlatformClient, config);
 
 		LOGGER.debug("Execution end");
-		System.out.println("Execution end");
 
 	}
 

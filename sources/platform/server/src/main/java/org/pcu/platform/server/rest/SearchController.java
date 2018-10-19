@@ -22,8 +22,8 @@ public class SearchController {
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<JsonNode> search(@RequestBody JsonNode searchQuery) {
 		try {
-			documentService.search(searchQuery);
-			return new ResponseEntity<>(HttpStatus.CREATED);
+			JsonNode result = documentService.search(searchQuery);
+			return new ResponseEntity<JsonNode>(result, HttpStatus.OK);
 		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

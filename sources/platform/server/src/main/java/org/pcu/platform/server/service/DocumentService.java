@@ -13,8 +13,8 @@ public class DocumentService {
 	@Autowired
 	private PcuIndex pcuIndex;
 
-	public void search(JsonNode searchQuery) throws PcuIndexException {
-		// TODO gafou
+	public JsonNode search(JsonNode searchQuery) throws PcuIndexException {
+		return pcuIndex.getDocuments(searchQuery);
 
 	}
 
