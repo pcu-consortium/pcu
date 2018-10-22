@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import SearchBar from './components/SearchBar';
-import SearchResult from './components/SearchResult';
+import SearchBar from '../components/SearchBar';
+import SearchResult from '../components/SearchResult';
 
 
 const initialState = {
@@ -13,11 +13,6 @@ const initialState = {
     hits: { hits: [], total: 0 },
     took: 0
 };
-
-var debug = false;
-var pcuUrl = '/pcu/';
-var searchUrl = pcuUrl + 'search/esapi/'; // on PCU's ElasticSearch-like API impl'd on local ElasticSearch
-var searchFileUrl = searchUrl + 'files/file/_search'; 
 
 
 class Search extends Component {
@@ -31,8 +26,9 @@ class Search extends Component {
             queryRequest.from = 0;
             queryRequest.size = 10;
         }
+        var objectRequest =  {query:queryRequest, index:'files', type:'file'};
         this.setState(prevState => ({ ...prevState, queryRequest: queryRequest }));
-        axios.post(searchFileUrl, queryRequest).then(response => {
+        axios.post(process.env.REACT_APP_SEARCH_API, objectRequest).then(response => {
             this.setState(prevState => ({ ...prevState, hits: response.data.hits, took: response.data.took }));
             console.log("response state", this.state);
         }).catch(error => {
@@ -90,7 +86,7 @@ class Search extends Component {
                 {this.state.hits.total === 0 ? '' : (
                     <div>
 
-                        {debug ? (
+                        {process.env.REACT_APP_DEBUG ? (
                             <div className="resultsNumbers">
                                 query: {JSON.stringify(this.state.queryRequest.query, null, '\t')}.
                             </div>

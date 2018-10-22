@@ -6,8 +6,6 @@ var t = {
     'application/pdf': 'PDF',
 }
 
-var pcuUrl = '/pcu/';
-var fileApiUrl = pcuUrl + 'file/api/content/';
 
 class SearchResult extends React.Component {
     constructor(props) {
@@ -138,7 +136,7 @@ class SearchResult extends React.Component {
                                     <div className="resultsItem__filtersMenu">
                                         <span title={hit._source.fulltext ? hit._source.fulltext : ''}>Text</span>
                                         &nbsp;-&nbsp;
-                                           <a href={fileApiUrl + hit._source.content.store_path}>Cached</a>
+                                           <a href={process.env.REACT_APP_DOCUMENTS_API + hit._source.content.store_path}>Cached</a>
                                         &nbsp;-&nbsp;
                                            <span title={"find file with same hash" + hit._source.content.hash} onClick={() => this.handleFindSameHash(hit._source.content.hash)}>Same</span>
                                         &nbsp;-&nbsp;

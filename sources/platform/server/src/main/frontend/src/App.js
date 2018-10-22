@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style/main.css'
 
-import Search from './scenes/Search/Search.js';
+import Search from './pages/Search.js';
 
 class App extends Component {
   
