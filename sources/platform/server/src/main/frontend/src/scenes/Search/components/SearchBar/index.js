@@ -68,11 +68,11 @@ class SearchBar extends React.Component {
                     </div>
                     <div className="searchBar__menuList">
                         <ul>
-                            <li><a href="">Overview</a></li>
-                            <li><a href="">Use Cases</a></li>
-                            <li><a href="">Resources</a></li>
-                            <li><a href="">News</a></li>
-                            <li><a href="">Community</a></li>
+                            <li><a href="/">Overview</a></li>
+                            <li><a href="/">Use Cases</a></li>
+                            <li><a href="/">Resources</a></li>
+                            <li><a href="/">News</a></li>
+                            <li><a href="/">Community</a></li>
                         </ul>
                     </div>
                 </div>

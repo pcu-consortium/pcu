@@ -115,7 +115,7 @@ class Search extends Component {
                     <div className="footer__wrapper">
                         <ul className="footer__list">
                             <li><a href="http://pcu-consortium.github.io/">PCU Consortium</a></li>
-                            <li><a href="">Documentation</a></li>
+                            <li><a href="/">Documentation</a></li>
                             <li><a href="http://smile.fr/">Support</a></li>
                             {/*}
                                 // TODO font awesome in webpack :
@@ -127,7 +127,7 @@ class Search extends Component {
                                    <a alt="Slideshare" href="https://www.slideshare.net/pcuconsortium" target="_blank"><i class="fa fa-slideshare fa-2x"></i></a>
                                 </a></li>
                                 */}
-                            <li><a>© 2017 PCU Consortium</a></li>
+                            <li>© 2017 PCU Consortium</li>
                         </ul>
                     </div>
                 </div>
