@@ -58,10 +58,10 @@ public class PcuAgentTest {
 		// pcu agent configuration
 		String confFileName = UUID.randomUUID().toString();
 		File confFile = temporaryFolder.newFile(confFileName + ".json");
-		String workdirFolderName = UUID.randomUUID().toString();
-		File workdir = temporaryFolder.newFolder(workdirFolderName);
+		String workDirFolderName = UUID.randomUUID().toString();
+		File workDir = temporaryFolder.newFolder(workDirFolderName);
 		File sampleFolder = createTemporaryFolderWithSample();
-		String variablesFilePath = createTempVariables(workdir.getAbsolutePath(), sampleFolder.getAbsolutePath());
+		String variablesFilePath = createTempVariables(workDir.getAbsolutePath(), sampleFolder.getAbsolutePath());
 		String xmlFilePath = createTempXml();
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -78,12 +78,12 @@ public class PcuAgentTest {
 		String[] args = new String[] { confFile.getAbsolutePath() };
 		PcuAgent.main(args);
 
-		List<String> workdirFileNames = Arrays.asList(workdir.listFiles()).stream().map(File::getAbsolutePath)
+		List<String> workDirFileNames = Arrays.asList(workDir.listFiles()).stream().map(File::getAbsolutePath)
 				.collect(Collectors.toList());
 
-		assertThat(workdirFileNames).contains(workdir.getAbsolutePath() + "/crawlstore");
-		assertThat(workdirFileNames).contains(workdir.getAbsolutePath() + "/logs");
-		assertThat(workdirFileNames).contains(workdir.getAbsolutePath() + "/progress");
+		assertThat(workDirFileNames).contains(workDir.getAbsolutePath() + "/crawlstore");
+		assertThat(workDirFileNames).contains(workDir.getAbsolutePath() + "/logs");
+		assertThat(workDirFileNames).contains(workDir.getAbsolutePath() + "/progress");
 
 		Files.delete(Paths.get(sampleFolder.getAbsolutePath() + "/20171206 POSS/PCU@POSS_20171206.pdf"));
 
@@ -102,13 +102,13 @@ public class PcuAgentTest {
 		assertThat(deleteRequests.get(0).getUrl()).matches("/indexes/files/types/file/documents/(.*)POSS_20171206.pdf");
 	}
 
-	private String createTempVariables(String workdir, String targetPath) throws IOException {
+	private String createTempVariables(String workDir, String targetPath) throws IOException {
 		String filename = UUID.randomUUID().toString();
 		File tmpFile = File.createTempFile(filename, ".variables");
 		InputStream is = PcuAgentTest.class.getClassLoader()
 				.getResourceAsStream("norconex-filesystem-config.variables");
 		String content = IOUtils.toString(is, Charsets.UTF_8);
-		content = content.replace("${workdir}", workdir).replace("${targetPath}", targetPath);
+		content = content.replace("${workDir}", workDir).replace("${targetPath}", targetPath);
 		FileUtils.writeStringToFile(tmpFile, content, Charsets.UTF_8);
 		return tmpFile.getAbsolutePath();
 	}

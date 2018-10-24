@@ -2,11 +2,11 @@
 <!DOCTYPE xml>
 <fscollector id="${collectorid}">
 
-	<logsDir>${workdir}/logs</logsDir>
-	<progressDir>${workdir}/progress</progressDir>
+	<logsDir>${workDir}/logs</logsDir>
+	<progressDir>${workDir}/progress</progressDir>
 
 	<crawlerDefaults>
-		<workDir>${workdir}</workDir>
+		<workDir>${workDir}</workDir>
 		<startPaths>
 			<path>${path}</path>
 		</startPaths>
@@ -18,7 +18,7 @@
 		<crawlDataStoreFactory class="${dataStoreFactory}" />
 
 		<committer class="${committer}">
-			<directory>${workdir}/crawledFiles</directory>
+			<directory>${workDir}/crawledFiles</directory>
 		</committer>
 
 	</crawlerDefaults>

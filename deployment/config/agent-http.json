@@ -1,0 +1,7 @@
+{
+    "collectorId" : "pcu-release-collector-http",
+    "datasourceId" : "pcu-release-datasource-http",
+    "pcuPlatformUrl" : "http://localhost:8080",
+    "norconexhttp.config.xml" : "../config/norconex-http-config.xml",
+    "norconexhttp.config.variables" : "../config/norconex-http-config.variables"
+}

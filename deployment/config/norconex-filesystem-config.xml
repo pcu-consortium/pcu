@@ -26,6 +26,7 @@
 
 	<crawlers>
 		<crawler id="${crawlerid}">
+			<maxDocuments>${maxDocuments}</maxDocuments>
 		</crawler>
 	</crawlers>
 

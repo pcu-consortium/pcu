@@ -1,0 +1,12 @@
+collectorid=PcuHttpCollector
+crawlerid=PcuHttpCrawler
+workdir=../workdirHttp
+stayOnDomain=true
+stayOnPort=true
+stayOnProtocol=true
+url=https://www.data.gouv.fr/fr/
+maxDepth=3
+ignoreSitemapResolverFactory=true
+delayDefault=5000
+dataStoreFactory=com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory
+committer=org.pcu.connectors.collectors.http.internal.PcuHttpCommitter

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-INFO='[\033[0;32mINFO\033[0m]'
-WARN='[\033[0;33mWARN\033[0m]'
-ERROR='[\033[0;31mERROR\033[0m]'
+INFO='[\033[0;32mPCU\033[0m][\033[0;32mINFO\033[0m]'
+WARN='[\033[0;32mPCU\033[0m][\033[0;33mWARN\033[0m]'
+ERROR='[\033[0;32mPCU\033[0m][\033[0;31mERROR\033[0m]'
 
 echo -e "${INFO} PCU entreprise search release : START"
 DEPLOYMENT_FOLDER=$(pwd) 
@@ -16,7 +16,9 @@ echo -e "${INFO} Release folder:${RELEASE_FOLDER}"
 echo -e "${INFO} Build sources"
 cd ${SOURCES_FOLDER}
 mvn clean install -o -DskipTests
-cd provided/agent-filesystem-norconex
+cd ${SOURCES_FOLDER}/provided/agent-filesystem-norconex
+mvn clean install -o -DskipTests
+cd ${SOURCES_FOLDER}/provided/agent-http-norconex
 mvn clean install -o -DskipTests
 cd ${DEPLOYMENT_FOLDER}
 
@@ -28,7 +30,8 @@ mkdir ${RELEASE_FOLDER}
 cp -rf ${DEPLOYMENT_FOLDER}/scripts ${RELEASE_FOLDER}/scripts
 cp -rf ${DEPLOYMENT_FOLDER}/config ${RELEASE_FOLDER}/config
 cp -rf ${SOURCES_FOLDER}/provided/dist ${RELEASE_FOLDER}
-cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}
+cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-filesystem.jar
+cp -rf ${SOURCES_FOLDER}/provided/agent-http-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-http.jar
 cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/pcu-platform-server.jar
 
 echo -e "${INFO} PCU entreprise search release : END"

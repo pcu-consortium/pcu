@@ -1,8 +1,8 @@
-package org.pcu.connectors.collectors.filesystem.internal;
+package org.pcu.connectors.collectors.http.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class PcuFilesystemDocument {
+public class PcuHttpDocument {
 
 	private String reference;
 	private String id;

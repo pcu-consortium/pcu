@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<httpcollector id="${collectorid}">
+
+	<logsDir>${workdir}/logs</logsDir>
+	<progressDir>${workdir}/progress</progressDir>
+
+	<crawlerDefaults>
+		<workDir>${workdir}</workDir>
+
+		<startURLs stayOnDomain="${stayOnDomain}" stayOnPort="${stayOnPort}" stayOnProtocol="${stayOnProtocol}">
+			<url>${url}</url>
+		</startURLs>
+		<numThreads>2</numThreads>
+
+		<keepDownloads>false</keepDownloads>
+
+		<maxDepth>${maxDepth}</maxDepth>
+		<sitemapResolverFactory ignore="${ignoreSitemapResolverFactory}" />
+		<delay default="${delayDefault}" />
+
+		<crawlDataStoreFactory class="${dataStoreFactory}" />
+
+		<committer class="${committer}">
+			<directory>${workdir}/crawledFiles</directory>
+		</committer>
+	</crawlerDefaults>
+
+
+	<crawlers>
+		<crawler id="${crawlerid}">
+		</crawler>
+	</crawlers>
+
+</httpcollector>

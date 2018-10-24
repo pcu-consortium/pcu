@@ -13,3 +13,6 @@ docker images docker.elastic.co/elasticsearch/elasticsearch:6.4.2
 echo "Start Elasticsearch 6.4.2 container : elasticsearch-pcu"
 docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name elasticsearch-pcu -d docker.elastic.co/elasticsearch/elasticsearch:6.4.2
 
+#echo "simple site for agent crawling"
+#docker run -p 80:80 kennethreitz/httpbin
+
