@@ -10,3 +10,4 @@ ignoreSitemapResolverFactory=true
 delayDefault=5000
 dataStoreFactory=com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory
 committer=org.pcu.connectors.collectors.http.internal.PcuHttpCommitter
+maxDocuments=100
