@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.pcu.platform.IngestDocumentRequest;
+import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,12 +79,12 @@ public class PcuFilesystemCommitter implements ICommitter {
 				LOGGER.debug("Metadatas: " + doc.getMetadata().toString());
 			}
 
-			IngestDocumentRequest ingestDocumentRequest = new IngestDocumentRequest();
-			ingestDocumentRequest.setId(doc.getId());
-			ingestDocumentRequest.setIndex(doc.getIndex());
-			ingestDocumentRequest.setType(doc.getType());
-			ingestDocumentRequest.setDocument(doc.getMetadata());
-			pcuPlatformclient.ingest(ingestDocumentRequest);
+			Document document = new Document();
+			document.setId(doc.getId());
+			document.setIndex(doc.getIndex());
+			document.setType(doc.getType());
+			document.setDocument(doc.getMetadata());
+			pcuPlatformclient.ingest(document);
 		});
 		addJSON.clear();
 		LOGGER.info("Commit removed documents");

@@ -1,7 +1,7 @@
 package org.pcu.platform.server.rest;
 
 import org.pcu.connectors.index.PcuIndexException;
-import org.pcu.platform.IngestDocumentRequest;
+import org.pcu.platform.Document;
 import org.pcu.platform.server.service.IngestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,9 +19,9 @@ public class IngestResource {
 	private IngestService ingestService;
 
 	@RequestMapping(path = "/ingest", method = RequestMethod.POST, consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<Void> ingestDocument(@RequestBody IngestDocumentRequest ingestRequest) {
+	public ResponseEntity<Void> ingestDocument(@RequestBody Document document) {
 		try {
-			ingestService.ingestDocument(ingestRequest);
+			ingestService.ingestDocument(document);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} catch (PcuIndexException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -16,3 +16,22 @@ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name elas
 #echo "simple site for agent crawling"
 #docker run -p 80:80 kennethreitz/httpbin
 
+echo "Prepare network confluent"
+docker network create confluent
+
+echo "Start zookeeper"
+docker run -d \
+    --net=confluent \
+    --name=zookeeper \
+    -e ZOOKEEPER_CLIENT_PORT=2181 \
+    confluentinc/cp-zookeeper:5.0.0
+
+echo "Start kafka"
+docker run -d \
+    --net=confluent \
+    --name=kafka \
+    -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+    -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+    -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+    confluentinc/cp-kafka:5.0.0
+

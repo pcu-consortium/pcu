@@ -1,6 +1,6 @@
 package org.pcu.platform.client;
 
-import org.pcu.platform.IngestDocumentRequest;
+import org.pcu.platform.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -27,7 +27,7 @@ public interface PcuPlatformClient {
 
 	@RequestLine("POST ingest")
 	@Headers("Content-Type: application/json")
-	void ingest(IngestDocumentRequest ingestDocumentRequest);
+	void ingest(Document document);
 
 	@RequestLine("GET indexes/{indexId}/types/{type}/documents/{documentId}")
 	JsonNode getDocument(@Param("indexId") String indexId, @Param("type") String type,

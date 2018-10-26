@@ -2,6 +2,7 @@ package org.pcu.platform;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// TODO rename as document identifier
 public class DocumentRequest {
 
 	@JsonProperty("index")

@@ -11,7 +11,7 @@ public class Document {
 	private String type;
 	@JsonProperty("id")
 	private String id;
-	
+
 	@JsonProperty("document")
 	private JsonNode document;
 
@@ -39,6 +39,12 @@ public class Document {
 		this.id = id;
 	}
 
+	public JsonNode getDocument() {
+		return document;
+	}
 
+	public void setDocument(JsonNode document) {
+		this.document = document;
+	}
 
 }

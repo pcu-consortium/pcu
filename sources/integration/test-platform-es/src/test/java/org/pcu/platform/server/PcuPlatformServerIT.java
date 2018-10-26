@@ -4,6 +4,7 @@ import static com.jayway.restassured.RestAssured.delete;
 import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.post;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -11,8 +12,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.pcu.platform.Document;
 import org.pcu.platform.DocumentRequest;
-import org.pcu.platform.IngestDocumentRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -23,10 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json" }, webEnvironment = WebEnvironment.DEFINED_PORT)
+		"pcu.index.file=pcuindex.json" , "bootstrap.servers=kafka:9092"}, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class PcuPlatformServerIT {
 
 	@Value("${local.server.port}")
@@ -39,6 +41,9 @@ public class PcuPlatformServerIT {
 	@Test
 	public void testStatus() throws IOException {
 		get("/status").then().assertThat().statusCode(HttpStatus.OK.value());
+		Response response = get("/configuration");
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getBody().asString()).contains("bootstrap.servers");
 	}
 
 	@Test
@@ -47,13 +52,13 @@ public class PcuPlatformServerIT {
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.CREATED.value());
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-		ObjectNode document = new ObjectMapper().createObjectNode();
-		document.put("author", "testAuthor");
-		IngestDocumentRequest createRequest = new IngestDocumentRequest();
+		ObjectNode content = new ObjectMapper().createObjectNode();
+		content.put("author", "testAuthor");
+		Document createRequest = new Document();
 		createRequest.setId(documentId);
 		createRequest.setType(type);
 		createRequest.setIndex(indexId);
-		createRequest.setDocument(document);
+		createRequest.setDocument(content);
 		given().body(createRequest).contentType(ContentType.JSON).when().post("/ingest").then().assertThat()
 				.statusCode(HttpStatus.CREATED.value());
 		given().body(createRequest).contentType(ContentType.JSON).when().post("/ingest").then().assertThat()

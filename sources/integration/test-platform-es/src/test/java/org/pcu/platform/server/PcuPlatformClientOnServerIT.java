@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.pcu.platform.IngestDocumentRequest;
+import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
 import org.pcu.platform.client.PcuPlatformClientException;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,18 +51,18 @@ public class PcuPlatformClientOnServerIT {
 			pcuPlatformClient.createIndex(indexId);
 		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
 
-		ObjectNode document = new ObjectMapper().createObjectNode();
-		document.put("author", "testAuthor");
-		IngestDocumentRequest ingestDocumentRequest = new IngestDocumentRequest();
-		ingestDocumentRequest.setId(documentId);
-		ingestDocumentRequest.setType(type);
-		ingestDocumentRequest.setIndex(indexId);
-		ingestDocumentRequest.setDocument(document);
+		ObjectNode content = new ObjectMapper().createObjectNode();
+		content.put("author", "testAuthor");
+		Document document = new Document();
+		document.setId(documentId);
+		document.setType(type);
+		document.setIndex(indexId);
+		document.setDocument(content);
 		assertThatCode(() -> {
-			pcuPlatformClient.ingest(ingestDocumentRequest);
+			pcuPlatformClient.ingest(document);
 		}).doesNotThrowAnyException();
 		assertThatThrownBy(() -> {
-			pcuPlatformClient.ingest(ingestDocumentRequest);
+			pcuPlatformClient.ingest(document);
 		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
 
 		assertThatCode(() -> {
