@@ -48,5 +48,5 @@ public class PcuPlatformServerConfiguration {
 			throw new IllegalArgumentException("Could not load configuration");
 		}
 	}
-	
+
 }

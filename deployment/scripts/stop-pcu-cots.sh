@@ -12,6 +12,6 @@ echo "Stop zookeeper container: zookeeper"
 docker stop zookeeper
 echo "Remove zookeeper container: zookeeper"
 docker rm zookeeper
-echo "Remove network confluent"
-docker network rm confluent
+#echo "Remove network confluent"
+#docker network rm confluent
 
