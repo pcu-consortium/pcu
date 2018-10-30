@@ -16,6 +16,7 @@ public class IndexService {
 	private PcuIndex pcuIndex;
 
 	public void createIndex(String indexId) throws PcuIndexException {
+		LOGGER.debug("create index");
 		boolean created = pcuIndex.createIndex(indexId);
 		if (!created) {
 			throw new PcuIndexException("could not create index");
@@ -23,6 +24,7 @@ public class IndexService {
 	}
 
 	public void deleteIndex(String indexId) throws PcuIndexException {
+		LOGGER.debug("delete index");
 		boolean deleted = pcuIndex.deleteIndex(indexId);
 		if (!deleted) {
 			throw new PcuIndexException("could not delete index");

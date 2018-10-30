@@ -44,11 +44,26 @@ docker run \
   --if-not-exists --zookeeper localhost:2181
 
 
-echo "Check ingest topic in Kafka"
+echo "Check Ingest topic in Kafka"
 docker run \
   --net=host \
   --rm \
   confluentinc/cp-kafka:5.0.0 \
   kafka-topics --describe --topic Ingest --zookeeper localhost:2181
+
+echo "Start kafka control center"
+docker run -d \
+  --net=host \
+  --name=control-center \
+  --ulimit nofile=16384:16384 \
+  -p 9021:9021 \
+  -v /tmp/control-center/data:/var/lib/confluent-control-center \
+  -e CONTROL_CENTER_ZOOKEEPER_CONNECT=localhost:2181 \
+  -e CONTROL_CENTER_BOOTSTRAP_SERVERS=localhost:9092 \
+  -e CONTROL_CENTER_REPLICATION_FACTOR=1 \
+  -e CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS=1 \
+  -e CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1 \
+  -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
+  confluentinc/cp-enterprise-control-center:5.0.0
 
 

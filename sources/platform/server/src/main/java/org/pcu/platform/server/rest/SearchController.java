@@ -2,6 +2,8 @@ package org.pcu.platform.server.rest;
 
 import org.pcu.connectors.index.PcuIndexException;
 import org.pcu.platform.server.service.DocumentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping(path = "/search")
 public class SearchController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
+
 	@Autowired
 	private DocumentService documentService;
 
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<JsonNode> search(@RequestBody JsonNode searchQuery) {
+		LOGGER.debug("search");
 		try {
 			JsonNode result = documentService.search(searchQuery);
 			return new ResponseEntity<JsonNode>(result, HttpStatus.OK);

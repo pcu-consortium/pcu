@@ -20,30 +20,25 @@ public class DocumentService {
 	@Autowired
 	private PcuIndex pcuIndex;
 
-//	@KafkaListener(topics = "${kafka.topic.addDocument}")
-//	public void receive(Document payload) throws PcuIndexException {
-//		LOGGER.info("received kafka payload addDocument='{}'", payload);
-//		createDocument(payload.getDocument(), payload.getIndex(), payload.getType(), payload.getId());
-//	}
-
 	@KafkaListener(topics = "${kafka.topic.addDocument}")
-	public void listen(ConsumerRecord<String, Document> cr) throws Exception {
-		LOGGER.info("received kafka ='{}'", cr.key());
-		LOGGER.info(cr.toString());
+	public void createDocumentFromKafka(ConsumerRecord<String, Document> cr) throws Exception {
+		LOGGER.debug("add document in index from kafka topic");
 		createDocument(cr.value().getDocument(), cr.value().getIndex(), cr.value().getType(), cr.value().getId());
-		// latch.countDown();
 	}
 
 	public JsonNode search(JsonNode searchQuery) throws PcuIndexException {
+		LOGGER.debug("search document");
 		return pcuIndex.getDocuments(searchQuery);
 
 	}
 
 	public JsonNode get(String indexId, String type, String documentId) throws PcuIndexException {
+		LOGGER.debug("get document");
 		return pcuIndex.getDocument(indexId, type, documentId);
 	}
 
 	public void deleteDocument(String indexId, String type, String documentId) throws PcuIndexException {
+		LOGGER.debug("delete document");
 		boolean deleted = pcuIndex.deleteDocument(indexId, type, documentId);
 		if (!deleted) {
 			throw new PcuIndexException("could not delete document");
