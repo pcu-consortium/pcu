@@ -79,11 +79,14 @@
 
 		<!-- spring-boot : -->
 		<spring-boot.version>2.0.5.RELEASE</spring-boot.version>
+		<spring-kafka.version>2.1.10.RELEASE</spring-kafka.version>
 		<spring.version>5.1.0.RELEASE</spring.version>
 
 		<!-- rest : -->
 		<jackson.version>2.9.5</jackson.version>
 		<feign.version>9.7.0</feign.version>
+
+		<kafka.version>2.0.0</kafka.version>
 
 		<!-- doc api : OpenAPI Spec compatibility 2.0 -->
 		<swagger.version>1.5.17</swagger.version>
@@ -135,6 +138,46 @@
 				<version>${jackson.version}</version>
 			</dependency>
 
+
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${spring-kafka.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.kafka</groupId>
+						<artifactId>kafka-clients</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.kafka</groupId>
+						<artifactId>connect-json</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.kafka</groupId>
+						<artifactId>connect-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-clients</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>connect-json</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>connect-api</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-streams</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>io.searchbox</groupId>

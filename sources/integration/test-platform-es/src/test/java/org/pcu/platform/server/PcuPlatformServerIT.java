@@ -31,11 +31,11 @@ import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=Ingest", "kafka.topic.addDocument=Ingest",
+		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformServerIT-Ingest", "kafka.topic.addDocument=PcuPlatformServerIT-Ingest",
 		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:9092",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
-		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.DEFINED_PORT)
+		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PcuPlatformServerIT {
 	
 	
@@ -82,7 +82,7 @@ public class PcuPlatformServerIT {
 				break;
 			} else {
 				searchResponse = null;
-				TimeUnit.SECONDS.sleep(4);
+				TimeUnit.SECONDS.sleep(10);
 				continue;
 			}
 		}

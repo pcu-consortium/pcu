@@ -31,6 +31,7 @@ public class DocumentResource {
 			JsonNode document = documentService.get(indexId, type, documentId);
 			return new ResponseEntity<JsonNode>(document, HttpStatus.OK);
 		} catch (PcuIndexException e) {
+			LOGGER.error("get document error : {}",e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

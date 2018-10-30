@@ -20,7 +20,7 @@ docker run -d \
     -e ZOOKEEPER_CLIENT_PORT=2181 \
     -e ZOOKEEPER_TICK_TIME=2000 \
     -e ZOOKEEPER_SYNC_LIMIT=2 \
-    confluentinc/cp-zookeeper:5.0.0
+    confluentinc/cp-zookeeper:5.0.1
 
 echo "Start kafka"
 docker run -d \
@@ -30,7 +30,7 @@ docker run -d \
     -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
     -e KAFKA_BROKER_ID=2 \
     -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
-    confluentinc/cp-kafka:5.0.0
+    confluentinc/cp-kafka:5.0.1
 
 echo "Start kafka : waiting..."
 sleep 30
@@ -39,7 +39,7 @@ sleep 30
 echo "Create Ingest topic in Kafka"
 docker run \
   --net=host \
-  --rm confluentinc/cp-kafka:5.0.0 \
+  --rm confluentinc/cp-kafka:5.0.1 \
   kafka-topics --create --topic Ingest --partitions 1 --replication-factor 1 \
   --if-not-exists --zookeeper localhost:2181
 
@@ -48,7 +48,7 @@ echo "Check Ingest topic in Kafka"
 docker run \
   --net=host \
   --rm \
-  confluentinc/cp-kafka:5.0.0 \
+  confluentinc/cp-kafka:5.0.1 \
   kafka-topics --describe --topic Ingest --zookeeper localhost:2181
 
 echo "Start kafka control center"
@@ -64,6 +64,6 @@ docker run -d \
   -e CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS=1 \
   -e CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1 \
   -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
-  confluentinc/cp-enterprise-control-center:5.0.0
+  confluentinc/cp-enterprise-control-center:5.0.1
 
 

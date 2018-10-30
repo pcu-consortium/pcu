@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +17,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json" }, webEnvironment = WebEnvironment.DEFINED_PORT)
+		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=Ingest", "kafka.topic.addDocument=Ingest",
+		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:9092",
+		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
+		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
+		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PcuPlatformClientOnServerIT {
 
 	@Value("${local.server.port}")
@@ -36,7 +42,7 @@ public class PcuPlatformClientOnServerIT {
 	}
 
 	@Test
-	public void testScenario() throws IOException {
+	public void testScenario() throws IOException, InterruptedException {
 
 		PcuPlatformClient pcuPlatformClient = PcuPlatformClient.connect("http://localhost:" + port);
 
@@ -53,17 +59,17 @@ public class PcuPlatformClientOnServerIT {
 
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
-		Document document = new Document();
-		document.setId(documentId);
-		document.setType(type);
-		document.setIndex(indexId);
-		document.setDocument(content);
+		Document createRequest = new Document();
+		createRequest.setId(documentId);
+		createRequest.setType(type);
+		createRequest.setIndex(indexId);
+		createRequest.setDocument(content);
+
 		assertThatCode(() -> {
-			pcuPlatformClient.ingest(document);
+			pcuPlatformClient.ingest(createRequest);
 		}).doesNotThrowAnyException();
-		assertThatThrownBy(() -> {
-			pcuPlatformClient.ingest(document);
-		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
+
+		TimeUnit.SECONDS.sleep(4);
 
 		assertThatCode(() -> {
 			pcuPlatformClient.getDocument(indexId, type, documentId);
@@ -85,6 +91,14 @@ public class PcuPlatformClientOnServerIT {
 		assertThatThrownBy(() -> {
 			pcuPlatformClient.deleteIndex(indexId);
 		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
+	}
+
+	private JsonNode getSearchQuery(String indexId, String type) throws IOException {
+		String searchQuery = "{\"index\":\"{indexId}\",\"type\":\"{type}\",\"query\":{\"query\":{\"match\":{\"author\":\"testAuthor\"}}}}";
+		searchQuery = searchQuery.replace("{indexId}", indexId);
+		searchQuery = searchQuery.replace("{type}", type);
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readTree(searchQuery);
 	}
 
 }
