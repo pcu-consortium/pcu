@@ -4,13 +4,10 @@ jdk:
   - openjdk10
 services:
   - elasticsearch
-  - docker
 env:
   matrix:
     - ELASTICSEARCH=6.4.2
 before_install:
-  - docker run -d --net=host --name=zookeeper -e ZOOKEEPER_CLIENT_PORT=2181 -e ZOOKEEPER_TICK_TIME=2000 -e ZOOKEEPER_SYNC_LIMIT=2 confluentinc/cp-zookeeper:5.0.1
-  - docker run -d --net=host --name=kafka -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e KAFKA_BROKER_ID=2 -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 confluentinc/cp-kafka:5.0.1
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH}.deb && sudo dpkg -i --force-confnew elasticsearch-${ELASTICSEARCH}.deb && sudo service elasticsearch restart
   - cd sources
 before_script:

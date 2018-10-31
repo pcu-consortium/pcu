@@ -15,6 +15,7 @@ import org.pcu.platform.client.PcuPlatformClientException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,11 +24,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=Ingest", "kafka.topic.addDocument=Ingest",
-		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:9092",
+		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformClientOnServerIT-Ingest",
+		"kafka.topic.addDocument=PcuPlatformClientOnServerIT-Ingest", "spring.kafka.consumer.group-id=pcu-platform",
+		"spring.kafka.bootstrap-servers=localhost:29092",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
 		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformServerIT-Ingest" }, brokerProperties = {
+		"auto.create.topics.enable=true", "listeners=PLAINTEXT://localhost:29092", "port=29092" })
 public class PcuPlatformClientOnServerIT {
 
 	@Value("${local.server.port}")

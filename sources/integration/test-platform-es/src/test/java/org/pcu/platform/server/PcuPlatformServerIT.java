@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,14 +32,15 @@ import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformServerIT-Ingest", "kafka.topic.addDocument=PcuPlatformServerIT-Ingest",
-		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:9092",
+		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformServerIT-Ingest",
+		"kafka.topic.addDocument=PcuPlatformServerIT-Ingest", "spring.kafka.consumer.group-id=pcu-platform",
+		"spring.kafka.bootstrap-servers=localhost:9092",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
 		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformServerIT-Ingest" }, brokerProperties = {
+		"auto.create.topics.enable=true", "listeners=PLAINTEXT://localhost:9092", "port=9092" })
 public class PcuPlatformServerIT {
-	
-	
 
 	@Value("${local.server.port}")
 	int port;
@@ -46,7 +48,7 @@ public class PcuPlatformServerIT {
 	private String indexId;
 	private String documentId;
 	private String type;
-
+	
 	@Test
 	public void testStatus() throws IOException {
 		get("/status").then().assertThat().statusCode(HttpStatus.OK.value());
@@ -88,7 +90,7 @@ public class PcuPlatformServerIT {
 		}
 
 		assertThat(searchResponse).isNotNull();
-		
+
 		DocumentRequest deleteRequest = new DocumentRequest();
 		deleteRequest.setId(documentId);
 		deleteRequest.setType(type);
