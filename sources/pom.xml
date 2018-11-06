@@ -88,9 +88,8 @@
 
 		<kafka.version>2.0.0</kafka.version>
 
-		<!-- doc api : OpenAPI Spec compatibility 2.0 -->
-		<swagger.version>1.5.17</swagger.version>
-		<swagger-ui.version>3.17.0</swagger-ui.version>
+		<!-- doc api -->
+		<swagger.version>2.9.2</swagger.version>
 
 		<!-- logging : -->
 		<slf4j.version>1.7.25</slf4j.version><!-- spring-boot & logback's ; 1.7.25 -->
@@ -161,6 +160,7 @@
 				<version>1.2</version>
 			</dependency>
 
+			<!-- client -->
 			<dependency>
 				<groupId>io.github.openfeign</groupId>
 				<artifactId>feign-core</artifactId>
@@ -187,6 +187,18 @@
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-core</artifactId>
 				<version>${logback.version}</version>
+			</dependency>
+
+			<!-- swagger -->
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${swagger.version}</version>
 			</dependency>
 
 			<!-- tests : -->

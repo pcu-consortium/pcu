@@ -16,4 +16,5 @@ script:
   - mvn test -B
   - mvn verify -B
 after_success:
+  - pwd
   - mvn clean cobertura:cobertura coveralls:report
