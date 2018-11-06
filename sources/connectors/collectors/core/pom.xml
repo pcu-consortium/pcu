@@ -14,12 +14,28 @@
 	<name>PCU Collector Core</name>
 	<description>PCU Collector Core</description>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
 			<artifactId>pcu-collectors-api</artifactId>
+			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-platform-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 	</dependencies>
 
 </project>

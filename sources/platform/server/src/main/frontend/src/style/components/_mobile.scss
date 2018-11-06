@@ -1,0 +1,174 @@
+/* ABOVE MOBILE */
+
+@media screen and (min-width: 1280px) {
+
+    div.footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .appWrapper {
+        position: relative;
+        padding-bottom: 90px;
+    }
+
+}
+
+/* BELOW MOBILE */
+
+@media screen and (max-width: 1279px) {
+    
+    .searchBar__wrapperSearch--large .searchBar__logo img {
+        margin: auto 20px auto 20px;
+    }
+
+    .searchBar__wrapperSearch--large {
+        padding: 0 20px 25px 20px;
+    }
+
+    .searchBar__wrapperSearch {
+        height: 100px;
+        position: relative;
+    }
+
+    .searchBar__bar {
+        height: 52px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -26px;
+        width: 80%;
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+    
+    .searchBar__bar input {
+        height: 52px;
+        line-height: 52px;
+        width: 100%;
+        margin: 0 auto;
+        min-width: 0;
+    }
+
+    .searchBar__menuList {
+        visibility: hidden;
+        display: none;
+    }
+
+    .searchBar__logo {
+        width: 100%;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .searchBar__logo img {
+        width: 55px;
+        margin-top: 15px;
+    }
+
+    .searchBar__searchFilter__wrapper {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .searchBar__searchFilter {
+        padding-left: 0;
+    }
+
+    .searchBar__searchFilter ul {
+        padding: 40px 15px 0px 15px;
+        justify-content: center;
+        margin-right: -30px;
+    }
+
+    .selectSortFilter__wrapper {
+        background: white;
+        width: 100%;
+        padding: 25px;
+        > div {
+            margin-left: auto;
+        }
+    }
+
+    ul.footer__list {
+        padding: 0 10%;
+    }
+
+    ul.footer__list li {
+        margin: auto 20px auto 0;
+    }
+
+    .results {
+        padding: 0 10%;
+    }
+
+    .searchBar__loginArea {
+        padding: 0;
+    }
+
+    .results__colLeft,
+    .results__colRight {
+        width: 100%;
+    }
+
+    .results__colLeft {
+        padding-top: 0;
+    }
+
+    .colRight__wrapper {
+        border-left: 0;
+    } 
+
+    // Handle Footer
+
+    div.footer {
+        position: fixed;
+        top: 72px;
+        bottom: 0;
+        left: -100%;
+        right: auto;
+        background: #00537A;
+        height: auto;
+        border-top: 2px solid lighten(#00537A, 10%);
+        width: 100%;
+
+        -webkit-transition: 0.3s all ease-in-out;
+        -o-transition: 0.3s all ease-in-out;
+        transition: 0.3s all ease-in-out;
+        &.show {
+            left: 0;
+        }
+    }
+
+    ul.footer__list {
+        display: block;
+        padding: 40px 25px;
+        li { margin-bottom: 25px; }
+    }
+
+    ul.footer__list li a { color: white; }
+
+    // Handle Login
+
+    .loginOverlay__title {
+        padding-left: 35px;
+    }
+
+    .loginOverlay__wrapperGlobal {
+        width: 100%;
+    }
+
+    .loginOverlay__wrapper {
+        padding: 0 35px 45px 35px;
+        display: block;
+        width: 100%;
+    }
+
+    .loginOverlay__logoPCU {
+        width: 75%;
+        height: auto;
+    }
+
+}

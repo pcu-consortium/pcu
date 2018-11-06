@@ -1,6 +1,0 @@
-collectorid=PcuFilesystemCollector
-crawlerid=PcuFilesystemCrawler
-workdir=/tmp/workdir
-path=/home/gafou/projets/innovation/pcu/sources/git-pcu-consortium/pcu/applications/search/dist/sample
-dataStoreFactory=com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory
-committer=org.pcu.connectors.collectors.filesystem.PcuFilesystemCommitter

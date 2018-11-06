@@ -6,10 +6,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.norconex.committer.core.CommitterException;
 import com.norconex.committer.core.ICommitter;
 import com.norconex.commons.lang.map.Properties;
@@ -21,9 +24,8 @@ public class PcuFilesystemCommitter implements ICommitter {
 	/** Default committer directory */
 	public static final String DEFAULT_DIRECTORY = "pcu-committer-json";
 
-	// FIXME add the indexer service
-	//@Autowired
-	//private PcuIndexer pcuIndexer;
+	private PcuPlatformClient pcuPlatformclient;
+	private String datasourceId;
 
 	private List<PcuFilesystemDocument> addJSON = new ArrayList<>();
 	private List<PcuFilesystemDocument> removeJSON = new ArrayList<>();
@@ -34,13 +36,14 @@ public class PcuFilesystemCommitter implements ICommitter {
 		try {
 			PcuFilesystemDocument doc = new PcuFilesystemDocument();
 
-			doc.setId(reference);
+			doc.setId(DigestUtils.md5Hex(datasourceId+reference));
+			doc.setReference(reference);
 			doc.setIndex("files");
 			doc.setType("file");
 
 			StringWriter writer = new StringWriter();
 			metadata.storeToJSON(writer);
-			doc.setMetadata(writer.toString().getBytes());
+			doc.setMetadata(new ObjectMapper().readTree(writer.toString()));
 
 			addJSON.add(doc);
 
@@ -54,7 +57,8 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void remove(String reference, Properties metadata) {
 		LOGGER.debug("Remove document with reference " + reference);
 		PcuFilesystemDocument doc = new PcuFilesystemDocument();
-		doc.setId(reference);
+		doc.setId(DigestUtils.md5Hex(datasourceId+reference));
+		doc.setReference(reference);
 		doc.setIndex("files");
 		doc.setType("file");
 		removeJSON.add(doc);
@@ -64,24 +68,42 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void commit() {
 
 		LOGGER.debug("Commit documents");
-		// send to PCU, but for now log
 		LOGGER.info("Commit added documents");
-		addJSON.forEach(doc -> LOGGER.info(doc.toString()));
+		
 		addJSON.forEach(doc -> {
-			//pcuIndexer.createDocument(doc.getMetadata(), doc.getIndex(), doc.getType(), doc.getId());
+			LOGGER.debug("Id: " + doc.getId());
+			LOGGER.debug("Reference: " + doc.getReference());
+			LOGGER.debug("Index: " + doc.getIndex());
+			LOGGER.debug("Type: " + doc.getType());
+			if (doc != null && doc.getMetadata() != null) {
+				LOGGER.debug("Metadatas: " + doc.getMetadata().toString());
+			}
+
+			Document document = new Document();
+			document.setId(doc.getId());
+			document.setIndex(doc.getIndex());
+			document.setType(doc.getType());
+			document.setDocument(doc.getMetadata());
+			pcuPlatformclient.ingest(document);
 		});
 		addJSON.clear();
 		LOGGER.info("Commit removed documents");
-		removeJSON.forEach(doc -> LOGGER.info(doc.toString()));
 		removeJSON.forEach(doc -> {
-			//pcuIndexer.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
+			LOGGER.debug("Id: " + doc.getId());
+			LOGGER.debug("Reference: " + doc.getReference());
+			LOGGER.debug("Index: " + doc.getIndex());
+			LOGGER.debug("Type: " + doc.getType());
+			pcuPlatformclient.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
 		});
 		removeJSON.clear();
-
 	}
 
-	public void setPcuIndexer(PcuPlatformClient pcuIndexer) {
-		//this.pcuIndexer = pcuIndexer;
+	public void setPcuPlatformClient(PcuPlatformClient pcuPlatformclient) {
+		this.pcuPlatformclient = pcuPlatformclient;
+	}
+	
+	public void setDatasourceId(String datasourceId) {
+		this.datasourceId = datasourceId;
 	}
 
 }

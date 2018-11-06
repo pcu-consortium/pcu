@@ -1,57 +1,48 @@
 package org.pcu.platform.client;
 
-import java.io.IOException;
+import org.pcu.platform.Document;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import feign.Feign;
+import feign.Headers;
 import feign.Logger;
+import feign.Param;
 import feign.RequestLine;
-import feign.Response;
 import feign.codec.Decoder;
-import feign.codec.ErrorDecoder;
-import feign.gson.GsonDecoder;
+import feign.codec.Encoder;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
 
-public class PcuPlatformClient {
+public interface PcuPlatformClient {
 
-	interface PCUPlateform {
+	@RequestLine("GET status")
+	void status();
 
-		@RequestLine("POST document")
-		boolean createDocument(byte[] document, String index, String type, String id);
+	@RequestLine("POST indexes/{indexId}")
+	void createIndex(@Param("indexId") String indexId);
 
-		@RequestLine("DELETE document")
-		boolean deleteDocument(String index, String type, String id);
+	@RequestLine("DELETE indexes/{indexId}")
+	void deleteIndex(@Param("indexId") String indexId);
 
-		static PCUPlateform connect(String url) {
-			Decoder decoder = new GsonDecoder();
-			return Feign.builder().decoder(decoder).errorDecoder(new PCUPlateformErrorDecoder(decoder))
-					.logger(new Logger.ErrorLogger()).logLevel(Logger.Level.BASIC).target(PCUPlateform.class, url);
-		}
+	@RequestLine("POST ingest")
+	@Headers("Content-Type: application/json")
+	void ingest(Document document);
+
+	@RequestLine("GET indexes/{indexId}/types/{type}/documents/{documentId}")
+	JsonNode getDocument(@Param("indexId") String indexId, @Param("type") String type,
+			@Param("documentId") String documentId);
+	
+	@RequestLine("DELETE indexes/{indexId}/types/{type}/documents/{documentId}")
+	void deleteDocument(@Param("indexId") String indexId, @Param("type") String type,
+			@Param("documentId") String documentId);
+
+	static PcuPlatformClient connect(String url) {
+		Encoder encoder = new JacksonEncoder();
+		Decoder decoder = new JacksonDecoder();
+		return Feign.builder().decoder(decoder).encoder(encoder).errorDecoder(new PcuPlatformErrorDecoder(decoder))
+				.logger(new Logger.ErrorLogger()).logLevel(Logger.Level.BASIC).target(PcuPlatformClient.class, url);
 	}
 
-	static class PCUPlateformErrorDecoder implements ErrorDecoder {
 
-		final Decoder decoder;
-		final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
-
-		PCUPlateformErrorDecoder(Decoder decoder) {
-			this.decoder = decoder;
-		}
-
-		@Override
-		public Exception decode(String methodKey, Response response) {
-			try {
-				return (Exception) decoder.decode(response, PCUPlateformClientError.class);
-			} catch (IOException fallbackToDefault) {
-				return defaultDecoder.decode(methodKey, response);
-			}
-		}
-	}
-
-	static class PCUPlateformClientError extends RuntimeException {
-		private String message; // parsed from json
-
-		@Override
-		public String getMessage() {
-			return message;
-		}
-	}
 }

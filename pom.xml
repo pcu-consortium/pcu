@@ -105,9 +105,9 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding><!-- else [WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent -->
-        <org.jacoco.version>0.7.7.201606060606</org.jacoco.version>
+        <org.jacoco.version>0.8.1</org.jacoco.version>
         <cobertura-plugin.version>2.7</cobertura-plugin.version>
-        <coveralls-plugin.version>4.0.0</coveralls-plugin.version>
+        <coveralls-plugin.version>4.3.0</coveralls-plugin.version>
     </properties>
     
     <dependencies>

@@ -1,12 +1,23 @@
 package org.pcu.connectors.collectors.filesystem.internal;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class PcuFilesystemDocument {
 
+	private String reference;
 	private String id;
 	private String index;
 	private String type;
-	private byte[] metadata;
+	private JsonNode metadata;
 
+	public void setReference(String reference) {
+		this.reference = reference;
+	}
+	
+	public String getReference() {
+		return reference;
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -31,11 +42,11 @@ public class PcuFilesystemDocument {
 		this.type = type;
 	}
 
-	public byte[] getMetadata() {
+	public JsonNode getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(byte[] metadata) {
+	public void setMetadata(JsonNode metadata) {
 		this.metadata = metadata;
 	}
 

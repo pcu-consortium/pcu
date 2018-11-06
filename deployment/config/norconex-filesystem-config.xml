@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<fscollector id="${collectorid}">
+
+	<logsDir>${workdir}/logs</logsDir>
+	<progressDir>${workdir}/progress</progressDir>
+
+	<crawlerDefaults>
+		<workDir>${workdir}</workDir>
+		<startPaths>
+			<path>${path}</path>
+		</startPaths>
+
+		<numThreads>2</numThreads>
+
+		<keepDownloads>false</keepDownloads>
+
+		<crawlDataStoreFactory class="${dataStoreFactory}" />
+
+		<committer class="${committer}">
+			<directory>${workdir}/crawledFiles</directory>
+		</committer>
+
+	</crawlerDefaults>
+
+
+	<crawlers>
+		<crawler id="${crawlerid}">
+			<maxDocuments>${maxDocuments}</maxDocuments>
+		</crawler>
+	</crawlers>
+
+</fscollector>
