@@ -38,8 +38,8 @@ public class PcuFilesystemCommitter implements ICommitter {
 
 			doc.setId(DigestUtils.md5Hex(datasourceId+reference));
 			doc.setReference(reference);
-			doc.setIndex("files");
-			doc.setType("file");
+			doc.setIndex("documents");
+			doc.setType("document");
 
 			StringWriter writer = new StringWriter();
 			metadata.storeToJSON(writer);
@@ -59,8 +59,8 @@ public class PcuFilesystemCommitter implements ICommitter {
 		PcuFilesystemDocument doc = new PcuFilesystemDocument();
 		doc.setId(DigestUtils.md5Hex(datasourceId+reference));
 		doc.setReference(reference);
-		doc.setIndex("files");
-		doc.setType("file");
+		doc.setIndex("documents");
+		doc.setType("document");
 		removeJSON.add(doc);
 	}
 

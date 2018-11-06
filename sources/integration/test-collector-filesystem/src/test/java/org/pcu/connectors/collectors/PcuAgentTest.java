@@ -1,13 +1,13 @@
 package org.pcu.connectors.collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.noContent;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -26,6 +26,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemNorconexCollector;
 import org.pcu.integration.TemporaryFolderExtension;
@@ -41,6 +43,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri;
 
 @ExtendWith({ TemporaryFolderExtension.class, WiremockResolver.class, WiremockUriResolver.class })
+@RunWith(JUnitPlatform.class)
 public class PcuAgentTest {
 
 	@RegisterExtension
@@ -88,18 +91,18 @@ public class PcuAgentTest {
 		Files.delete(Paths.get(sampleFolder.getAbsolutePath() + "/20171206 POSS/PCU@POSS_20171206.pdf"));
 
 		// second run pcu agent after deleting a file
-		PcuAgent.main(args);	
+		PcuAgent.main(args);
 
 		// check stub calls
 		List<LoggedRequest> ingestRequests = server.findAll(postRequestedFor(urlMatching("/ingest")));
 		List<LoggedRequest> deleteRequests = server.findAll(deleteRequestedFor(urlPathMatching("/indexes/(.*)")));
-		
+
 		assertThat(ingestRequests).hasSize(3);
 		assertThat(ingestRequests.get(0).getUrl()).isEqualTo("/ingest");
 		assertThat(ingestRequests.get(1).getUrl()).isEqualTo("/ingest");
 		assertThat(ingestRequests.get(2).getUrl()).isEqualTo("/ingest");
 		assertThat(deleteRequests).hasSize(1);
-		assertThat(deleteRequests.get(0).getUrl()).matches("/indexes/files/types/file/documents/(.*)POSS_20171206.pdf");
+		assertThat(deleteRequests.get(0).getUrl()).matches("/indexes/documents/types/document/documents/(.*)");
 	}
 
 	private String createTempVariables(String workDir, String targetPath) throws IOException {
