@@ -13,7 +13,6 @@ before_install:
 before_script:
   - sleep 10
 script:
-  - mvn test -B
-  - mvn verify -B
+  - mvn test verify jacoco:report -B
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn coveralls:report

@@ -47,6 +47,7 @@ public class DocumentService {
 
 	public void createDocument(JsonNode document, String indexId, String type, String documentId)
 			throws PcuIndexException {
+		LOGGER.debug("create document");
 		boolean created = pcuIndex.createDocument(document, indexId, type, documentId);
 		if (!created) {
 			throw new PcuIndexException("could not create document");

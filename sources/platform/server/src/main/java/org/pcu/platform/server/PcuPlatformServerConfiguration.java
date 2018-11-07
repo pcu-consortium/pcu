@@ -15,8 +15,14 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableSwagger2
 public class PcuPlatformServerConfiguration {
 
 	/** for prop check purpose */
@@ -47,6 +53,12 @@ public class PcuPlatformServerConfiguration {
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration");
 		}
+	}
+
+	@Bean
+	public Docket productApi() {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+				.apis(RequestHandlerSelectors.basePackage("org.pcu.platform.server.rest")).build();
 	}
 
 }
