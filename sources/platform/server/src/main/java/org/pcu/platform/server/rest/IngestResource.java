@@ -1,5 +1,7 @@
 package org.pcu.platform.server.rest;
 
+import java.io.InputStream;
+
 import org.pcu.connectors.index.PcuIndexException;
 import org.pcu.platform.Document;
 import org.pcu.platform.server.service.IngestService;
@@ -24,6 +26,17 @@ public class IngestResource {
 
 	@RequestMapping(path = "/ingest", method = RequestMethod.POST, consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<Void> ingestDocument(@RequestBody Document document) {
+		LOGGER.debug("ingest document");
+		try {
+			ingestService.ingestDocument(document);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} catch (PcuIndexException e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(path = "/ingest", method = RequestMethod.POST, consumes = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public ResponseEntity<Void> ingestDocument(@RequestBody InputStream document) {
 		LOGGER.debug("ingest document");
 		try {
 			ingestService.ingestDocument(document);

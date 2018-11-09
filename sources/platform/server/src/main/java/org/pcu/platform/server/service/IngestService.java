@@ -1,5 +1,7 @@
 package org.pcu.platform.server.service;
 
+import java.io.InputStream;
+
 import org.pcu.connectors.index.PcuIndexException;
 import org.pcu.platform.Document;
 import org.slf4j.Logger;
@@ -20,9 +22,15 @@ public class IngestService {
 	@Value("${kafka.topic.ingest}")
 	private String ingestTopic;
 
+//	@Autowired
+//	private PcuStorage pcuStorage;
+
 	public void ingestDocument(Document document) throws PcuIndexException {
 		LOGGER.debug("Add document in kafka ingestTopic");
 		kafkaTemplate.send(ingestTopic, document);
 	}
 
+	public void ingestDocument(InputStream document) throws PcuIndexException {
+
+	}
 }

@@ -18,6 +18,7 @@
 		<module>common</module>
 		<module>test-collector-filesystem</module>
 		<module>test-index-es</module>
+		<module>test-storage-vfs2</module>
 		<module>test-platform-es</module>
 	</modules>
 

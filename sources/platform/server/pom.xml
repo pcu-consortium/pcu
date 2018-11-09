@@ -36,6 +36,16 @@
 			<artifactId>pcu-index-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-storage-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-storage-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

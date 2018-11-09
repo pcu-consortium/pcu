@@ -17,5 +17,6 @@
 	<modules>
 		<module>collectors</module>
 		<module>index</module>
+		<module>storage</module>
 	</modules>
 </project>

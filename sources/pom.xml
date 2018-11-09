@@ -180,6 +180,12 @@
 				<version>1.2</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-vfs2</artifactId>
+				<version>2.2</version>
+			</dependency>
+
 			<!-- client -->
 			<dependency>
 				<groupId>io.github.openfeign</groupId>
