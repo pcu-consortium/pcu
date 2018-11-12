@@ -15,15 +15,17 @@ public class PcuDatabaseCollector implements PcuCollector {
 	public void execute(PcuPlatformClient pcuPlatformClient, PcuCollectorConfig config) throws PcuCollectorException {
 		LOGGER.debug("Execution start");
 
-		if (pcuPlatformClient == null) {
-			throw new PcuCollectorException("pcuPlatformClient is mandatory"); 
-		}
+		//if (pcuPlatformClient == null) {
+			
+			//throw new PcuCollectorException("pcuPlatformClient is mandatory"); 
+			
+		//}
 		if (config == null) {
 			throw new PcuCollectorException("config is mandatory");
+			
 		}
 		PcuDatabaseNoroneCollector pcudatabaseNorconexCollector = new PcuDatabaseNoroneCollector();
 		pcudatabaseNorconexCollector.execute(pcuPlatformClient, config);
-
 		LOGGER.debug("Execution end");
 		
 	}

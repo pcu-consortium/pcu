@@ -9,6 +9,10 @@
 	</parent>
 	<artifactId>pcu-collectors-database</artifactId>
 	<packaging>jar</packaging>
+	<properties>
+		<spring.framework>4.3.0.RELEASE</spring.framework>
+		<postgres.version>42.1.4</postgres.version>
+	</properties>
 	
 		<dependencies>
 		<!-- PCU : -->
@@ -22,6 +26,27 @@
 			<artifactId>pcu-collectors-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.framework}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.framework}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.framework}</version>
+		</dependency>
+		<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.6</version>
+</dependency>
+		
 
 		<!-- collectors : -->
 		<dependency>
