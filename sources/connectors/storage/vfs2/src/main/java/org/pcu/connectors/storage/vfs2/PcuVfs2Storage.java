@@ -9,7 +9,9 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.pcu.connectors.storage.PcuStorage;
+import org.pcu.connectors.storage.PcuStorageContainerNotFoundException;
 import org.pcu.connectors.storage.PcuStorageException;
+import org.pcu.connectors.storage.PcuStorageFileNotFoundException;
 
 public class PcuVfs2Storage implements PcuStorage {
 
@@ -64,11 +66,13 @@ public class PcuVfs2Storage implements PcuStorage {
 	}
 
 	@Override
-	public boolean upload(InputStream content, String containerName, String id) throws PcuStorageException {
+	public boolean upload(InputStream content, String containerName, String id)
+			throws PcuStorageContainerNotFoundException, PcuStorageException {
 		try {
 			FileObject container = manager.resolveFile(containerName);
 			if (!container.exists()) {
-				throw new PcuStorageException("Could not upload file in container : container does not exists");
+				throw new PcuStorageContainerNotFoundException(
+						"Could not upload file in container : container does not exists");
 			}
 			FileObject file = container.resolveFile(id);
 			if (file.exists()) {
@@ -101,16 +105,18 @@ public class PcuVfs2Storage implements PcuStorage {
 	}
 
 	@Override
-	public InputStream download(String containerName, String id) throws PcuStorageException {
+	public InputStream download(String containerName, String id)
+			throws PcuStorageContainerNotFoundException, PcuStorageFileNotFoundException, PcuStorageException {
 		try {
-			// TODO Auto-generated method stub
 			FileObject container = manager.resolveFile(containerName);
 			if (!container.exists()) {
-				throw new PcuStorageException("Could not download file from container : container does not exists");
+				throw new PcuStorageContainerNotFoundException(
+						"Could not download file from container : container does not exists");
 			}
 			FileObject file = container.resolveFile(id);
 			if (!file.exists()) {
-				throw new PcuStorageException("Could not download file from container : file does not exists");
+				throw new PcuStorageFileNotFoundException(
+						"Could not download file from container : file does not exists");
 			}
 			FileContent content = file.getContent();
 			return content.getInputStream();
@@ -120,11 +126,13 @@ public class PcuVfs2Storage implements PcuStorage {
 	}
 
 	@Override
-	public boolean delete(String containerName, String id) throws PcuStorageException {
+	public boolean delete(String containerName, String id)
+			throws PcuStorageContainerNotFoundException, PcuStorageException {
 		try {
 			FileObject container = manager.resolveFile(containerName);
 			if (!container.exists()) {
-				throw new PcuStorageException("Could not delete file from container : container does not exists");
+				throw new PcuStorageContainerNotFoundException(
+						"Could not delete file from container : container does not exists");
 			}
 			FileObject file = container.resolveFile(id);
 			if (!file.exists()) {

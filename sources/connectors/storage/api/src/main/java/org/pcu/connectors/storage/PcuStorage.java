@@ -14,10 +14,12 @@ public interface PcuStorage extends AutoCloseable {
 
 	boolean deleteContainer(String containerName) throws PcuStorageException;
 
-	boolean upload(InputStream content, String containerName, String id) throws PcuStorageException;
+	boolean upload(InputStream content, String containerName, String id)
+			throws PcuStorageContainerNotFoundException, PcuStorageException;
 
-	InputStream download(String containerName, String id) throws PcuStorageException;
+	InputStream download(String containerName, String id)
+			throws PcuStorageContainerNotFoundException, PcuStorageFileNotFoundException, PcuStorageException;
 
-	boolean delete(String containerName, String id) throws PcuStorageException;
+	boolean delete(String containerName, String id) throws PcuStorageContainerNotFoundException, PcuStorageException;
 
 }

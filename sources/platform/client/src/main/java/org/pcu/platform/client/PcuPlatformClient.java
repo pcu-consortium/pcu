@@ -1,5 +1,7 @@
 package org.pcu.platform.client;
 
+import java.io.InputStream;
+
 import org.pcu.platform.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,10 +31,14 @@ public interface PcuPlatformClient {
 	@Headers("Content-Type: application/json")
 	void ingest(Document document);
 
+	@RequestLine("POST ingest/{documentId}")
+	@Headers("Content-Type: application/octet-stream")
+	void ingest(@Param("documentId") String documentId, InputStream document);
+
 	@RequestLine("GET indexes/{indexId}/types/{type}/documents/{documentId}")
 	JsonNode getDocument(@Param("indexId") String indexId, @Param("type") String type,
 			@Param("documentId") String documentId);
-	
+
 	@RequestLine("DELETE indexes/{indexId}/types/{type}/documents/{documentId}")
 	void deleteDocument(@Param("indexId") String indexId, @Param("type") String type,
 			@Param("documentId") String documentId);
@@ -43,6 +49,5 @@ public interface PcuPlatformClient {
 		return Feign.builder().decoder(decoder).encoder(encoder).errorDecoder(new PcuPlatformErrorDecoder(decoder))
 				.logger(new Logger.ErrorLogger()).logLevel(Logger.Level.BASIC).target(PcuPlatformClient.class, url);
 	}
-
 
 }

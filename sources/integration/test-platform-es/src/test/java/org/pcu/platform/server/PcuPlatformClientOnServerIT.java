@@ -3,10 +3,14 @@ package org.pcu.platform.server;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.pcu.platform.Document;
@@ -23,19 +27,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformClientOnServerIT-Ingest",
-		"kafka.topic.addDocument=PcuPlatformClientOnServerIT-Ingest", "spring.kafka.consumer.group-id=pcu-platform",
+@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { 
+		"pcu.index.type=ES6",
+		"pcu.index.file=pcuindex.json", 
+		"pcu.storage.type=VFS2",
+		"pcu.storage.file=PcuPlatformClientOnServerIT_pcustorage.json",
+		"ingest.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",
+		"ingest.topic.file=PcuPlatformClientOnServerIT-Ingest-File",
+		"index.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",
+		"spring.kafka.consumer.group-id=pcu-platform", 
 		"spring.kafka.bootstrap-servers=localhost:29092",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
-		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformServerIT-Ingest" }, brokerProperties = {
-		"auto.create.topics.enable=true", "listeners=PLAINTEXT://localhost:29092", "port=29092" })
+		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform",
+		"ingest.container.name.metadata=ingestMetadata",
+		"ingest.container.name.file=ingestFile" }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformClientOnServerIT-Ingest-File",
+		"PcuPlatformClientOnServerIT-Ingest-Metadata" }, brokerProperties = { "auto.create.topics.enable=true",
+				"listeners=PLAINTEXT://localhost:29092", "port=29092" })
 public class PcuPlatformClientOnServerIT {
 
 	@Value("${local.server.port}")
 	int port;
+
+	@BeforeAll
+	private static void beforeAll() {
+		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformClientOnServerIT"));
+	}
+
+	@AfterAll
+	private static void afterAll() {
+		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformClientOnServerIT"));
+	}
 
 	@Test
 	public void testStatus() throws IOException {

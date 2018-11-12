@@ -20,9 +20,9 @@ public class DocumentService {
 	@Autowired
 	private PcuIndex pcuIndex;
 
-	@KafkaListener(topics = "${kafka.topic.addDocument}")
+	@KafkaListener(topics = "${index.topic.metadata}")
 	public void createDocumentFromKafka(ConsumerRecord<String, Document> cr) throws Exception {
-		LOGGER.debug("add document in index from kafka topic");
+		LOGGER.debug("add document in index from pipeline");
 		createDocument(cr.value().getDocument(), cr.value().getIndex(), cr.value().getType(), cr.value().getId());
 	}
 
