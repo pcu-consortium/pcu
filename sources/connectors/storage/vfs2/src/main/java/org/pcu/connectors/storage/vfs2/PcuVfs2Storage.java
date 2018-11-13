@@ -23,7 +23,6 @@ public class PcuVfs2Storage implements PcuStorage {
 		manager.init();
 		baseConnection = builder.getPath();
 		manager.setBaseFile(manager.resolveFile(baseConnection));
-
 	}
 
 	@Override

@@ -8,6 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -35,16 +37,11 @@ import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { 
-		"pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", 
-		"pcu.storage.type=VFS2", 
-		"pcu.storage.file=PcuPlatformServerIT_pcustorage.json",
+@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
+		"pcu.index.file=pcuindex.json", "pcu.storage.type=VFS2", "pcu.storage.file=PcuPlatformServerIT_pcustorage.json",
 		"ingest.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
-		"ingest.topic.file=PcuPlatformServerIT-Ingest-File", 
-		"index.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
-		"spring.kafka.consumer.group-id=pcu-platform", 
-		"spring.kafka.bootstrap-servers=localhost:29093",
+		"ingest.topic.file=PcuPlatformServerIT-Ingest-File", "index.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
+		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:29093",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
 		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform",
@@ -61,17 +58,18 @@ public class PcuPlatformServerIT {
 	private String indexId;
 	private String documentId;
 	private String type;
-	
+
 	@BeforeAll
-	private static void beforeAll() {
+	private static void beforeAll() throws IOException {
 		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformServerIT"));
+		Files.createDirectories(Paths.get("/tmp/PcuPlatformServerIT"));
 	}
 
 	@AfterAll
 	private static void afterAll() {
 		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformServerIT"));
 	}
-	
+
 	@Test
 	public void testStatus() throws IOException {
 		get("/status").then().assertThat().statusCode(HttpStatus.OK.value());

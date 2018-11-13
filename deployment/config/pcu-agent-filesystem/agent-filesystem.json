@@ -1,0 +1,7 @@
+{
+    "collectorId" : "pcu-release-collector-filesystem",
+    "datasourceId" : "pcu-release-datasource-filesystem",
+    "pcuPlatformUrl" : "http://localhost:8080",
+    "norconexfilesystem.config.xml" : "../config/pcu-agent-filesystem/norconex-filesystem-config.xml",
+    "norconexfilesystem.config.variables" : "../config/pcu-agent-filesystem/norconex-filesystem-config.variables"
+}

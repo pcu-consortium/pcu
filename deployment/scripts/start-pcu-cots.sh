@@ -36,20 +36,31 @@ echo "Start kafka : waiting..."
 sleep 30
 
 
-echo "Create Ingest topic in Kafka"
+echo "Create topics in Kafka"
 docker run \
   --net=host \
   --rm confluentinc/cp-kafka:5.0.1 \
-  kafka-topics --create --topic Ingest --partitions 1 --replication-factor 1 \
+  kafka-topics --create --topic Ingest-File --partitions 1 --replication-factor 1 \
   --if-not-exists --zookeeper localhost:2181
 
+docker run \
+  --net=host \
+  --rm confluentinc/cp-kafka:5.0.1 \
+  kafka-topics --create --topic Ingest-Metadata --partitions 1 --replication-factor 1 \
+  --if-not-exists --zookeeper localhost:2181
 
-echo "Check Ingest topic in Kafka"
+echo "Check topics in Kafka"
 docker run \
   --net=host \
   --rm \
   confluentinc/cp-kafka:5.0.1 \
-  kafka-topics --describe --topic Ingest --zookeeper localhost:2181
+  kafka-topics --describe --topic Ingest-File --zookeeper localhost:2181
+
+docker run \
+  --net=host \
+  --rm \
+  confluentinc/cp-kafka:5.0.1 \
+  kafka-topics --describe --topic Ingest-Metadata --zookeeper localhost:2181
 
 echo "Start kafka control center"
 docker run -d \

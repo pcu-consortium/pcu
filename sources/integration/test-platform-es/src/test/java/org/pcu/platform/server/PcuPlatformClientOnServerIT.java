@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -27,16 +29,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { 
-		"pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", 
-		"pcu.storage.type=VFS2",
+@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
+		"pcu.index.file=pcuindex.json", "pcu.storage.type=VFS2",
 		"pcu.storage.file=PcuPlatformClientOnServerIT_pcustorage.json",
 		"ingest.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",
 		"ingest.topic.file=PcuPlatformClientOnServerIT-Ingest-File",
 		"index.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",
-		"spring.kafka.consumer.group-id=pcu-platform", 
-		"spring.kafka.bootstrap-servers=localhost:29092",
+		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:29092",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
 		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform",
@@ -51,8 +50,9 @@ public class PcuPlatformClientOnServerIT {
 	int port;
 
 	@BeforeAll
-	private static void beforeAll() {
+	private static void beforeAll() throws IOException {
 		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformClientOnServerIT"));
+		Files.createDirectories(Paths.get("/tmp/PcuPlatformClientOnServerIT"));
 	}
 
 	@AfterAll
