@@ -20,8 +20,8 @@ public class PcuDatasourceConfiguration {
 		System.out.print("Start database configuration");
 		DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 		driverManagerDataSource.setUrl(url);
-		driverManagerDataSource.setUsername(password);
-		driverManagerDataSource.setPassword(username);
+		driverManagerDataSource.setUsername(username);
+		driverManagerDataSource.setPassword(password);
 		driverManagerDataSource.setDriverClassName(driver);
 		LOGGER.debug("end database configuration");
 		System.out.print("end  database configuration");
