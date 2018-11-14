@@ -4,13 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
 import org.pcu.platform.client.PcuPlatformClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.io.FileUtils;
 
 import com.norconex.collector.core.CollectorConfigLoader;
 import com.norconex.collector.core.crawler.ICrawlerConfig;
@@ -20,6 +19,8 @@ import com.norconex.collector.fs.FilesystemCollectorConfig;
 public class PcuFilesystemNorconexCollector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemNorconexCollector.class);
+
+	public static final String CONFIG_COMMIT_FILE_KEY = "norconexfilesystem.config.commitFiles";
 
 	public static final String EXTERNAL_CONFIG_XML_KEY = "norconexfilesystem.config.xml";
 	public static final String EXTERNAL_CONFIG_VARIABLES_KEY = "norconexfilesystem.config.variables";
@@ -43,7 +44,7 @@ public class PcuFilesystemNorconexCollector {
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
 				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
 					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuPlatformClient(pcuPlatformclient);
-					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setDatasourceId(config.getDatasourceId());
+					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuCollectorConfig(config);
 				}
 			}
 			FilesystemCollector collector = new FilesystemCollector(collectorConfig);

@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -84,6 +85,11 @@ public class PcuPlatformServerIT {
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.CREATED.value());
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
+		byte[] fileContent = Charset.forName("UTF-8").encode("test file").array();
+		
+		given().body(fileContent).contentType(ContentType.BINARY).when().post("/ingest/"+documentId).then().assertThat()
+		.statusCode(HttpStatus.CREATED.value());
+		
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
 		Document createRequest = new Document();

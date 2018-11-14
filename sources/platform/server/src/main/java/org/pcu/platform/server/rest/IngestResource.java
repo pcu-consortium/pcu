@@ -1,6 +1,6 @@
 package org.pcu.platform.server.rest;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 
 import org.pcu.connectors.storage.PcuStorageException;
 import org.pcu.platform.Document;
@@ -33,18 +33,20 @@ public class IngestResource {
 			ingestService.ingestDocument(document);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} catch (PcuPlatformException | PcuStorageException e) {
+			LOGGER.error("ingest metadata document error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@RequestMapping(path = "/ingest/{documentId}", method = RequestMethod.POST, consumes = {
 			MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public ResponseEntity<Void> ingestDocument(@PathVariable String documentId, @RequestBody InputStream document) {
+	public ResponseEntity<Void> ingestDocument(@PathVariable String documentId, @RequestBody byte[] fileContent) {
 		LOGGER.debug("ingest binary document");
 		try {
-			ingestService.ingestDocument(document, documentId);
+			ingestService.ingestDocument(new ByteArrayInputStream(fileContent), documentId);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} catch (PcuPlatformException | PcuStorageException e) {
+			LOGGER.error("ingest binary document error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

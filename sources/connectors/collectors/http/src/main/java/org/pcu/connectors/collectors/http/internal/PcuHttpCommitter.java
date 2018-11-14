@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
 
@@ -25,7 +26,7 @@ public class PcuHttpCommitter implements ICommitter {
 	public static final String DEFAULT_DIRECTORY = "pcu-committer-json";
 
 	private PcuPlatformClient pcuPlatformclient;
-	private String datasourceId;
+	private PcuCollectorConfig pcuCollectorConfig;
 
 	private List<PcuHttpDocument> addJSON = new ArrayList<>();
 	private List<PcuHttpDocument> removeJSON = new ArrayList<>();
@@ -36,7 +37,7 @@ public class PcuHttpCommitter implements ICommitter {
 		try {
 			PcuHttpDocument doc = new PcuHttpDocument();
 
-			doc.setId(DigestUtils.md5Hex(datasourceId + reference));
+			doc.setId(DigestUtils.md5Hex(pcuCollectorConfig.getCollectorId() + reference));
 			doc.setReference(reference);
 			doc.setIndex("documents");
 			doc.setType("document");
@@ -57,7 +58,7 @@ public class PcuHttpCommitter implements ICommitter {
 	public void remove(String reference, Properties metadata) {
 		LOGGER.debug("Remove document with reference " + reference);
 		PcuHttpDocument doc = new PcuHttpDocument();
-		doc.setId(DigestUtils.md5Hex(datasourceId + reference));
+		doc.setId(DigestUtils.md5Hex(pcuCollectorConfig.getCollectorId() + reference));
 		doc.setReference(reference);
 		doc.setIndex("documents");
 		doc.setType("document");
@@ -102,8 +103,8 @@ public class PcuHttpCommitter implements ICommitter {
 		this.pcuPlatformclient = pcuPlatformclient;
 	}
 
-	public void setDatasourceId(String datasourceId) {
-		this.datasourceId = datasourceId;
+	public void setPcuCollectorConfig(PcuCollectorConfig pcuCollectorConfig) {
+		this.pcuCollectorConfig = pcuCollectorConfig;
 	}
 
 }

@@ -43,7 +43,8 @@ public class PcuHttpNorconexCollector {
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
 				if (crawlerConfig.getCommitter() instanceof PcuHttpCommitter) {
 					((PcuHttpCommitter) crawlerConfig.getCommitter()).setPcuPlatformClient(pcuPlatformclient);
-					((PcuHttpCommitter) crawlerConfig.getCommitter()).setDatasourceId(config.getDatasourceId());
+					((PcuHttpCommitter) crawlerConfig.getCommitter()).setPcuCollectorConfig(config);
+					
 				}
 			}
 			HttpCollector collector = new HttpCollector(collectorConfig);

@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
 
@@ -25,7 +26,7 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public static final String DEFAULT_DIRECTORY = "pcu-committer-json";
 
 	private PcuPlatformClient pcuPlatformclient;
-	private String datasourceId;
+	private PcuCollectorConfig pcuCollectorConfig;
 
 	private List<PcuFilesystemDocument> addJSON = new ArrayList<>();
 	private List<PcuFilesystemDocument> removeJSON = new ArrayList<>();
@@ -34,9 +35,15 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void add(String reference, InputStream content, Properties metadata) {
 		LOGGER.debug("Add document with reference " + reference);
 		try {
-			PcuFilesystemDocument doc = new PcuFilesystemDocument();
+			String documentId = DigestUtils.md5Hex(pcuCollectorConfig.getDatasourceId() + reference);
+			if (pcuCollectorConfig.any().containsKey(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY)
+					&& "true".equals(pcuCollectorConfig.any().get(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY))) {
+				byte[] fileContent = content.readAllBytes();
+				pcuPlatformclient.ingest(documentId, fileContent);
+			}
 
-			doc.setId(DigestUtils.md5Hex(datasourceId+reference));
+			PcuFilesystemDocument doc = new PcuFilesystemDocument();
+			doc.setId(documentId);
 			doc.setReference(reference);
 			doc.setIndex("documents");
 			doc.setType("document");
@@ -57,7 +64,7 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void remove(String reference, Properties metadata) {
 		LOGGER.debug("Remove document with reference " + reference);
 		PcuFilesystemDocument doc = new PcuFilesystemDocument();
-		doc.setId(DigestUtils.md5Hex(datasourceId+reference));
+		doc.setId(DigestUtils.md5Hex(pcuCollectorConfig.getDatasourceId() + reference));
 		doc.setReference(reference);
 		doc.setIndex("documents");
 		doc.setType("document");
@@ -69,7 +76,7 @@ public class PcuFilesystemCommitter implements ICommitter {
 
 		LOGGER.debug("Commit documents");
 		LOGGER.info("Commit added documents");
-		
+
 		addJSON.forEach(doc -> {
 			LOGGER.debug("Id: " + doc.getId());
 			LOGGER.debug("Reference: " + doc.getReference());
@@ -101,9 +108,9 @@ public class PcuFilesystemCommitter implements ICommitter {
 	public void setPcuPlatformClient(PcuPlatformClient pcuPlatformclient) {
 		this.pcuPlatformclient = pcuPlatformclient;
 	}
-	
-	public void setDatasourceId(String datasourceId) {
-		this.datasourceId = datasourceId;
+
+	public void setPcuCollectorConfig(PcuCollectorConfig pcuCollectorConfig) {
+		this.pcuCollectorConfig = pcuCollectorConfig;
 	}
 
 }

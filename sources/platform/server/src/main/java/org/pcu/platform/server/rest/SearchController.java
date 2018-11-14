@@ -30,6 +30,7 @@ public class SearchController {
 			JsonNode result = documentService.search(searchQuery);
 			return new ResponseEntity<JsonNode>(result, HttpStatus.OK);
 		} catch (PcuIndexException e) {
+			LOGGER.error("search error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

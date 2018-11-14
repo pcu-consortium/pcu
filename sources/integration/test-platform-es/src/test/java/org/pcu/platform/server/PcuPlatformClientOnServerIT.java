@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -83,7 +84,13 @@ public class PcuPlatformClientOnServerIT {
 		assertThatThrownBy(() -> {
 			pcuPlatformClient.createIndex(indexId);
 		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
-
+		
+		byte[] fileContent = Charset.forName("UTF-8").encode("test file").array();
+		
+		assertThatCode(() -> {
+			pcuPlatformClient.ingest(documentId, fileContent);
+		}).doesNotThrowAnyException();
+		
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
 		Document createRequest = new Document();

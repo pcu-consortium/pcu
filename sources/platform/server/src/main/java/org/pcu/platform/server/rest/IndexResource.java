@@ -28,6 +28,7 @@ public class IndexResource {
 			indexService.createIndex(indexId);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} catch (PcuIndexException e) {
+			LOGGER.error("create index error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -39,6 +40,7 @@ public class IndexResource {
 			indexService.deleteIndex(indexId);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (PcuIndexException e) {
+			LOGGER.error("delete index error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
