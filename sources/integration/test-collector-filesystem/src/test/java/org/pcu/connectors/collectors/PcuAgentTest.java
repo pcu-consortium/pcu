@@ -56,6 +56,7 @@ public class PcuAgentTest {
 		// wiremock stub
 		assertThat(server.isRunning()).isTrue();
 		server.stubFor(post("/ingest").willReturn(ok()));
+		server.stubFor(post(urlPathMatching("/ingest/(.*)")).willReturn(ok()));
 		server.stubFor(delete(urlPathMatching("/indexes/(.*)")).willReturn(noContent()));
 
 		// pcu agent configuration
@@ -73,6 +74,7 @@ public class PcuAgentTest {
 		config.setDatasourceId("datasourceId");
 
 		config.setPcuPlatformUrl(uri);
+		config.set(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY,"true");
 		config.set(PcuFilesystemNorconexCollector.EXTERNAL_CONFIG_XML_KEY, xmlFilePath);
 		config.set(PcuFilesystemNorconexCollector.EXTERNAL_CONFIG_VARIABLES_KEY, variablesFilePath);
 		mapper.writeValue(confFile, config);

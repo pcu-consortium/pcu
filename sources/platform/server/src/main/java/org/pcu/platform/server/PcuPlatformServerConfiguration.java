@@ -6,6 +6,9 @@ import java.io.InputStream;
 import org.pcu.connectors.index.PcuIndex;
 import org.pcu.connectors.index.PcuIndexConfiguration;
 import org.pcu.connectors.index.PcuIndexFactory;
+import org.pcu.connectors.storage.PcuStorage;
+import org.pcu.connectors.storage.PcuStorageConfiguration;
+import org.pcu.connectors.storage.PcuStorageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -50,6 +53,33 @@ public class PcuPlatformServerConfiguration {
 			JsonNode configuration = mapper.readTree(is);
 			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexType, configuration);
 			return PcuIndexFactory.createIndex(pcuIndexConfiguration);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not load configuration");
+		}
+	}
+
+	@Bean
+	public PcuStorage pcuStorage() {
+		try {
+			String pcuStorageType = env.getProperty("pcu.storage.type");
+			String pcuStorageFile = env.getProperty("pcu.storage.file");
+
+			if (pcuStorageType == null) {
+				throw new IllegalArgumentException("pcu.storage.type property is mandatory");
+			}
+			if (pcuStorageFile == null) {
+				throw new IllegalArgumentException("pcu.storage.file property is mandatory");
+			}
+
+			ObjectMapper mapper = new ObjectMapper();
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream(pcuStorageFile);
+			if (is == null) {
+				throw new IllegalArgumentException("Could not find file " + pcuStorageFile);
+			}
+			JsonNode configuration = mapper.readTree(is);
+			PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(pcuStorageType,
+					configuration);
+			return PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration");
 		}

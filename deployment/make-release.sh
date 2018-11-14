@@ -28,28 +28,15 @@ echo -e "${INFO} Generate release folder"
 rm -rf ${RELEASE_FOLDER}
 mkdir ${RELEASE_FOLDER}
 cp -rf ${DEPLOYMENT_FOLDER}/scripts ${RELEASE_FOLDER}/scripts
-cp -rf ${DEPLOYMENT_FOLDER}/config ${RELEASE_FOLDER}/config
 cp -rf ${SOURCES_FOLDER}/provided/dist ${RELEASE_FOLDER}
-cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-filesystem.jar
-cp -rf ${SOURCES_FOLDER}/provided/agent-http-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-http.jar
-cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/pcu-platform-server.jar
+cp -rf ${DEPLOYMENT_FOLDER}/config ${RELEASE_FOLDER}/config
+mkdir ${RELEASE_FOLDER}/data
+mkdir ${RELEASE_FOLDER}/data/storage
+mkdir ${RELEASE_FOLDER}/lib
+cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-filesystem.jar
+cp -rf ${SOURCES_FOLDER}/provided/agent-http-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-http.jar
+cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/lib/pcu-platform-server.jar
+
 
 echo -e "${INFO} PCU entreprise search release : END"
 
-#pushd pcu-entreprise-search-beta
-#cp -rf ../features/connector/target/pcu-features-connector.jar .
-#cp -rf ../features/connector/src/main/resources/*conf .
-#cp -rf ../features/connector/src/main/resources/*groovy .
-#cp -rf ../features/connector/src/main/resources/*yml .
-#cp -rf ../features/connector/src/main/resources/bootstrap .
-#cp -rf ../applications/search/target/pcu-application-search.jar .
-#cp -rf ../applications/search/src/main/resources/*conf .
-#cp -rf ../applications/search/src/main/resources/*groovy .
-#cp -rf ../applications/search/src/main/resources/*yml .
-#cp -rf ../applications/search/src/main/resources/*properties .
-#cp -rf ../../../elasticsearch-5.5.1 .
-#rm -rf elasticsearch-5.5.1/data*
-#rm -rf pcu_store/
-#find . -name "*.log" -exec rm {} \;
-#tar cfz ../pcu-entreprise-search-beta_20171206.tar.gz ../pcu-entreprise-search-beta
-#popd

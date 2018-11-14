@@ -1,4 +1,4 @@
 #!/bin/bash
 
-java -Dlogging.config="../config/logback.xml" \
-    -jar ../pcu-collectors-agent-filesystem.jar ../config/agent-filesystem.json
+java -Dlogging.config="../config/pcu-agent-filesystem/logback.xml" \
+    -jar ../lib/pcu-collectors-agent-filesystem.jar ../config/pcu-agent-filesystem/agent-filesystem.json

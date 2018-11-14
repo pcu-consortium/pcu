@@ -6,11 +6,18 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.post;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,14 +39,18 @@ import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "kafka.topic.ingest=PcuPlatformServerIT-Ingest",
-		"kafka.topic.addDocument=PcuPlatformServerIT-Ingest", "spring.kafka.consumer.group-id=pcu-platform",
-		"spring.kafka.bootstrap-servers=localhost:9092",
+		"pcu.index.file=pcuindex.json", "pcu.storage.type=VFS2", "pcu.storage.file=PcuPlatformServerIT_pcustorage.json",
+		"ingest.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
+		"ingest.topic.file=PcuPlatformServerIT-Ingest-File", "index.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
+		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:29093",
 		"spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer",
 		"spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
-		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform" }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformServerIT-Ingest" }, brokerProperties = {
-		"auto.create.topics.enable=true", "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+		"spring.kafka.consumer.properties.spring.json.trusted.packages=org.pcu.platform",
+		"ingest.container.name.metadata=ingestMetadata",
+		"ingest.container.name.file=ingestFile" }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(partitions = 1, topics = { "PcuPlatformServerIT-Ingest-File",
+		"PcuPlatformServerIT-Ingest-Metadata" }, brokerProperties = { "auto.create.topics.enable=true",
+				"listeners=PLAINTEXT://localhost:29093", "port=29093" })
 public class PcuPlatformServerIT {
 
 	@Value("${local.server.port}")
@@ -48,7 +59,18 @@ public class PcuPlatformServerIT {
 	private String indexId;
 	private String documentId;
 	private String type;
-	
+
+	@BeforeAll
+	private static void beforeAll() throws IOException {
+		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformServerIT"));
+		Files.createDirectories(Paths.get("/tmp/PcuPlatformServerIT"));
+	}
+
+	@AfterAll
+	private static void afterAll() {
+		FileUtils.deleteQuietly(new File("/tmp/PcuPlatformServerIT"));
+	}
+
 	@Test
 	public void testStatus() throws IOException {
 		get("/status").then().assertThat().statusCode(HttpStatus.OK.value());
@@ -63,6 +85,11 @@ public class PcuPlatformServerIT {
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.CREATED.value());
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
+		byte[] fileContent = Charset.forName("UTF-8").encode("test file").array();
+		
+		given().body(fileContent).contentType(ContentType.BINARY).when().post("/ingest/"+documentId).then().assertThat()
+		.statusCode(HttpStatus.CREATED.value());
+		
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
 		Document createRequest = new Document();
@@ -109,7 +136,6 @@ public class PcuPlatformServerIT {
 
 	@BeforeEach
 	public void setUp() {
-
 		RestAssured.port = port;
 		RestAssured.baseURI = "http://localhost";
 

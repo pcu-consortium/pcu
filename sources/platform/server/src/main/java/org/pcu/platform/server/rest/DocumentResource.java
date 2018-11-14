@@ -44,6 +44,7 @@ public class DocumentResource {
 			documentService.deleteDocument(indexId, type, documentId);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (PcuIndexException e) {
+			LOGGER.error("delete document error : {}",e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

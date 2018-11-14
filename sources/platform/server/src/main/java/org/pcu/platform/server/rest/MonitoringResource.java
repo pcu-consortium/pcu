@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MonitoringResource {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringResource.class);
 
 	@Autowired
