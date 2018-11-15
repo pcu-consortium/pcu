@@ -1,13 +1,17 @@
 package org.pcu.platform.server;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -84,13 +88,20 @@ public class PcuPlatformClientOnServerIT {
 		assertThatThrownBy(() -> {
 			pcuPlatformClient.createIndex(indexId);
 		}).isInstanceOf(PcuPlatformClientException.class).hasMessageContaining("500");
-		
-		byte[] fileContent = Charset.forName("UTF-8").encode("test file").array();
-		
+
+		InputStream fileContent = new ByteArrayInputStream(Charset.forName("UTF-8").encode("test file").array());
+
 		assertThatCode(() -> {
 			pcuPlatformClient.ingest(documentId, fileContent);
 		}).doesNotThrowAnyException();
-		
+
+		File fileIngested = new File("/tmp/PcuPlatformClientOnServerIT/ingestFile/" + documentId);
+		assertThat(fileIngested.exists()).isTrue();
+		List<String> lines = Files.readAllLines(Paths.get("/tmp/PcuPlatformClientOnServerIT/ingestFile/" + documentId),
+				Charset.forName("UTF-8"));
+		assertThat(lines.size()).isEqualTo(1);
+		assertThat(lines.get(0)).isEqualTo("test file");
+
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
 		Document createRequest = new Document();

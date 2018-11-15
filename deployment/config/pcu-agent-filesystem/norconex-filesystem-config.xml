@@ -27,6 +27,10 @@
 	<crawlers>
 		<crawler id="${crawlerid}">
 			<maxDocuments>${maxDocuments}</maxDocuments>
+			<postImportProcessors>
+				<processor
+					class="org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemSendFilePostProcessor"></processor>
+			</postImportProcessors>
 		</crawler>
 	</crawlers>
 

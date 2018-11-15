@@ -3,8 +3,6 @@ package org.pcu.connectors.collectors.filesystem.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
@@ -22,25 +20,53 @@ public class PcuFilesystemCommitter implements ICommitter {
 
 	private static final Logger LOGGER = LogManager.getLogger(PcuFilesystemCommitter.class);
 
-	/** Default committer directory */
-	public static final String DEFAULT_DIRECTORY = "pcu-committer-json";
-
 	private PcuPlatformClient pcuPlatformclient;
 	private PcuCollectorConfig pcuCollectorConfig;
 
-	private List<PcuFilesystemDocument> addJSON = new ArrayList<>();
-	private List<PcuFilesystemDocument> removeJSON = new ArrayList<>();
-
 	@Override
 	public void add(String reference, InputStream content, Properties metadata) {
-		LOGGER.debug("Add document with reference " + reference);
+		addDocumentToPcu(reference, content, metadata);
+	}
+
+	@Override
+	public void remove(String reference, Properties metadata) {
+		removeDocumentToPcu(reference, metadata);
+	}
+
+	@Override
+	public void commit() {
+		// nothing to do, yolo
+	}
+
+	private void removeDocumentToPcu(String reference, Properties metadata) {
+		LOGGER.info("Commit remove document with reference " + reference);
+
+		String documentId = DigestUtils.md5Hex(pcuCollectorConfig.getDatasourceId() + reference);
+
+		PcuFilesystemDocument doc = new PcuFilesystemDocument();
+		doc.setId(documentId);
+		doc.setReference(reference);
+		doc.setIndex("documents");
+		doc.setType("document");
+
+		LOGGER.debug("Id: " + doc.getId());
+		LOGGER.debug("Reference: " + doc.getReference());
+		LOGGER.debug("Index: " + doc.getIndex());
+		LOGGER.debug("Type: " + doc.getType());
+
+		Document document = new Document();
+		document.setId(doc.getId());
+		document.setIndex(doc.getIndex());
+		document.setType(doc.getType());
+		pcuPlatformclient.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
+	}
+
+	private void addDocumentToPcu(String reference, InputStream content, Properties metadata) {
+		LOGGER.info("Commit add document with reference " + reference);
+
 		try {
+
 			String documentId = DigestUtils.md5Hex(pcuCollectorConfig.getDatasourceId() + reference);
-			if (pcuCollectorConfig.any().containsKey(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY)
-					&& "true".equals(pcuCollectorConfig.any().get(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY))) {
-				byte[] fileContent = content.readAllBytes();
-				pcuPlatformclient.ingest(documentId, fileContent);
-			}
 
 			PcuFilesystemDocument doc = new PcuFilesystemDocument();
 			doc.setId(documentId);
@@ -52,32 +78,6 @@ public class PcuFilesystemCommitter implements ICommitter {
 			metadata.storeToJSON(writer);
 			doc.setMetadata(new ObjectMapper().readTree(writer.toString()));
 
-			addJSON.add(doc);
-
-		} catch (IOException e) {
-			throw new CommitterException("Cannot create Json document to add for reference: " + reference, e);
-		}
-
-	}
-
-	@Override
-	public void remove(String reference, Properties metadata) {
-		LOGGER.debug("Remove document with reference " + reference);
-		PcuFilesystemDocument doc = new PcuFilesystemDocument();
-		doc.setId(DigestUtils.md5Hex(pcuCollectorConfig.getDatasourceId() + reference));
-		doc.setReference(reference);
-		doc.setIndex("documents");
-		doc.setType("document");
-		removeJSON.add(doc);
-	}
-
-	@Override
-	public void commit() {
-
-		LOGGER.debug("Commit documents");
-		LOGGER.info("Commit added documents");
-
-		addJSON.forEach(doc -> {
 			LOGGER.debug("Id: " + doc.getId());
 			LOGGER.debug("Reference: " + doc.getReference());
 			LOGGER.debug("Index: " + doc.getIndex());
@@ -92,17 +92,9 @@ public class PcuFilesystemCommitter implements ICommitter {
 			document.setType(doc.getType());
 			document.setDocument(doc.getMetadata());
 			pcuPlatformclient.ingest(document);
-		});
-		addJSON.clear();
-		LOGGER.info("Commit removed documents");
-		removeJSON.forEach(doc -> {
-			LOGGER.debug("Id: " + doc.getId());
-			LOGGER.debug("Reference: " + doc.getReference());
-			LOGGER.debug("Index: " + doc.getIndex());
-			LOGGER.debug("Type: " + doc.getType());
-			pcuPlatformclient.deleteDocument(doc.getIndex(), doc.getType(), doc.getId());
-		});
-		removeJSON.clear();
+		} catch (IOException e) {
+			throw new CommitterException("Cannot create Json document to add for reference: " + reference, e);
+		}
 	}
 
 	public void setPcuPlatformClient(PcuPlatformClient pcuPlatformclient) {

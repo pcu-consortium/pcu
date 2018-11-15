@@ -74,7 +74,6 @@ public class PcuAgentTest {
 		config.setDatasourceId("datasourceId");
 
 		config.setPcuPlatformUrl(uri);
-		config.set(PcuFilesystemNorconexCollector.CONFIG_COMMIT_FILE_KEY,"true");
 		config.set(PcuFilesystemNorconexCollector.EXTERNAL_CONFIG_XML_KEY, xmlFilePath);
 		config.set(PcuFilesystemNorconexCollector.EXTERNAL_CONFIG_VARIABLES_KEY, variablesFilePath);
 		mapper.writeValue(confFile, config);

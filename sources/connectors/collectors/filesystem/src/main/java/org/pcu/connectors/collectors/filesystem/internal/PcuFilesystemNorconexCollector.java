@@ -15,12 +15,12 @@ import com.norconex.collector.core.CollectorConfigLoader;
 import com.norconex.collector.core.crawler.ICrawlerConfig;
 import com.norconex.collector.fs.FilesystemCollector;
 import com.norconex.collector.fs.FilesystemCollectorConfig;
+import com.norconex.collector.fs.crawler.FilesystemCrawlerConfig;
+import com.norconex.collector.fs.doc.IFileDocumentProcessor;
 
 public class PcuFilesystemNorconexCollector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PcuFilesystemNorconexCollector.class);
-
-	public static final String CONFIG_COMMIT_FILE_KEY = "norconexfilesystem.config.commitFiles";
 
 	public static final String EXTERNAL_CONFIG_XML_KEY = "norconexfilesystem.config.xml";
 	public static final String EXTERNAL_CONFIG_VARIABLES_KEY = "norconexfilesystem.config.variables";
@@ -42,9 +42,24 @@ public class PcuFilesystemNorconexCollector {
 			}
 
 			for (ICrawlerConfig crawlerConfig : collectorConfig.getCrawlerConfigs()) {
+				// configure commiter
 				if (crawlerConfig.getCommitter() instanceof PcuFilesystemCommitter) {
 					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuPlatformClient(pcuPlatformclient);
 					((PcuFilesystemCommitter) crawlerConfig.getCommitter()).setPcuCollectorConfig(config);
+				}
+				// configure postprocessor
+				if (crawlerConfig instanceof FilesystemCrawlerConfig) {
+					IFileDocumentProcessor[] postProcessors = ((FilesystemCrawlerConfig) crawlerConfig)
+							.getPostImportProcessors();
+					if (postProcessors != null) {
+						for (IFileDocumentProcessor postProcessor : postProcessors) {
+							if (postProcessor instanceof PcuFilesystemSendFilePostProcessor) {
+								((PcuFilesystemSendFilePostProcessor) postProcessor).setPcuPlatformClient(pcuPlatformclient);
+								((PcuFilesystemSendFilePostProcessor) postProcessor).setPcuCollectorConfig(config);
+							}
+						}
+					}
+
 				}
 			}
 			FilesystemCollector collector = new FilesystemCollector(collectorConfig);
