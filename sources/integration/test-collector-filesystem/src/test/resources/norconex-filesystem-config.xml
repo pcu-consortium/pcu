@@ -15,17 +15,20 @@
 
 		<keepDownloads>false</keepDownloads>
 
-		<crawlDataStoreFactory class="${dataStoreFactory}" />
+		<crawlDataStoreFactory
+			class="${dataStoreFactory}" />
 
 		<committer class="${committer}">
 			<directory>${workDir}/crawledFiles</directory>
 		</committer>
-
 	</crawlerDefaults>
-
 
 	<crawlers>
 		<crawler id="${crawlerid}">
+			<postImportProcessors>
+				<processor
+					class="org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemSendFilePostProcessor"></processor>
+			</postImportProcessors>
 		</crawler>
 	</crawlers>
 

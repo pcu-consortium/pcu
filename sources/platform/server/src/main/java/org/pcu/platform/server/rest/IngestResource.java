@@ -1,7 +1,11 @@
 package org.pcu.platform.server.rest;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.pcu.connectors.storage.PcuStorageException;
 import org.pcu.platform.Document;
 import org.pcu.platform.PcuPlatformException;
@@ -40,14 +44,21 @@ public class IngestResource {
 
 	@RequestMapping(path = "/ingest/{documentId}", method = RequestMethod.POST, consumes = {
 			MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public ResponseEntity<Void> ingestDocument(@PathVariable String documentId, @RequestBody byte[] fileContent) {
+	public ResponseEntity<Void> ingestDocument(@PathVariable String documentId, final HttpServletRequest request) {
 		LOGGER.debug("ingest binary document");
-		try {
-			ingestService.ingestDocument(new ByteArrayInputStream(fileContent), documentId);
+
+		try (final InputStream is = getInputStream(request)) {
+			if (is != null) {
+				ingestService.ingestDocument(is, documentId);
+			}
 			return new ResponseEntity<>(HttpStatus.CREATED);
-		} catch (PcuPlatformException | PcuStorageException e) {
+		} catch (PcuPlatformException | PcuStorageException | IOException | FileUploadException e) {
 			LOGGER.error("ingest binary document error : {}", e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	private InputStream getInputStream(final HttpServletRequest request) throws IOException, FileUploadException {
+		return request.getInputStream();
 	}
 }
