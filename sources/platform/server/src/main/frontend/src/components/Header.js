@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logoPCU from "../style/images/logo-no-bg.png"
-import Search from "./Search.js";
+
 
 import {
     Collapse,
@@ -16,55 +16,74 @@ import {
     Button,
     Input
 } from 'reactstrap';
+
 const _navbar = { backgroundColor: '#00517c' };
 const navlink = { color: '#ffffff' };
 const pcuGreenColor = { color: '#8bc34a' }
 class Header extends React.Component {
     constructor(props) {
+        console.log("constructor Header");
         super(props);
 
         this.toggle = this.toggle.bind(this);
         this.state = {
-            makeSearch: false,
-            isOpen: false,
-            searchText: "",
-            request: {},
-            refresh: false,
+            pageContext: {
+                makeSearch: false,
+                isOpen: false,
+                searchText: "",
+                request: {},
+                refresh: false,
+                activeTab: 'home'
+            }
         };
     }
     onSearchTextChange = (e) => {
-        var searchText = e.target.value;
-        console.log("query = " + searchText);
-        this.setState((prevState) => ({ ...prevState, searchText: searchText }));
-        console.log("onSearchTextChange", this.state, e);
-
+        var nextSearchText = e.target.value;
+        let nextPageContext = {
+            ...this.state.pageContext, ...{
+                searchText: nextSearchText
+            }
+        }
+        this.state.pageContext =  nextPageContext;
     }
 
     handleSearchText = () => {
-        console.log("handleSearchText query = " + this.state.searchText);
         var REQUEST = {
             type: "document",
             index: "documents",
             query: {
                 query: {
                     match: {
-                        title: this.state.searchText
+                        title: this.state.pageContext.searchText
                     }
                 },
                 from: 0,
                 size: 10
             }
         }
-        this.setState({
-            request: REQUEST,
-            makeSearch: !this.state.makeSearch,
-            refresh: !this.state.refresh
 
-        });
-    }
-    toggle() {
+        let nextPageContext = {
+            ...this.state.pageContext, ...{
+                request: REQUEST,
+                makeSearch: !this.state.pageContext.makeSearch,
+                refresh: !this.state.pageContext.refresh,
+                activeTab: 'search'
+            }
+        }
         this.setState({
-            isOpen: !this.state.isOpen
+            pageContext: nextPageContext
+        });
+        this.props.changeTab(nextPageContext);
+    }
+
+    toggle() {
+        let nextPageContext = {
+            ...this.state.pageContext, ...{
+                isOpen: !this.state.isOpen
+            }
+        }
+        this.setState({
+            pageContext: nextPageContext
         });
     }
 
@@ -76,8 +95,8 @@ class Header extends React.Component {
                         <img src={logoPCU} alt="LOGO PCU" width="60" /> PCU
                     </NavbarBrand>
                     <NavbarToggler onClick={this.toggle} />
-                    <Collapse isOpen={this.state.isOpen} navbar>
-                        <Nav className="ml-auto" navbar>
+                    <Collapse isOpen={this.state.pageContext.isOpen} navbar>
+                        <Nav className="ml-auto" tabs>
                             <NavItem>
                                 <InputGroup>
                                     <Input placeholder="Search... "
@@ -89,26 +108,17 @@ class Header extends React.Component {
                                 </InputGroup>
                             </NavItem>
                             <NavItem>
-                                <NavLink style={navlink} href="/home/">Home</NavLink>
+                                <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'home' }); }}>Home</NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink style={navlink} href="/search/">Search</NavLink>
+                                <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'search' }); }}>Search</NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink style={navlink} href="/monitoring">Monitoring</NavLink>
+                                <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'monitoring' }); }}>Monitoring</NavLink>
                             </NavItem>
-
                         </Nav>
                     </Collapse>
                 </Navbar>
-                {this.state.makeSearch === true ?
-                    (
-                        <div>
-                            <Search request={this.state.request} refresh={this.state.refresh} />
-                        </div>
-                    ) : (
-                        ''
-                    )}
             </div>
         );
     }

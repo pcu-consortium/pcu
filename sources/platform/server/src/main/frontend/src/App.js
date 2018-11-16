@@ -1,35 +1,38 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { BrowserRouter as Router, Route } from "react-router-dom";
-
-import Home from "./pages/Home.js";
+import Home from "./pages/Page.js";
 import Header from "./components/Header.js";
 import Footer from "./components/Footer.js";
-import Monitoring from './components/Monitoring.js';
-
+import Page from "./pages/Page.js";
 
 class App extends Component {
+  constructor(props) {
+    console.log("constructor App");
+    super(props);
 
+    this.changeTab = this.changeTab.bind(this);
+    this.state = {
+      pageContext: this.props.pageContext
+    };
+  }
+
+
+  changeTab(nextPageContext) {
+    console.log("changeTab", nextPageContext);
+    this.setState({
+      pageContext: nextPageContext
+    })
+  }
 
   render() {
     return (
-      <Router>
-
         <div>
 
-          <Header />
-          <main id="main-content">
-            <Route path="*" component={Home} />
-            <Route path="/home" component={Home} />
-            <Route exact path="/" component={Home} />
-            <Route path="/monitoring" component={Monitoring} />
-
-          </main>
+          <Header changeTab={(pageContext) => this.changeTab(pageContext)} />
+          <Page pageContext={this.state.pageContext}/>
           <Footer />
         </div>
-
-      </Router>
     );
   }
 }
