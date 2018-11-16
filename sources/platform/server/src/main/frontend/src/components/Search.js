@@ -71,12 +71,20 @@ class Search extends React.Component {
             newSize = props.pageContext.request.query.size;
         }
         console.log("newsize",newSize);
-        this.setState({
-            pageContext: props.pageContext,
-            size: newSize,
-            request: newRequest
+        // merge
+        let nextState = {
+            ...this.state, ...{
+                pageContext: props.pageContext,
+                size: newSize,
+                request: newRequest
+            }
+        };
+        this.setState(nextState, function () {
+            this.handleSearch();
         });
-        this.handleSearch();
+        
+        console.log(nextState);
+        
     }
 
     componentWillMount() {
@@ -93,8 +101,9 @@ class Search extends React.Component {
         }
     }
 
+
     handleSearch() {
-        console.log('handle search');
+        console.log('handle search request ', this.state.request);
         axios.post("/search", this.state.request).then(response => {
             this.setState({
                 data: response.data,
@@ -168,7 +177,7 @@ class Search extends React.Component {
                     {totalResults !== 0 ? (
                         <div className="pagination-wrapper">
                             <div style={{ padding: "20px 0px 0px 0px" }}>
-                                <h6 >Query : {this.request.query.query.match.title}</h6>
+                                <h6 >Query : {this.state.request.query.query.match.title}</h6>
                             </div>
                             <span style={styleResultDetail}> {totalResults === 0 ?
                                 (

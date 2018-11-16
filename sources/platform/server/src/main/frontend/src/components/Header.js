@@ -44,10 +44,13 @@ class Header extends React.Component {
                 searchText: nextSearchText
             }
         }
-        this.state.pageContext =  nextPageContext;
+        this.setState({
+            pageContext: nextPageContext
+        })
     }
 
     handleSearchText = () => {
+        console.log("handleSearchText");
         var REQUEST = {
             type: "document",
             index: "documents",
@@ -70,6 +73,7 @@ class Header extends React.Component {
                 activeTab: 'search'
             }
         }
+        console.log("handleSearchText nextPageContext",nextPageContext);
         this.setState({
             pageContext: nextPageContext
         });

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-import Home from "./pages/Page.js";
 import Header from "./components/Header.js";
 import Footer from "./components/Footer.js";
 import Page from "./pages/Page.js";
