@@ -20,6 +20,8 @@ cd ${SOURCES_FOLDER}/provided/agent-filesystem-norconex
 mvn clean install -o -DskipTests
 cd ${SOURCES_FOLDER}/provided/agent-http-norconex
 mvn clean install -o -DskipTests
+cd ${SOURCES_FOLDER}/provided/agent-database-norconex
+mvn clean install -o -DskipTests
 cd ${DEPLOYMENT_FOLDER}
 
 
@@ -35,6 +37,7 @@ mkdir ${RELEASE_FOLDER}/data/storage
 mkdir ${RELEASE_FOLDER}/lib
 cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-filesystem.jar
 cp -rf ${SOURCES_FOLDER}/provided/agent-http-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-http.jar
+cp -rf ${SOURCES_FOLDER}/provided/agent-database-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-database.jar
 cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/lib/pcu-platform-server.jar
 
 

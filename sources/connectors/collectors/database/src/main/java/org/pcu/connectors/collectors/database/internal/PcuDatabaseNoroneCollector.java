@@ -41,48 +41,34 @@ public class PcuDatabaseNoroneCollector {
 			String typequery = other.get("typequery");
 			String query = other.get("query");
 			JSONArray listjsonobject = new JSONArray();
-			if (url != null && password != null && driver != null && username != null) {
+			if (url == null || password == null || driver == null || username == null) {
+				throw new PcuCollectorException("Collector configuration could not be instanciated");
+			} else {
 				PcuDatasourceConfiguration pcudatasourceconfiguration = new PcuDatasourceConfiguration();
 				DataSource datasource = pcudatasourceconfiguration.dataSource(url, password, username, driver);
 				Statement statement = datasource.getConnection().createStatement();
-				
-				if (typequery.toLowerCase().equals("select")) {
-					
-					ResultSet rs = statement.executeQuery(query);
-					ResultSetMetaData resultMeta = rs.getMetaData();
-					while (rs.next()) {
-						JSONObject json = new JSONObject();
-						for (int i = 1; i <= resultMeta.getColumnCount(); i++) {
-							Object obj = rs.getObject(i);
-							if (obj == null) {
-								json.put(resultMeta.getColumnName(i), "null");
-							} 
-							else 
-							{
-								json.put(resultMeta.getColumnName(i), obj.toString());
-							}
-						}
-						listjsonobject.put(json);
-					                   }
-				} 
-				else 
-				{
 
-					int rs = statement.executeUpdate(query);
+				ResultSet rs = statement.executeQuery(query);
+				ResultSetMetaData resultMeta = rs.getMetaData();
+				while (rs.next()) {
 					JSONObject json = new JSONObject();
-					json.put("response", rs);
+					for (int i = 1; i <= resultMeta.getColumnCount(); i++) {
+						Object obj = rs.getObject(i);
+						if (obj == null) {
+							json.put(resultMeta.getColumnName(i), "null");
+						} else {
+							json.put(resultMeta.getColumnName(i), obj.toString());
+						}
+					}
 					listjsonobject.put(json);
 				}
+
 				ObjectMapper objectMapper = new ObjectMapper();
 				JsonNode jsonNode = objectMapper.readTree(listjsonobject.toString());
 				System.out.print(jsonNode);
 				document.setDocument(jsonNode);
 				pcuPlatformclient.ingest(document);
 
-			} 
-			else
-			{
-				throw new PcuCollectorException("Collector configuration could not be instanciated");
 			}
 
 		} catch (Exception e) {
