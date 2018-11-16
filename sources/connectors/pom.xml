@@ -16,6 +16,6 @@
 		<module>collectors</module>
 		<module>index</module>
 		<module>storage</module>
-		<module>pcu-collectors-database</module>
+		
 	</modules>
 </project>
