@@ -8,6 +8,7 @@ import {
     TabContent,
     TabPane
 } from 'reactstrap';
+import Home from '../components/Home.js';
 
 class Page extends Component {
     constructor(props) {
@@ -38,7 +39,7 @@ class Page extends Component {
             <main id="main-content">
                 <TabContent activeTab={this.state.pageContext.activeTab}>
                     <TabPane tabId="home">
-                        <div>Home</div>
+                        <Home/>
                     </TabPane>
                     <TabPane tabId="search">
                         <Search pageContext={this.state.pageContext}/>

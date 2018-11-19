@@ -18,8 +18,9 @@ import {
 } from 'reactstrap';
 
 const _navbar = { backgroundColor: '#00517c' };
-const navlink = { color: '#ffffff' };
+const navlink = { color: '#ffffff', border: "0px" };
 const pcuGreenColor = { color: '#8bc34a' }
+const tabsStyle = {borderBottom: "1px solid #00517c"}
 class Header extends React.Component {
     constructor(props) {
         console.log("constructor Header");
@@ -83,7 +84,7 @@ class Header extends React.Component {
     toggle() {
         let nextPageContext = {
             ...this.state.pageContext, ...{
-                isOpen: !this.state.isOpen
+                isOpen: !this.state.pageContext.isOpen
             }
         }
         this.setState({
@@ -100,14 +101,14 @@ class Header extends React.Component {
                     </NavbarBrand>
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.pageContext.isOpen} navbar>
-                        <Nav className="ml-auto" tabs>
+                        <Nav className="ml-auto" tabs style={tabsStyle}>
                             <NavItem>
                                 <InputGroup>
                                     <Input placeholder="Search... "
                                         onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"
                                         onKeyPress={e => { if (e.key === 'Enter') { this.handleSearchText() } }} />
                                     <InputGroupAddon addonType="append">
-                                        <Button color="light" onClick={this.handleSearchText}> Search</Button>
+                                        <Button color="light" onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log("") ) }> Search</Button>
                                     </InputGroupAddon>
                                 </InputGroup>
                             </NavItem>
@@ -115,7 +116,7 @@ class Header extends React.Component {
                                 <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'home' }); }}>Home</NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'search' }); }}>Search</NavLink>
+                                <NavLink style={navlink} href="#" onClick={() => { this.state.pageContext.searchText === '' ? (this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'search' })) : (this.handleSearchText()) }}>Search</NavLink>
                             </NavItem>
                             <NavItem>
                                 <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'monitoring' }); }}>Monitoring</NavLink>

@@ -21,7 +21,7 @@ class Search extends React.Component {
         super(props);
         this.handleSearch = this.handleSearch.bind(this);
         this.changeNumberPage = this.changeNumberPage.bind(this);
-        
+
         this.state = {
             currentPage: 0,
             indexOfFirstSlice: 0,
@@ -70,7 +70,7 @@ class Search extends React.Component {
         if (props.pageContext && props.pageContext.request && props.pageContext.request.query) {
             newSize = props.pageContext.request.query.size;
         }
-        console.log("newsize",newSize);
+        console.log("newsize", newSize);
         // merge
         let nextState = {
             ...this.state, ...{
@@ -82,9 +82,9 @@ class Search extends React.Component {
         this.setState(nextState, function () {
             this.handleSearch();
         });
-        
+
         console.log(nextState);
-        
+
     }
 
     componentWillMount() {
@@ -103,22 +103,23 @@ class Search extends React.Component {
 
 
     handleSearch() {
-        console.log('handle search request ', this.state.request);
-        axios.post("/search", this.state.request).then(response => {
-            this.setState({
-                data: response.data,
-                total: response.data.hits.total,
-                request: this.state.request,
-                makeSearch: true
-            })
-            console.log("data");
-            console.log(this.state.data);
-            this.render();
-        }).catch(error => {
-            console.log("error", error);
-            this.render();
-        });
-
+        if (this.props.pageContext.activeTab === 'search' && this.state.request !== undefined) {
+            console.log('handle search request ', this.state.request);
+            axios.post("/search", this.state.request).then(response => {
+                this.setState({
+                    data: response.data,
+                    total: response.data.hits.total,
+                    request: this.state.request,
+                    makeSearch: true
+                })
+                console.log("data");
+                console.log(this.state.data);
+                this.render();
+            }).catch(error => {
+                console.log("error", error);
+                this.render();
+            });
+        }
     }
     getTitle() {
         if (this.props.pageContext.request && this.props.pageContext.request.query && this.request.query.query && this.request.query.query.match && this.request.query.query.match) {
