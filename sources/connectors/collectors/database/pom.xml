@@ -15,6 +15,7 @@
 	</properties>
 	
 		<dependencies>
+	
 		<!-- PCU : -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -26,27 +27,38 @@
 			<artifactId>pcu-collectors-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- collectors : -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${spring.framework}</version>
+			<groupId>com.norconex.collectors</groupId>
+			<artifactId>norconex-collector-filesystem</artifactId>
+			<version>2.8.0</version>
 		</dependency>
-		<dependency>
+
+	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.framework}</version>
+			<version>5.0.6.RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>5.1.2.RELEASE</version>
+		</dependency>
+
+		<!-- Spring JDBC Support -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.framework}</version>
+			<version>5.1.2.RELEASE</version>
 		</dependency>
 		<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>5.1.6</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.json/json -->
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.0.5</version>
+		</dependency>
+		
+
 <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
@@ -54,12 +66,7 @@
 </dependency>
 		
 
-		<!-- collectors : -->
-		<dependency>
-			<groupId>com.norconex.collectors</groupId>
-			<artifactId>norconex-collector-http</artifactId>
-			<version>2.8.1</version>
-		</dependency>
+	
 
 	</dependencies>
 </project>

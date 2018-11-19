@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
 import org.pcu.platform.Document;
 import org.pcu.platform.client.PcuPlatformClient;
