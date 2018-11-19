@@ -1,0 +1,17 @@
+.cardText {
+    color: #8bc34a ;
+    font-size: 36px;
+}
+.cardSmallText{
+    color: #8bc34a ;
+    font-size: 18px;
+}
+#logo {
+    display:table-cell;
+    vertical-align:middle;
+    
+}
+#logo img {
+    max-height:100%;
+    max-width:100%;
+}

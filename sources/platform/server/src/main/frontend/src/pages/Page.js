@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Monitoring from '../components/Monitoring.js';
 import Search from '../components/Search.js';
 
@@ -17,7 +18,7 @@ class Page extends Component {
 
         this.state = {
             pageContext: {
-                activeTab:'home'
+                activeTab: 'home'
             }
         };
     }
@@ -39,10 +40,10 @@ class Page extends Component {
             <main id="main-content">
                 <TabContent activeTab={this.state.pageContext.activeTab}>
                     <TabPane tabId="home">
-                        <Home/>
+                        <Home />
                     </TabPane>
                     <TabPane tabId="search">
-                        <Search pageContext={this.state.pageContext}/>
+                        <Search pageContext={this.state.pageContext} />
                     </TabPane>
                     <TabPane tabId="monitoring">
                         <Monitoring />
