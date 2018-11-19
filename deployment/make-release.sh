@@ -37,7 +37,8 @@ mkdir ${RELEASE_FOLDER}/data/storage
 mkdir ${RELEASE_FOLDER}/lib
 cp -rf ${SOURCES_FOLDER}/provided/agent-filesystem-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-filesystem.jar
 cp -rf ${SOURCES_FOLDER}/provided/agent-http-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-http.jar
-cp -rf ${SOURCES_FOLDER}/provided/agent-database-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/pcu-collectors-agent-database.jar
+cp -rf ${SOURCES_FOLDER}/provided/agent-database-norconex/target/pcu-collectors-agent-jar-with-dependencies.jar ${RELEASE_FOLDER}/lib/pcu-collectors-agent-database.jar
+cp -rf ${SOURCES_FOLDER}/integration/test-collector-database/target/test-collector-database-0.1.0-SNAPSHOT.jar ${RELEASE_FOLDER}/lib/test-collector-database.jar
 cp -rf ${SOURCES_FOLDER}/platform/server/target/pcu-platform-server-exec.jar ${RELEASE_FOLDER}/lib/pcu-platform-server.jar
 
 

@@ -1,6 +1,6 @@
 {
     "collectorId" : "pcu-release-collector-database",
     "datasourceId" : "pcu-release-datasource-database",
-    "pcuPlatformUrl" : "http://localhost:8080",
+    "pcuPlatformUrl" : "http://localhost:8080"
  
 }

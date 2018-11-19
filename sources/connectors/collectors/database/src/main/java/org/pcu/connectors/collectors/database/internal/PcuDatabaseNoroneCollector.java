@@ -34,6 +34,13 @@ public class PcuDatabaseNoroneCollector {
 			Map<String, String> other = new HashMap<String, String>();
 			Document document = new Document();
 			other = config.any();
+			config.set("username", "jague");
+			config.set("driver", "com.mysql.jdbc.Driver");
+			config.set("password", "123");
+			config.set("typequery", "select");
+			//config.set("query", "insert into  tutorial (id,name) values (4,'mysql') ");
+			config.set("query", "select * from tutorial ");
+			config.set("url", "jdbc:mysql://localhost/testdatabase1");
 			String url = other.get("url");
 			String password = other.get("password");
 			String driver = other.get("driver");
