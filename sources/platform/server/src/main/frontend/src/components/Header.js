@@ -1,8 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logoPCU from "../style/images/logo-no-bg.png"
-
-
 import {
     Collapse,
     Navbar,
@@ -20,13 +18,10 @@ import {
 const _navbar = { backgroundColor: '#00517c' };
 const navlink = { color: '#ffffff', border: "0px" };
 const pcuGreenColor = { color: '#8bc34a' }
-const tabsStyle = {borderBottom: "1px solid #00517c"}
+const tabsStyle = { borderBottom: "1px solid #00517c" }
 class Header extends React.Component {
     constructor(props) {
-        console.log("constructor Header");
         super(props);
-
-        this.toggle = this.toggle.bind(this);
         this.state = {
             pageContext: {
                 makeSearch: false,
@@ -37,6 +32,7 @@ class Header extends React.Component {
                 activeTab: 'home'
             }
         };
+        this.toggle = this.toggle.bind(this);
     }
     onSearchTextChange = (e) => {
         var nextSearchText = e.target.value;
@@ -51,7 +47,6 @@ class Header extends React.Component {
     }
 
     handleSearchText = () => {
-        console.log("handleSearchText");
         var REQUEST = {
             type: "document",
             index: "documents",
@@ -74,7 +69,6 @@ class Header extends React.Component {
                 activeTab: 'search'
             }
         }
-        console.log("handleSearchText nextPageContext",nextPageContext);
         this.setState({
             pageContext: nextPageContext
         });
@@ -108,7 +102,7 @@ class Header extends React.Component {
                                         onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"
                                         onKeyPress={e => { if (e.key === 'Enter') { this.handleSearchText() } }} />
                                     <InputGroupAddon addonType="append">
-                                        <Button color="light" onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log("") ) }> Search</Button>
+                                        <Button color="light" onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log(""))}> Search</Button>
                                     </InputGroupAddon>
                                 </InputGroup>
                             </NavItem>

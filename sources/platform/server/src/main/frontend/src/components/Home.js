@@ -10,12 +10,16 @@ import speedometer from "../style/images/speedometer-128.png"
 
 
 import {
-    Card, CardText, CardTitle, Button, CardImg, CardImgOverlay, Row, Col, Container, CardGroup, CardSubtitle, CardBody
+    Card,
+    CardText,
+    CardTitle,
+    CardImg,
+    CardImgOverlay,
+    Container,
+    CardGroup,
+    CardBody,
+    Row
 } from 'reactstrap';
-const HomeOverlay = {
-    textAlign: "center",
-    padding: "0rem"
-}
 
 class Home extends React.Component {
 
@@ -23,7 +27,7 @@ class Home extends React.Component {
         return (
             <div>
                 <div style={{ backgroundColor: "rgba(0, 0, 0, 0.66)" }}>
-                    <Card inverse >
+                    <Card inverse style={{ border: "0px solid rgba(0, 0, 0, .125)" }} >
                         <CardImg width="100%" src={neurons} alt="Card image cap" />
                         <CardImgOverlay style={{ backgroundColor: "rgba(0, 0, 0, 0.66)", textAlign: "center" }}>
                             <img src={logoPCU} alt="LOGO PCU" width="12%" />
@@ -33,32 +37,30 @@ class Home extends React.Component {
                     </Card>
                 </div>
                 <Container fluid style={{ lineHeight: '32px' }}>
+                    <Row style={{ textAlign: "center" }}>
+                        Use Cases
+                    </Row>
                     <CardGroup >
-                        <Card style={{ border: "0" }}>
-                            <CardImg style={{ width: "40%", borderRadius: "50%" }} width="10 % " src={organization} alt="Card image cap" />
+                        <Card style={{ border: "0", marginLeft: "10%" }}>
+                            <CardImg style={{ width: "30%" }} src={organization} alt="Card image cap" />
                             < CardBody >
-                                <CardTitle>Card title</CardTitle>
-                                <CardSubtitle>Card subtitle</CardSubtitle>
-                                <CardText>This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</CardText>
-                                <Button>Button</Button>
+                                <CardTitle>Enterprise Search</CardTitle>
+                                <CardText>Centralise your search across your enterprise securely.</CardText>
+                            </CardBody>
+                        </Card>
+
+                        <Card style={{ border: "0", marginLeft: "10%" }}>
+                            <CardImg style={{ width: "30%" }} src={shoppingCart} alt="Card image cap" />
+                            <CardBody>
+                                <CardTitle>E-Commerce</CardTitle>
+                                <CardText>Optimize search on your product catalog.</CardText>
                             </CardBody>
                         </Card>
                         <Card style={{ border: "0" }}>
-                            <CardImg style={{ width: "40%" }} src={shoppingCart} alt="Card image cap" />
+                            <CardImg style={{ width: "30%" }} src={speedometer} alt="Card image cap" />
                             <CardBody>
-                                <CardTitle>Card title</CardTitle>
-                                <CardSubtitle>Card subtitle</CardSubtitle>
-                                <CardText>This card has supporting text below as a natural lead-in to additional content.</CardText>
-                                <Button>Button</Button>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}>
-                            <CardImg style={{ width: "40%" }} src={speedometer} alt="Card image cap" />
-                            <CardBody>
-                                <CardTitle>Card title</CardTitle>
-                                <CardSubtitle>Card subtitle</CardSubtitle>
-                                <CardText>This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</CardText>
-                                <Button>Button</Button>
+                                <CardTitle>Customer Insights</CardTitle>
+                                <CardText>Check your customer satisfaction.</CardText>
                             </CardBody>
                         </Card>
                     </CardGroup>

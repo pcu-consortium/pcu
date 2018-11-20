@@ -6,7 +6,6 @@ import Page from "./pages/Page.js";
 
 class App extends Component {
   constructor(props) {
-    console.log("constructor App");
     super(props);
 
     this.changeTab = this.changeTab.bind(this);
@@ -17,7 +16,6 @@ class App extends Component {
 
 
   changeTab(nextPageContext) {
-    console.log("changeTab", nextPageContext);
     this.setState({
       pageContext: nextPageContext
     })
@@ -25,12 +23,11 @@ class App extends Component {
 
   render() {
     return (
-        <div>
-
-          <Header changeTab={(pageContext) => this.changeTab(pageContext)} />
-          <Page pageContext={this.state.pageContext}/>
-          <Footer />
-        </div>
+      <div>
+        <Header changeTab={(pageContext) => this.changeTab(pageContext)} />
+        <Page pageContext={this.state.pageContext} />
+        <Footer />
+      </div>
     );
   }
 }
