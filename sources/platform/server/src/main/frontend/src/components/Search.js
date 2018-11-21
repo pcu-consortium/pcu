@@ -139,9 +139,11 @@ class Search extends React.Component {
                 return (
                     <Row key={index}>
                         <Jumbotron style={jumbotron} className="shadow">
-                            <h4 className="display-6">{data._source.title}</h4>
+                            <h4 className="display-6" style={{ cursor: "pointer" }} onClick={() => window.open(data._source['Content-Location'], "_blank")}>{data._source.title}</h4>
                             <p className="lead">{data._source.title}</p>
-                            <a style={{ width: "100%", overflow: "auto", color: "#337ab7" }} href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
+                            <div style={{ width: "100%", overflow: "auto" }}>
+                                <a target="_blank" rel="noopener noreferrer" style={{ color: "#337ab7" }} href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
+                            </div>
                             <hr className="my-1" />
                         </Jumbotron>
                     </Row>
@@ -165,7 +167,7 @@ class Search extends React.Component {
                             }
                             </span>
                             <Row>
-                                <Col xs="10" style={{ width: "100%", overflow: "auto" }} >
+                                <Col xs="9" style={{ width: "100%", overflow: "auto" }} >
                                     <Pagination aria-label="Page navigation example">
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
@@ -192,7 +194,7 @@ class Search extends React.Component {
                                         </PaginationItem>
                                     </Pagination>
                                 </Col>
-                                <Col xs="2">
+                                <Col xs="3">
                                     <Input type="select" name="select" onChange={this.changeNumberPage} >
                                         <option value="10">10</option>
                                         <option value="20">20</option>

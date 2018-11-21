@@ -9,6 +9,7 @@ import shoppingCart from "../style/images/shopping-cart-filled-128.png"
 import speedometer from "../style/images/speedometer-128.png"
 
 
+
 import {
     Card,
     CardText,
@@ -17,8 +18,7 @@ import {
     CardImgOverlay,
     Container,
     CardGroup,
-    CardBody,
-    Row
+    CardBody
 } from 'reactstrap';
 
 class Home extends React.Component {
@@ -26,46 +26,54 @@ class Home extends React.Component {
     render() {
         return (
             <div>
-                <div style={{ backgroundColor: "rgba(0, 0, 0, 0.66)" }}>
-                    <Card inverse style={{ border: "0px solid rgba(0, 0, 0, .125)" }} >
-                        <CardImg width="100%" src={neurons} alt="Card image cap" />
+                <div className="main_container">
+                    <Card inverse>
+                        <CardImg className="imgResponsive" src={neurons} alt="Card image cap" />
                         <CardImgOverlay style={{ backgroundColor: "rgba(0, 0, 0, 0.66)", textAlign: "center" }}>
-                            <img src={logoPCU} alt="LOGO PCU" width="12%" />
+                            <img src={logoPCU} alt="LOGO PCU" width="20%" />
                             <CardText className="cardText">Unified Knowledge Platform</CardText>
                             <CardText className="cardSmallText">Open Source Search framework for everyone.</CardText>
                         </CardImgOverlay>
                     </Card>
                 </div>
-                <Container fluid style={{ lineHeight: '32px' }}>
-                    <Row style={{ textAlign: "center" }}>
+                <Container fluid>
+                    <div style={{ textAlign: "center", margin: "2% 0% 4% 0%", color: "#00517c", fontSize: "30pt" }}>
                         Use Cases
-                    </Row>
-                    <CardGroup >
-                        <Card style={{ border: "0", marginLeft: "10%" }}>
+                        <h6 style={{ color: "#777777" }}>One search framework to rule them all.</h6>
+                    </div>
+                    <CardGroup style={{ marginLeft: "10%" }} >
+                        <Card style={{ border: "0" }}>
                             <CardImg style={{ width: "30%" }} src={organization} alt="Card image cap" />
-                            < CardBody >
+                            < CardBody style={{ padding: "10px 0px" }}>
                                 <CardTitle>Enterprise Search</CardTitle>
                                 <CardText>Centralise your search across your enterprise securely.</CardText>
                             </CardBody>
                         </Card>
 
-                        <Card style={{ border: "0", marginLeft: "10%" }}>
+                        <Card style={{ border: "0" }}>
                             <CardImg style={{ width: "30%" }} src={shoppingCart} alt="Card image cap" />
-                            <CardBody>
+                            <CardBody style={{ padding: "10px 0px" }}>
                                 <CardTitle>E-Commerce</CardTitle>
                                 <CardText>Optimize search on your product catalog.</CardText>
                             </CardBody>
                         </Card>
                         <Card style={{ border: "0" }}>
                             <CardImg style={{ width: "30%" }} src={speedometer} alt="Card image cap" />
-                            <CardBody>
+                            <CardBody style={{ padding: "10px 0px" }}>
                                 <CardTitle>Customer Insights</CardTitle>
                                 <CardText>Check your customer satisfaction.</CardText>
                             </CardBody>
                         </Card>
                     </CardGroup>
                 </Container>
-            </div>
+
+                <Container fluid style={{ backgroundColor: "#eee" }}>
+                    <div style={{ textAlign: "center", margin: "2% 0% 4% 0%", color: "#00517c", fontSize: "30pt" }}>
+                        Partners
+                        <h6 style={{ color: "#777777" }}>United we stand, divided we fall.</h6>
+                    </div>
+                </Container>
+            </div >
         )
     }
 }
