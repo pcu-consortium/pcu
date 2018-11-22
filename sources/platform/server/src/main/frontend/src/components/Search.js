@@ -17,7 +17,6 @@ const jumbotron = { backgroundColor: 'rgba(243, 243, 243, 0.8)', padding: 0, wid
 const styleResultDetail = { color: 'rgba(120, 120, 120, 0.40)' };
 class Search extends React.Component {
     constructor(props) {
-        console.log('constructor Search');
         super(props);
         this.handleSearch = this.handleSearch.bind(this);
         this.changeNumberPage = this.changeNumberPage.bind(this);
@@ -30,47 +29,35 @@ class Search extends React.Component {
             request: {}
         };
 
-        console.log("constructor this.state", this.state);
-        console.log("constructor this.props", this.props);
     }
 
 
     handleClick(e, index) {
-        console.log('handle click');
         e.preventDefault();
-        console.log("index =  " + index)
-        console.log("currentPage =  " + this.state.currentPage)
         let nextPage = index;
         let nextIndexOfFirstSlice = nextPage * this.state.request.query.size;
-        console.log("nextIndexOfFirstSlice = " + nextIndexOfFirstSlice);
         let nextIndexOfLastSlice = (nextPage + 1) * this.state.request.query.size;
-        console.log("nextIndexOfLastSlice = " + nextIndexOfLastSlice);
         let nextRequest = this.state.request;
         nextRequest.query.from = nextIndexOfFirstSlice;
-        console.log("nextRequest = ", nextRequest);
         this.setState({
             currentPage: nextPage,
             indexOfFirstSlice: nextIndexOfFirstSlice,
             indexOfLastSlice: nextIndexOfLastSlice,
             request: nextRequest
         });
-        console.log('handle search update');
         this.handleSearch();
     }
 
     componentWillReceiveProps(props) {
-        console.log("componentWillReceiveProps", props.pageContext);
 
         let newRequest = {};
         if (props.pageContext) {
             newRequest = props.pageContext.request;
         }
-        console.log("newRequest", newRequest);
         let newSize = 0;
         if (props.pageContext && props.pageContext.request && props.pageContext.request.query) {
             newSize = props.pageContext.request.query.size;
         }
-        console.log("newsize", newSize);
         // merge
         let nextState = {
             ...this.state, ...{
@@ -82,14 +69,10 @@ class Search extends React.Component {
         this.setState(nextState, function () {
             this.handleSearch();
         });
-
-        console.log(nextState);
-
     }
 
     componentWillMount() {
         if (this.props.pageContext && this.props.pageContext.request) {
-            console.log('Search Component Will Mount');
             axios.post("/search", this.state.request).then(response => {
                 this.setState({
                     data: response.data,
@@ -101,10 +84,8 @@ class Search extends React.Component {
         }
     }
 
-
     handleSearch() {
         if (this.props.pageContext.activeTab === 'search' && this.state.request !== undefined) {
-            console.log('handle search request ', this.state.request);
             axios.post("/search", this.state.request).then(response => {
                 this.setState({
                     data: response.data,
@@ -112,8 +93,6 @@ class Search extends React.Component {
                     request: this.state.request,
                     makeSearch: true
                 })
-                console.log("data");
-                console.log(this.state.data);
                 this.render();
             }).catch(error => {
                 console.log("error", error);
@@ -129,9 +108,6 @@ class Search extends React.Component {
         }
     }
 
-    display(renderSlice) {
-        console.log("currentSlice", renderSlice);
-    }
     changeNumberPage(e) {
         let changeRequest = this.state.request;
         changeRequest.query.size = Number(e.target.value);
@@ -163,9 +139,11 @@ class Search extends React.Component {
                 return (
                     <Row key={index}>
                         <Jumbotron style={jumbotron} className="shadow">
-                            <h4 className="display-6">{data._source.title}</h4>
+                            <h4 className="display-6" style={{ cursor: "pointer" }} onClick={() => window.open(data._source['Content-Location'], "_blank")}>{data._source.title}</h4>
                             <p className="lead">{data._source.title}</p>
-                            <a href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
+                            <div style={{ width: "100%", overflow: "auto" }}>
+                                <a target="_blank" rel="noopener noreferrer" style={{ color: "#337ab7" }} href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
+                            </div>
                             <hr className="my-1" />
                         </Jumbotron>
                     </Row>
@@ -184,12 +162,12 @@ class Search extends React.Component {
                                 (
                                     <Alert color="warning">
                                         No Result Found
-                        </Alert>
+                                    </Alert>
                                 ) : ("Results :" + (indexOfFirstSlice + 1) + "-" + (indexOfLastSlice < totalResults ? indexOfLastSlice : totalResults) + " of " + totalResults + " , Search took " + this.state.data.took + "ms.")
                             }
                             </span>
                             <Row>
-                                <Col xs="10">
+                                <Col xs="9" style={{ width: "100%", overflow: "auto" }} >
                                     <Pagination aria-label="Page navigation example">
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
@@ -206,6 +184,7 @@ class Search extends React.Component {
                                                 </PaginationLink>
                                             </PaginationItem>
                                         )}
+
                                         <PaginationItem disabled={currentPage >= pagesCount - 1}>
                                             <PaginationLink
                                                 onClick={e => this.handleClick(e, currentPage + 1)}
@@ -215,7 +194,7 @@ class Search extends React.Component {
                                         </PaginationItem>
                                     </Pagination>
                                 </Col>
-                                <Col xs="2">
+                                <Col xs="3">
                                     <Input type="select" name="select" onChange={this.changeNumberPage} >
                                         <option value="10">10</option>
                                         <option value="20">20</option>
@@ -232,7 +211,7 @@ class Search extends React.Component {
                                 </div >
                                 <div className="pagination-wrapper">
 
-                                    <Pagination aria-label="Page navigation example">
+                                    <Pagination aria-label="Page navigation example" style={{ width: "100%", overflow: "auto" }}>
 
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
@@ -261,7 +240,11 @@ class Search extends React.Component {
                                 </div>
                             </Fragment>
                         </div>
-                    ) : ('')
+                    ) : (
+                            <Alert color="warning">
+                                No Result Found
+                            </Alert>
+                        )
                     }
 
                 </section >
