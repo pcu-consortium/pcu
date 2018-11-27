@@ -17,14 +17,14 @@ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name elas
 echo "start mysql 5.6 container"
 
 
-docker run -d --name mysql-server-pcu \
+docker run -d --net=host -p 3306:3306  --name mysql-server-pcu \
 -v /storage/mysql-server-pcu/datadir:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123 \
 severalnines/mysql-pxb:5.6
 
 
 echo "create database pour test  "
-docker exec -it mysql-server-pcu  mysql -uroot -p123 -e "create database testdatabase ;
+docker exec -it mysql-server-pcu  mysql -uroot -p123 -e "  DROP DATABASE  testdatabase; create database testdatabase ;
 
 use testdatabase ;
 
@@ -48,7 +48,7 @@ echo "Start kafka"
 docker run -d \
     --net=host \
     --name=kafka \
-    -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 \²
+    -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 \
     -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
     -e KAFKA_BROKER_ID=2 \
     -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
