@@ -6,9 +6,8 @@ ERROR='[\033[0;32mPCU\033[0m][\033[0;31mERROR\033[0m]'
 
 echo -e "${INFO} PCU entreprise search release : START"
 DEPLOYMENT_FOLDER=$(pwd) 
-RELEASE_FOLDER=${DEPLOYMENT_FOLDER}/pcu-entreprise-search-release
+RELEASE_FOLDER=${DEPLOYMENT_FOLDER}/pcu-platform-release
 SOURCES_FOLDER=${DEPLOYMENT_FOLDER}/../sources
-ES_FOLDER=${DEPLOYMENT_FOLDER}/../../elasticsearch-5.5.1
 echo -e "${INFO} Deployment folder:${DEPLOYMENT_FOLDER}"
 echo -e "${INFO} Sources folder:${SOURCES_FOLDER}"
 echo -e "${INFO} Release folder:${RELEASE_FOLDER}"

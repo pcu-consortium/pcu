@@ -76,5 +76,3 @@ docker run -d \
   -e CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1 \
   -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
   confluentinc/cp-enterprise-control-center:5.0.1
-
-

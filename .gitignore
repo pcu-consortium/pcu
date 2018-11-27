@@ -43,4 +43,5 @@ local.properties
 #specific project
 pcu-entreprise-search-release/
 pcu-entreprise-search-beta*
+pcu-platform-release/
 .vscode

@@ -20,7 +20,6 @@ The PCU Consortium aims at building an Open Source, unified Machine Learning (ML
 that makes search a first-class citizen of Big Data.
 It is bundled with a default application : the PCU Entreprise Search engine.
 
-
 Features
    * Big Data components : integrated in a pluggable, decoupled manner by Service Provider Interfaces (SPI) for **search, compute, messaging, fs**
       * search : ElasticSearch client API (& search SPI impl). It is built on built on Apache CXF, Jackson, Spring Boot. See
@@ -35,21 +34,17 @@ Upcoming : auto cleanup, quotas.
 Tools
    * upcoming : Swagger online API developer documentation and further playground
 
-Team
-   * Specifications : the PCU Consortium
-   * foundations (Spring, REST), ElasticSearch API, file indexer & Avro data model prototype, File content API & impl, server : Marc Dutoo, Smile
-   * File content Metadata Extractor : Emmanuel Keller, Wallix / Qwazr
-   * Entreprise Search UI : Jennifer Aouizerat (design), Romain Gilles (integration), Marc Dutoo (v0), Smile
+[Team](AUTHORS.md)
 
-License : Apache License 2.0
+License : [Apache License 2.0](LICENCE)
 
-Requirements : [Java JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Maven 3](http://maven.apache.org/download.cgi)
+Requirements : [Java Open JDK 10](https://openjdk.java.net/projects/jdk/10/), [Maven 3](http://maven.apache.org/download.cgi)
 
 Roadmap : TODO
 
 
 # Latest release
-The latest release is [PCU Entreprise Search beta Technology Preview](https://owncloud.smile.eu/s/6toBC6N2VJv4EHC).
+TODO link bintray
 
 
 # Quickstart
@@ -60,39 +55,54 @@ git clone git@github.com:pcu-consortium/pcu.git
 ````
 
 ## Build
+
+The easiest way to build the PCU platform is to generate a release package:
 ````bash
+cd deployment
+./make-release.sh
+````
+
+Platform sources simple build:
+* Build platform sources
+````bash
+cd sources
+mvn clean install -DskipTests
+````
+* Build provided Norconex agent as Filesystem crawler agent
+````bash
+cd sources/agent-filesystem-norconex
+mvn clean install -DskipTests
+````
+* Build provided Norconex agent as Web crawler agent
+````bash
+cd sources/agent-http-norconex
 mvn clean install -DskipTests
 ````
 
-NB. in order to get newer versions of the big data components that are integrated through their SNAPSHOT versions, such as [Qwazr Extractor](providers/metadata/extractor) :
-````bash
-mvn -U clean install
-````
-
 ## Try it out
-The easiest way to test the PCU platform is to use it as an Entreprise Search server :
-````bash
-cd application/search
-mvn spring-boot:run
-````
 
-then configure a file connector to crawl for instance your home, and start it :
+Generate the platform release package (see **Build**)
+
+
+Launch ES, Zookeeper and Kafka (requirements : Docker with user as sudoer) :
 ````bash
-cd features/connector/
-vi src/main/resources/bootstrap/poller.yaml
-roots:
-  - /home/yourusername
-mvn spring-boot:run
+cd pcu-platform-release/scripts/
+./start-pcu-cots.sh
+````
+Check :
+* ES : open in brower : [http://localhost:9200/](http://localhost:9200/)
+* Zookeeper : execute command 'telnet localhost 2181'
+* Kafka 
+
+Launch PCU platform server :
+````bash
+cd pcu-platform-release/scripts/
+./start-pcu-platform.sh
 ````
 
 and browse to its web search UI at [http://localhost:8080](http://localhost:8080).
 
-You can also only start its backend instead :
-````bash
-cd features/search/server
-mvn -Pheadless spring-boot:run
-````
-then go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
+and go to the [Swagger UI playground](http://localhost:8080/pcu/api-docs?url=http://localhost:8080/pcu/swagger.json) and try its indexing and search request samples.
 
 ## Run unit tests
 Install [ElasticSearch 5.5.1](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.1.tar.gz) and start it :
