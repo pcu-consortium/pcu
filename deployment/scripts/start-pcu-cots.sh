@@ -13,28 +13,6 @@ docker images docker.elastic.co/elasticsearch/elasticsearch:6.4.2
 echo "Start Elasticsearch 6.4.2 container : elasticsearch-pcu"
 docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name elasticsearch-pcu -d docker.elastic.co/elasticsearch/elasticsearch:6.4.2
 
-
-echo "start mysql 5.6 container"
-
-
-docker run -d --net=host -p 3306:3306  --name mysql-server-pcu \
--v /storage/mysql-server-pcu/datadir:/var/lib/mysql \
--e MYSQL_ROOT_PASSWORD=123 \
-severalnines/mysql-pxb:5.6
-
-
-echo "create database pour test  "
-docker exec -it mysql-server-pcu  mysql -uroot -p123 -e "  DROP DATABASE  testdatabase; create database testdatabase ;
-
-use testdatabase ;
-
-create table tutorial(id INT NOT NULL AUTO_INCREMENT,    name VARCHAR(100) NOT NULL,      PRIMARY KEY (id ) );
-
-insert into tutorial  (id,name)values(1,'sql');
-
-insert into tutorial  (id,name)values(2,'java');"
-
-
 echo "Start zookeeper"
 docker run -d \
     --net=host \
@@ -98,5 +76,24 @@ docker run -d \
   -e CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1 \
   -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
   confluentinc/cp-enterprise-control-center:5.0.1
+
+echo "start mysql 5.6 container"
+
+
+docker run -d  -h host -p 3306:3306  --name mysql-server-pcu \
+-v /storage/mysql-server-pcu/datadir:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123 \
+severalnines/mysql-pxb:5.6
+
+echo "create database pour test  "
+docker exec -it mysql-server-pcu  mysql -uroot -p123 -e "  DROP DATABASE  testdatabase; create database testdatabase ;
+
+use testdatabase ;
+
+create table tutorial(id INT NOT NULL AUTO_INCREMENT,    name VARCHAR(100) NOT NULL,      PRIMARY KEY (id ) );
+
+insert into tutorial  (id,name)values(1,'sql');
+
+insert into tutorial  (id,name)values(2,'java');"
 
 

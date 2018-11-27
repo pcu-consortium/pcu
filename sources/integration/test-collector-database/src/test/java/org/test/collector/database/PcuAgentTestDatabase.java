@@ -78,9 +78,9 @@ public class PcuAgentTestDatabase {
 		config.set("typequery", "select");
 		//config.set("query", "insert into  tutorial (id,name) values (4,'mysql') ");
 		config.set("query", "select * from tutorial ");
-		config.set("url", "jdbc:mysql://localhost/testdatabase");
+		config.set("url", "jdbc:mysql://127.0.0.1:3306/testdatabase");
 		config.setDatasourceId("datasourceId");
-		config.set("datasourceId", "datasourceId");
+		
 		mapper.writeValue(confFile, config);
 
 		// first run pcu agent
