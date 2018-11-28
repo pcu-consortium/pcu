@@ -1,0 +1,14 @@
+---
+- hosts: servers
+  any_errors_fatal: yes
+  vars_prompt:
+    - name: "pcu_action"
+      prompt: "Which action you want to execute ( install or uninstall) pcu ?"
+      default: "install"
+      private: no
+  vars_files:
+    - group_vars/pcu_vars.yml
+  roles:
+    - { role: server_basics, when: pcu_action == 'install'}
+    - { role: pcu_install, when: pcu_action == 'install' }
+    - { role: pcu_uninstall, when: pcu_action == 'uninstall' }

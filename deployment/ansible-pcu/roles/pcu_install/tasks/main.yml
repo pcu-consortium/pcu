@@ -1,0 +1,4 @@
+---
+# tasks file for pcu_install
+- name: download kafka
+  local_action: get_url url={{ pcu_defaults.kafka2.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.name }}

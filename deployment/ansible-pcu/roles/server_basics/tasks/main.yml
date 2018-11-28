@@ -1,0 +1,32 @@
+
+- name: debug display
+  debug: msg="download folder = {{ pcu_defaults.download_folder }}"
+
+- name: Download jdk10
+  local_action: get_url url={{ pcu_defaults.jdk10.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.jdk10.name }} checksum={{ pcu_defaults.jdk10.checksum }}
+  #https://download.java.net/java/GA/jdk10/10.0.2/19aef61b38124481863b1413dce1855f/13/openjdk-10.0.2_linux-x64_bin.tar.gz.sha256
+
+- name: creating jvm directory
+  file:
+    path: /usr/lib/jvm
+    state: directory
+
+- name: unarchive jdk10
+  unarchive:
+    src: /tmp/openjdk-10.0.2_linux-x64_bin.tar.gz
+    creates: /usr/lib/jvm/jdk-10.0.2
+    dest: /usr/lib/jvm/
+
+- name: adding alternatives java
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /usr/lib/jvm/jdk-10.0.2/bin/java
+    priority: 1
+
+- name: adding alternatives javac
+  alternatives:
+    name: javac
+    link: /usr/bin/javac
+    path: /usr/lib/jvm/jdk-10.0.2/bin/javac
+    priority: 1
