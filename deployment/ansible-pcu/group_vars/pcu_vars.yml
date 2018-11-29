@@ -5,5 +5,18 @@ pcu_defaults:
     url: 'https://download.java.net/java/GA/jdk10/10.0.2/19aef61b38124481863b1413dce1855f/13/openjdk-10.0.2_linux-x64_bin.tar.gz'
     checksum: 'sha256:f3b26abc9990a0b8929781310e14a339a7542adfd6596afb842fa0dd7e3848b2'
   kafka2:
-    name: kafka_2.12-2.1.0.tgz
+    name: kafka_2.12-2.1.0
+    archive_name: kafka_2.12-2.1.0.tgz
     url: 'http://apache.crihan.fr/dist/kafka/2.1.0/kafka_2.12-2.1.0.tgz'
+    remote_folder: /home/pcu/kafka
+  zookeeper3:
+    name: zookeeper-3.4.13
+    archive_name: zookeeper-3.4.13.tar.gz
+    url: 'http://mirror.ibcp.fr/pub/apache/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz'
+    remote_folder: /home/pcu/zookeeper
+    conf_file:
+      dir_name: conf
+      name: zoo.cfg
+      tickTime: 2000
+      dataDir: /var/lib/zookeeper
+      clientPort: 2181

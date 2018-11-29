@@ -1,4 +1,44 @@
 ---
 # tasks file for pcu_install
-- name: download kafka
-  local_action: get_url url={{ pcu_defaults.kafka2.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.name }}
+- name: download kafka2
+  local_action: get_url url={{ pcu_defaults.kafka2.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.archive_name }}
+
+- name: creating kafka directory
+  file:
+    path: "{{ pcu_defaults.kafka2.remote_folder }}"
+    state: directory
+
+- name: copy kafka2
+  unarchive:
+    src: "{{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.archive_name }}"
+    creates: "{{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}"
+    dest: "{{ pcu_defaults.kafka2.remote_folder }}/"
+
+- name: download zookeeper3
+  local_action: get_url url={{ pcu_defaults.zookeeper3.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.zookeeper3.archive_name }}
+
+- name: creating zookeeper directory
+  file:
+    path: "{{ pcu_defaults.zookeeper3.remote_folder }}"
+    state: directory
+
+- name: copy zookeeper3
+  unarchive:
+    src: "{{ pcu_defaults.download_folder }}/{{ pcu_defaults.zookeeper3.archive_name }}"
+    creates: "{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}"
+    dest: "{{ pcu_defaults.zookeeper3.remote_folder }}/"
+
+- name: creating zookeeper configuration directory
+  file:
+    path: "{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/{{ pcu_defaults.zookeeper3.conf_file.dir_name }}"
+    state: directory
+
+- name: creating zookeeper dataDir
+  file:
+    path: "{{ pcu_defaults.zookeeper3.conf_file.dataDir }}"
+    state: directory
+
+- name: write zookeeper configuration
+  template:
+    src: zoo.cfg.j2
+    dest: "{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/{{ pcu_defaults.zookeeper3.conf_file.dir_name }}/{{ pcu_defaults.zookeeper3.conf_file.name }}"
