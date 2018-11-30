@@ -33,6 +33,11 @@
     path: "{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/{{ pcu_defaults.zookeeper3.conf_file.dir_name }}"
     state: directory
 
+- name: creating zookeeper log directory
+  file:
+    path: "/var/log/zookeeper"
+    state: directory
+
 - name: creating zookeeper dataDir
   file:
     path: "{{ pcu_defaults.zookeeper3.conf_file.dataDir }}"

@@ -1,0 +1,18 @@
+[Unit]
+Description=zookeeper
+After=network.service
+After=syslog.target
+
+[Service]
+Environment=JAVA_HOME=/usr/lib/jvm/jdk-10.0.2
+PIDFile=/var/lib/zookeeper/zookeeper_server.pid
+User=root
+Group=root
+Type=forking
+SyslogIdentifier=root
+ExecStart=/home/pcu/zookeeper/zookeeper/bin/zkServer.sh start
+ExecStop=/home/pcu/zookeeper/zookeeper/bin/zkServer.sh stop
+SuccessExitStatus=SIGKILL
+
+[Install]
+WantedBy=multi-user.target
