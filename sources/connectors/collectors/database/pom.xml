@@ -13,9 +13,9 @@
 		<spring.framework>4.3.0.RELEASE</spring.framework>
 		<postgres.version>42.1.4</postgres.version>
 	</properties>
-	
-		<dependencies>
-	
+
+	<dependencies>
+
 		<!-- PCU : -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -35,7 +35,7 @@
 			<version>2.8.0</version>
 		</dependency>
 
-	<dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>5.0.6.RELEASE</version>
@@ -57,16 +57,27 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.0.5</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>6.1.0.jre8</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.9.1</version>
+		</dependency>
 
-<dependency>
-    <groupId>org.json</groupId>
-    <artifactId>json</artifactId>
-    <version>20180130</version>
-</dependency>
-		
 
-	
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180130</version>
+		</dependency>
+
+
+
 
 	</dependencies>
 </project>

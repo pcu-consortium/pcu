@@ -71,6 +71,7 @@ public class PcuDatabaseNoroneCollector {
 					JsonNode jsonNode = objectMapper.readTree(json.toString());
 					document.setDocument(jsonNode);
 					pcuPlatformclient.ingest(document);
+					LOGGER.debug("End Execution");
 				}
 
 			}
