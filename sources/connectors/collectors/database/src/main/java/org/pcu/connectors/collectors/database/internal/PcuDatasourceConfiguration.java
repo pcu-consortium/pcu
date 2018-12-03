@@ -16,7 +16,6 @@ public class PcuDatasourceConfiguration {
 
 	@Bean
 	DataSource dataSource(String url, String password, String username, String driver) {
-		LOGGER.debug("Start database configuration");
 		System.out.print("Start database configuration");
 		DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 		driverManagerDataSource.setUrl(url);
@@ -24,7 +23,6 @@ public class PcuDatasourceConfiguration {
 		driverManagerDataSource.setPassword(password);
 		driverManagerDataSource.setDriverClassName(driver);
 		LOGGER.debug("end database configuration");
-		System.out.print("end  database configuration");
 		return driverManagerDataSource;
 	}
 

@@ -7,8 +7,8 @@
     <artifactId>pcu-integration-tests</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>test-collector-database</artifactId>
-  <name>test-collector-database</name>
+  <artifactId>pcu-integration-test-collector-database</artifactId>
+  <name>PCU Integration test : collector database</name>
  
 	<dependencies>
 
@@ -77,6 +77,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 

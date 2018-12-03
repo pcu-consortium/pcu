@@ -9,8 +9,13 @@
 		<groupId>org.pcu-consortium.pcu</groupId>
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>agent-database-norconex</artifactId>
-	<name>agent-database-norconex</name>
+	
+	<artifactId>pcu-agent-database-jdbc</artifactId>
+	<packaging>jar</packaging>
+
+	<name>PCU Agent database jdbc</name>
+	<description>PCU Agent database jdbc</description>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
