@@ -145,6 +145,7 @@ class Search extends React.Component {
                                 <a target="_blank" rel="noopener noreferrer" style={{ color: "#337ab7" }} href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
                             </div>
                             <hr className="my-1" />
+                            <p>{data._source.title}</p>
                         </Jumbotron>
                     </Row>
                 );

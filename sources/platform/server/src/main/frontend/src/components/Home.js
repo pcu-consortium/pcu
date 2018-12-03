@@ -72,66 +72,6 @@ class Home extends React.Component {
                         </Card>
                     </CardGroup>
                 </Container>
-
-                <Container fluid style={{ backgroundColor: "#eee" }}>
-                    <div style={{ textAlign: "center", margin: "2% 0% 4% 0%", color: "#00517c", fontSize: "30pt" }}>
-                        Partners
-                        <h6 style={{ color: "#777777" }}>United we stand, divided we fall.</h6>
-                    </div>
-                    <CardGroup style={{ marginLeft: "5%",marginRight: "5%" }} >
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={bpi} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>BPI FRANCE</CardTitle>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={smile} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>SMILE</CardTitle>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={armadillo} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>ARMADILLO</CardTitle>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={lipn} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>LIPN</CardTitle>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={esilv} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>ESILV</CardTitle>
-                            </CardBody>
-                        </Card>
-                        <Card style={{ border: "0" }}  className="text-center">
-                            <CardImg style={{ width: "15%", marginLeft: "auto", marginRight: "auto"  }} src={wallix} alt="Card image cap" />
-                            < CardBody style={{ padding: "10px 0px" }}>
-                                <CardTitle>WALLIX</CardTitle>
-                            </CardBody>
-                        </Card>
-                    </CardGroup>
-                    <div class="container-fluid">
-                            <div class="col-lg-12 text-center pcu-margin-bottom">
-                                <a href="http://www.smile.eu" target="_blank"><img alt="Smile" src={{smile}} /></a>
-                                <a href="http://lipn.univ-paris13.fr" target="_blank"><img alt="LIPN" src="/assets/images/partners/lipn.jpg" /></a>
-                                <a href="https://www.esilv.fr" target="_blank"><img alt="ESILV" src="/assets/images/partners/esilv.jpg" /></a>
-                                <a href="https://www.proxem.com" target="_blank"><img alt="Proxem" src="/assets/images/partners/proxem.svg" /></a>
-                                <a href="https://www.armadillo.fr" target="_blank"><img alt="Armadillo" src="/assets/images/partners/armadillo.png" /></a>
-                                <a href="http://www.wallix.fr" target="_blank"><img alt="Wallix" src="/assets/images/partners/wallix.png" /></a>
-                            </div>
-                            <div class="col-lg-12 text-center">
-                                <a href="http://www.bpifrance.fr" target="_blank"><img alt="BPI France" src="/assets/images/partners/bpi-france.png" /></a>
-                                <a href="http://www.systematic-paris-region.org" target="_blank"><img alt="Systematic GTLL" src="/assets/images/partners/systematic.png" /></a>
-                                <a href="https://www.iledefrance.fr" target="_blank"><img alt="Region Ile-de-France" src="/assets/images/partners/idf.png" /></a>
-                            </div>
-                        </div>
-                </Container>
                         </div >
                         )
                     }
