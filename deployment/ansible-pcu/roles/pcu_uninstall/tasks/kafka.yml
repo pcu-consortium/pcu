@@ -1,0 +1,6 @@
+- name: Clean kafka files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ pcu_defaults.kafka2.remote_folder }}"

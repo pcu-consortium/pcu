@@ -1,0 +1,17 @@
+- name: download kafka2
+  local_action: get_url url={{ pcu_defaults.kafka2.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.archive_name }}
+
+- name: creating kafka directory
+  file:
+    path: "{{ pcu_defaults.kafka2.remote_folder }}"
+    state: directory
+    owner: "{{ pcu_defaults.pcu_user }}"
+    group: "{{ pcu_defaults.pcu_group }}"
+
+- name: copy kafka2
+  unarchive:
+    src: "{{ pcu_defaults.download_folder }}/{{ pcu_defaults.kafka2.archive_name }}"
+    creates: "{{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}"
+    dest: "{{ pcu_defaults.kafka2.remote_folder }}/"
+    owner: "{{ pcu_defaults.pcu_user }}"
+    group: "{{ pcu_defaults.pcu_group }}"

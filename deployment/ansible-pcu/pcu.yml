@@ -12,3 +12,4 @@
     - { role: server_basics, when: pcu_action == 'install'}
     - { role: pcu_install, when: pcu_action == 'install' }
     - { role: pcu_uninstall, when: pcu_action == 'uninstall' }
+    - { role: server_basics_uninstall, when: pcu_action == 'uninstall'}

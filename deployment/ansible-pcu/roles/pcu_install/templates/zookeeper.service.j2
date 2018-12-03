@@ -1,0 +1,18 @@
+[Unit]
+Description=zookeeper
+After=network.service
+After=syslog.target
+
+[Service]
+Environment=JAVA_HOME={{ pcu_defaults.jdk10.java_home }}
+PIDFile=/var/lib/zookeeper/zookeeper_server.pid
+User={{ pcu_defaults.zookeeper3.user }}
+Group={{ pcu_defaults.zookeeper3.group }}
+Type=forking
+SyslogIdentifier=root
+ExecStart={{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/bin/zkServer.sh start
+ExecStop={{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/bin/zkServer.sh stop
+SuccessExitStatus=SIGKILL
+
+[Install]
+WantedBy=multi-user.target

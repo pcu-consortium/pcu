@@ -1,6 +1,6 @@
 # ZooKeeper install path (where you extracted the tarball)
-ZOOKEEPER='/home/pcu/zookeeper/zookeeper-3.4.13'
-ZOOUSER=root
+ZOOKEEPER='{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}'
+ZOOUSER={{ pcu_defaults.zookeeper3.user }}
 
 source /etc/rc.d/init.d/functions
 source $ZOOKEEPER/bin/zkEnv.sh

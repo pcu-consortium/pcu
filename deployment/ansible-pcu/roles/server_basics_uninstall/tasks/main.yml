@@ -1,0 +1,6 @@
+---
+# tasks file for server_basics_uninstall
+- name: Deleting the 'pcu_user'
+  user:
+    name: "{{ pcu_defaults.pcu_user }}"
+    state: absent

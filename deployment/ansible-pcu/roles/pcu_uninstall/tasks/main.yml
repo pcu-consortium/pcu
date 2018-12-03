@@ -1,2 +1,10 @@
 ---
 # tasks file for pcu_uninstall
+- name: debug display
+  debug: msg="inventory_hostname = {{ inventory_hostname }} in groups['zookeeper']"
+
+- include_tasks: zookeeper.yml
+  when: inventory_hostname in groups['zookeeper']
+
+- include_tasks: kafka.yml
+  when: inventory_hostname in groups['kafka']

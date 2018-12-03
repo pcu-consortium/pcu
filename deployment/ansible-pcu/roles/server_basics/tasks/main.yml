@@ -1,6 +1,7 @@
-
-- name: debug display
-  debug: msg="download folder = {{ pcu_defaults.download_folder }}"
+- name: Add the 'pcu_user'
+  user:
+    name: "{{ pcu_defaults.pcu_user }}"
+    comment: pcu user
 
 - name: Download jdk10
   local_action: get_url url={{ pcu_defaults.jdk10.url }} dest={{ pcu_defaults.download_folder }}/{{ pcu_defaults.jdk10.name }} checksum={{ pcu_defaults.jdk10.checksum }}
@@ -14,19 +15,19 @@
 - name: unarchive jdk10
   unarchive:
     src: /tmp/openjdk-10.0.2_linux-x64_bin.tar.gz
-    creates: /usr/lib/jvm/jdk-10.0.2
+    creates: "{{ pcu_defaults.jdk10.java_home }}"
     dest: /usr/lib/jvm/
 
 - name: adding alternatives java
   alternatives:
     name: java
     link: /usr/bin/java
-    path: /usr/lib/jvm/jdk-10.0.2/bin/java
+    path: "{{ pcu_defaults.jdk10.java_home }}/bin/java"
     priority: 1
 
 - name: adding alternatives javac
   alternatives:
     name: javac
     link: /usr/bin/javac
-    path: /usr/lib/jvm/jdk-10.0.2/bin/javac
+    path: "{{ pcu_defaults.jdk10.java_home }}/bin/javac"
     priority: 1
