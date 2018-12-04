@@ -66,6 +66,11 @@
     src: zookeeper.j2
     dest: "/etc/init.d/zookeeper"
 
+- name: create myid file
+  copy:
+    content: "{{ inventory_hostname }}"
+    dest: "{{ pcu_defaults.zookeeper3.conf_file.dataDir }}/myid"
+
 - name: start service zookeeper
   service:
     name: zookeeper.service

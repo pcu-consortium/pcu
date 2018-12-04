@@ -15,3 +15,8 @@
     dest: "{{ pcu_defaults.kafka2.remote_folder }}/"
     owner: "{{ pcu_defaults.pcu_user }}"
     group: "{{ pcu_defaults.pcu_group }}"
+
+- name: Set config files
+  template:
+    src: kafka/pcu_server.properties.j2
+    dest: "{{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}/config/pcu_server.properties"

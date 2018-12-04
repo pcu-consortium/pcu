@@ -5,11 +5,12 @@ After=syslog.target
 
 [Service]
 Environment=JAVA_HOME={{ pcu_defaults.jdk10.java_home }}
+Environment=ZOO_LOG_DIR={{ pcu_defaults.zookeeper3.log_dir }}
 PIDFile=/var/lib/zookeeper/zookeeper_server.pid
 User={{ pcu_defaults.zookeeper3.user }}
 Group={{ pcu_defaults.zookeeper3.group }}
 Type=forking
-SyslogIdentifier=root
+SyslogIdentifier={{ pcu_defaults.zookeeper3.user }}
 ExecStart={{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/bin/zkServer.sh start
 ExecStop={{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/bin/zkServer.sh stop
 SuccessExitStatus=SIGKILL

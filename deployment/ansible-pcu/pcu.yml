@@ -8,6 +8,8 @@
       private: no
   vars_files:
     - group_vars/pcu_vars.yml
+  vars:
+    servers_zookeeper: "{{ groups['zookeeper'] }}"
   roles:
     - { role: server_basics, when: pcu_action == 'install'}
     - { role: pcu_install, when: pcu_action == 'install' }
