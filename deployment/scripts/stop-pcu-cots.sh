@@ -16,10 +16,7 @@ echo "Stop zookeeper container: zookeeper"
 docker stop zookeeper
 echo "Remove zookeeper container: zookeeper"
 docker rm zookeeper
-echo "stop  mysql 5.6 container: mysql"
-docker stop mysql-server-pcu
-echo "Remove  mysql 5.6 container: mysql"
-docker rm mysql-server-pcu
-
-
-
+echo "stop  mysql 5.6 container: mysql-pcu"
+docker stop mysql-pcu
+echo "Remove  mysql 5.6 container: mysql-pcu"
+docker rm mysql-pcu

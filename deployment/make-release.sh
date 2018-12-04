@@ -28,8 +28,6 @@ cd ${SOURCES_FOLDER}/provided/agent-database-jdbc
 mvn clean install -o -DskipTests
 cd ${DEPLOYMENT_FOLDER}
 
-
-
 echo -e "${INFO} Generate release folder"
 rm -rf ${RELEASE_FOLDER}
 mkdir ${RELEASE_FOLDER}
