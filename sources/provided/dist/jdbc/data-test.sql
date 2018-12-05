@@ -16,6 +16,5 @@ CREATE TABLE PHARMA_PRODUCTS (
     Teneur VARCHAR(255),
     Unite VARCHAR(255),
     Substance VARCHAR(255),
-    No_CAS_Substance VARCHAR(255),
-    PRIMARY KEY (No_AMM)
+    No_CAS_Substance VARCHAR(255)
 );

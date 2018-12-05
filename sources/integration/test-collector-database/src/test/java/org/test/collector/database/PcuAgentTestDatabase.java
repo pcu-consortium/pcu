@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +49,7 @@ public class PcuAgentTestDatabase {
 	public TemporaryFolderExtension temporaryFolder = new TemporaryFolderExtension();
 
 	@Test
-	public void norconexCollectorOnSampleOk(@Wiremock WireMockServer server, @WiremockUri String uri)
+	public void norconexCollectorOnFileSampleOk(@Wiremock WireMockServer server, @WiremockUri String uri)
 			throws IOException, URISyntaxException {
         
 		
@@ -66,7 +64,7 @@ public class PcuAgentTestDatabase {
 		File confFile = temporaryFolder.newFile(confFileName + ".json");
 		String workDirFolderName = UUID.randomUUID().toString();
 		File workDir = temporaryFolder.newFolder(workDirFolderName);
-		File sampleFolder = createTemporaryFolderWithSample();
+		File fileFolder = createTemporaryFolderWithFileSample();
 		ObjectMapper mapper = new ObjectMapper();
 		PcuCollectorConfig config = new PcuCollectorConfig();
 		config.setCollectorId("collectorId");
@@ -120,11 +118,11 @@ public class PcuAgentTestDatabase {
 		return tmpFile.getAbsolutePath();
 	}
 
-	private File createTemporaryFolderWithSample() throws IOException, URISyntaxException {
-		File sampleFolder = temporaryFolder.newFolder("sample");
-		File existingSample = new File(PcuAgentTestDatabase.class.getClassLoader().getResource("sample").toURI());
-		FileUtils.copyDirectory(existingSample, sampleFolder);
-		return sampleFolder;
+	private File createTemporaryFolderWithFileSample() throws IOException, URISyntaxException {
+		File newFileFolder = temporaryFolder.newFolder("file");
+		File existingFileFolder = new File(PcuAgentTestDatabase.class.getClassLoader().getResource("file").toURI());
+		FileUtils.copyDirectory(existingFileFolder, newFileFolder);
+		return newFileFolder;
 	}
 
 }

@@ -10,11 +10,10 @@
 	<artifactId>pcu-collectors-database</artifactId>
 	<packaging>jar</packaging>
 	<properties>
-		<spring.framework>4.3.0.RELEASE</spring.framework>
+		<spring.version>5.1.0.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
-
 		<!-- PCU : -->
 		<dependency>
 			<groupId>org.pcu-consortium.pcu</groupId>
@@ -40,20 +39,21 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>5.0.6.RELEASE</version>
+			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>5.1.2.RELEASE</version>
+			<version>${spring.version}</version>
 		</dependency>
 
 		<!-- Spring JDBC Support -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>5.1.2.RELEASE</version>
+			<version>${spring.version}</version>
 		</dependency>
+		<!-- JDBC drivers : TODO check if it should be here -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -71,15 +71,12 @@
 			<version>3.9.1</version>
 		</dependency>
 
-
+		<!-- TODO check if usefull ? (jackson ?) -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20180130</version>
 		</dependency>
-
-
-
-
 	</dependencies>
+	
 </project>

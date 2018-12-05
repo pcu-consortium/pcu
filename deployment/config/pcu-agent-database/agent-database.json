@@ -1,11 +1,11 @@
 {
-   "collectorId" : "pcu-release-collector-database",
+    "collectorId" : "pcu-release-collector-database",
     "datasourceId" : "pcu-release-datasource-database",
     "pcuPlatformUrl" : "http://localhost:8080",
     "url":"jdbc:mysql://127.0.0.1:3306/testdatabase",
     "username":"root",
-    "password":"123",
+    "password":"password",
     "driver":"com.mysql.jdbc.Driver",
-    "query" :"select * from tutorial"
+    "query" :"select * from PHARMA_PRODUCTS"
+ }
  
-}

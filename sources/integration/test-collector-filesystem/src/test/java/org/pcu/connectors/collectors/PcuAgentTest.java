@@ -50,7 +50,7 @@ public class PcuAgentTest {
 	public TemporaryFolderExtension temporaryFolder = new TemporaryFolderExtension();
 
 	@Test
-	public void norconexCollectorOnSampleOk(@Wiremock WireMockServer server, @WiremockUri String uri)
+	public void norconexCollectorOnFileSampleOk(@Wiremock WireMockServer server, @WiremockUri String uri)
 			throws IOException, URISyntaxException {
 
 		// wiremock stub
@@ -64,8 +64,8 @@ public class PcuAgentTest {
 		File confFile = temporaryFolder.newFile(confFileName + ".json");
 		String workDirFolderName = UUID.randomUUID().toString();
 		File workDir = temporaryFolder.newFolder(workDirFolderName);
-		File sampleFolder = createTemporaryFolderWithSample();
-		String variablesFilePath = createTempVariables(workDir.getAbsolutePath(), sampleFolder.getAbsolutePath());
+		File fileFolder = createTemporaryFolderWithFileSample();
+		String variablesFilePath = createTempVariables(workDir.getAbsolutePath(), fileFolder.getAbsolutePath());
 		String xmlFilePath = createTempXml();
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -89,7 +89,7 @@ public class PcuAgentTest {
 		assertThat(workDirFileNames).contains(workDir.getAbsolutePath() + "/logs");
 		assertThat(workDirFileNames).contains(workDir.getAbsolutePath() + "/progress");
 
-		Files.delete(Paths.get(sampleFolder.getAbsolutePath() + "/20171206 POSS/PCU@POSS_20171206.pdf"));
+		Files.delete(Paths.get(fileFolder.getAbsolutePath() + "/20171206 POSS/PCU@POSS_20171206.pdf"));
 
 		// second run pcu agent after deleting a file
 		PcuAgent.main(args);
@@ -125,11 +125,11 @@ public class PcuAgentTest {
 		return tmpFile.getAbsolutePath();
 	}
 
-	private File createTemporaryFolderWithSample() throws IOException, URISyntaxException {
-		File sampleFolder = temporaryFolder.newFolder("sample");
-		File existingSample = new File(PcuAgentTest.class.getClassLoader().getResource("sample").toURI());
-		FileUtils.copyDirectory(existingSample, sampleFolder);
-		return sampleFolder;
+	private File createTemporaryFolderWithFileSample() throws IOException, URISyntaxException {
+		File newFileFolder = temporaryFolder.newFolder("file");
+		File existingFileFolder = new File(PcuAgentTest.class.getClassLoader().getResource("file").toURI());
+		FileUtils.copyDirectory(existingFileFolder, newFileFolder);
+		return newFileFolder;
 	}
 
 }

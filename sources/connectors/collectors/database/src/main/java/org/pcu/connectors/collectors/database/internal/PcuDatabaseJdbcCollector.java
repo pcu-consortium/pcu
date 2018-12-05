@@ -62,7 +62,7 @@ public class PcuDatabaseJdbcCollector {
 				String documentId = DigestUtils.md5Hex(config.getDatasourceId() + reference++);
 				document.setType("document");
 				document.setId(documentId);
-				document.setIndex("document");
+				document.setIndex("documents");
 				ObjectMapper objectMapper = new ObjectMapper();
 				JsonNode jsonNode = objectMapper.readTree(json.toString());
 				document.setDocument(jsonNode);

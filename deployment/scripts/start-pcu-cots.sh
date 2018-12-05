@@ -84,7 +84,9 @@ docker run -d \
   confluentinc/cp-enterprise-control-center:5.0.1
 
 echo "Start mysql 5.6 container"
+echo ${PCU_DIST_FOLDER}
 docker run --name mysql-pcu \
+  --net=host \
   -e MYSQL_ROOT_PASSWORD=password \
   -v ${PCU_DIST_FOLDER}:/opt \
   -d mysql:5.6
@@ -93,5 +95,5 @@ echo "Start mysql : waiting 30s..."
 sleep 30
 
 echo "Insert data in mysql"
-docker exec mysql-pcu /bin/bash -c 'mysql -u root -ppassword < /opt/jdbc/data-test.sql'
-docker exec mysql-pcu /bin/bash -c 'mysql testdatabase -u root -ppassword < /opt/jdbc/data-test-content.sql'
+docker exec mysql-pcu /bin/bash -c 'mysql -u root -ppassword </opt/jdbc/data-test.sql'
+docker exec mysql-pcu /bin/bash -c 'mysql testdatabase -u root -ppassword </opt/jdbc/data-test-content.sql'
