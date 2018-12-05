@@ -1,4 +1,4 @@
-broker.id=0
+#broker.id={{ broker_id }}
 
 num.network.threads=3
 num.io.threads=8
@@ -7,7 +7,7 @@ socket.send.buffer.bytes=102400
 socket.receive.buffer.bytes=102400
 socket.request.max.bytes=104857600
 
-log.dirs=/tmp/kafka-logs
+log.dirs={{ pcu_defaults.kafka2.log_folder }}
 
 num.partitions=1
 num.recovery.threads.per.data.dir=1
@@ -20,6 +20,8 @@ transaction.state.log.min.isr=1
 log.retention.hours=168
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
+
+listeners=PLAINTEXT://:{{ pcu_defaults.kafka2.listener_port }}
 
 #zookeeper.connect=10.1.13.87:2181
 zookeeper.connect=

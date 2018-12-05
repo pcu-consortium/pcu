@@ -1,6 +1,14 @@
+- name: stop service kafka
+  service:
+    name: kafka.service
+    daemon_reload: yes
+    state: stopped
+
 - name: Clean kafka files
   file:
     path: "{{ item }}"
     state: absent
   with_items:
+    - "{{ pcu_defaults.kafka2.service_folder }}/kafka.service"
     - "{{ pcu_defaults.kafka2.remote_folder }}"
+    - "{{ pcu_defaults.kafka2.log_folder }}"

@@ -9,9 +9,14 @@ pcu_defaults:
     java_home: /usr/lib/jvm/jdk-10.0.2
   kafka2:
     name: kafka_2.12-2.1.0
+    user: pcu
+    group: pcu
+    listener_port: 9091
     archive_name: kafka_2.12-2.1.0.tgz
     url: 'http://apache.crihan.fr/dist/kafka/2.1.0/kafka_2.12-2.1.0.tgz'
     remote_folder: /opt/kafka
+    log_folder: /tmp/kafka-logs
+    service_folder: /lib/systemd/system
   zookeeper3:
     name: zookeeper-3.4.13
     user: pcu

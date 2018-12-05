@@ -4,5 +4,5 @@ clientPort={{ pcu_defaults.zookeeper3.conf_file.clientPort }}
 initLimit=5
 syncLimit=2
 {% for zoo in servers_zookeeper %}
-server.{{ zoo }}={{ hostvars[zoo].ansible_host }}:2181:3888
+server.{{ loop.index }}={{ hostvars[zoo].ansible_host }}:2181:3888
 {% endfor %}

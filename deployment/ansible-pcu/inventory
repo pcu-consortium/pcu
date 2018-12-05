@@ -1,14 +1,15 @@
 localhost ansible_connection=local
 server1 ansible_host=10.1.13.87 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 server2 ansible_host=10.1.13.175 ansible_user=root ansible_python_interpreter=/usr/bin/python3
+server3 ansible_host=10.1.13.166 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 
 [zookeeper]
-server1
-server2
+server1 zoo_id=1
+#server2 zoo_id=2
 
 [kafka]
-server1
-server2
+server2 broker_id=1
+server3 broker_id=2
 
 [servers:children]
 zookeeper

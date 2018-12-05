@@ -10,7 +10,6 @@
     state: absent
   with_items:
     - "{{ pcu_defaults.zookeeper3.service_folder }}/zookeeper.service"
-    - "/etc/init.d/zookeeper"
     - "{{ pcu_defaults.zookeeper3.remote_folder }}/"
     - "{{ pcu_defaults.zookeeper3.conf_file.dataDir }}"
     - "/var/log/zookeeper"

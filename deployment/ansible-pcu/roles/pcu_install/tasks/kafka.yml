@@ -20,3 +20,14 @@
   template:
     src: kafka/pcu_server.properties.j2
     dest: "{{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}/config/pcu_server.properties"
+
+- name: write kafka service file
+  template:
+    src: kafka/kafka.service.j2
+    dest: "{{ pcu_defaults.kafka2.service_folder }}/kafka.service"
+
+- name: start service kafka
+  service:
+    name: kafka.service
+    daemon_reload: yes
+    state: started

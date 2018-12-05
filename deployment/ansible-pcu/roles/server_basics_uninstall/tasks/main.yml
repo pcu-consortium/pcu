@@ -1,6 +1,15 @@
 ---
 # tasks file for server_basics_uninstall
-- name: Deleting the 'pcu_user'
-  user:
-    name: "{{ pcu_defaults.pcu_user }}"
-    state: absent
+# - name: Deleting the 'pcu_user'
+#   user:
+#     name: "{{ pcu_defaults.pcu_user }}"
+#     state: absent
+
+- name: copy userdel script
+  copy:
+    src: files/system/pcu_del_user.sh
+    dest: "/tmp/pcu_del_user.sh"
+    mode: 0755
+
+- name: Execute userdel script
+  command: "bash /tmp/pcu_del_user.sh {{ pcu_defaults.pcu_user }}"

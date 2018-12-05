@@ -51,24 +51,24 @@
 
 - name: write zookeeper configuration
   template:
-    src: zoo.cfg.j2
+    src: zookeeper/zoo.cfg.j2
     dest: "{{ pcu_defaults.zookeeper3.remote_folder }}/{{ pcu_defaults.zookeeper3.name }}/{{ pcu_defaults.zookeeper3.conf_file.dir_name }}/{{ pcu_defaults.zookeeper3.conf_file.name }}"
     owner: "{{ pcu_defaults.pcu_user }}"
     group: "{{ pcu_defaults.pcu_group }}"
 
 - name: write zookeeper service file
   template:
-    src: zookeeper.service.j2
+    src: zookeeper/zookeeper.service.j2
     dest: "{{ pcu_defaults.zookeeper3.service_folder }}/zookeeper.service"
 
-- name: write zookeeper init.d file
-  template:
-    src: zookeeper.j2
-    dest: "/etc/init.d/zookeeper"
+# - name: write zookeeper init.d file
+#   template:
+#     src: zookeeper/zookeeper.j2
+#     dest: "/etc/init.d/zookeeper"
 
 - name: create myid file
   copy:
-    content: "{{ inventory_hostname }}"
+    content: "{{ zoo_id }}"
     dest: "{{ pcu_defaults.zookeeper3.conf_file.dataDir }}/myid"
 
 - name: start service zookeeper

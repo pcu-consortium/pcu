@@ -1,0 +1,32 @@
+[Unit]
+Description=Kafka Daemon
+Wants=syslog.target
+
+# suppose you have a service named zookeeper that it start zookeeper and we want Kafka service run after the zookeeper service
+After=network.service
+After=zookeeper.service
+
+[Service]
+Type=forking
+
+# the user whom you want run the Kafka start and stop command under
+User={{ pcu_defaults.kafka2.user }}
+Group={{ pcu_defaults.kafka2.group }}
+
+# the file path that contains envirnment variables
+#EnvironmentFile=/home/kafka/profile
+
+# the directory that the commands will run there
+WorkingDirectory={{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}
+
+# Kafka server start command
+ExecStart={{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}/bin/kafka-server-start.sh -daemon {{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}/config/pcu_server.properties
+
+# Kafka server stop command
+ExecStop={{ pcu_defaults.kafka2.remote_folder }}/{{ pcu_defaults.kafka2.name }}/bin/kafka-server-stop.sh -daemon
+
+TimeoutSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
