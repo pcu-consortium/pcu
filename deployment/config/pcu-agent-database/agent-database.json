@@ -2,10 +2,12 @@
     "collectorId" : "pcu-release-collector-database",
     "datasourceId" : "pcu-release-datasource-database",
     "pcuPlatformUrl" : "http://localhost:8080",
+    "pcuType" : "document",
+    "pcuIndex" : "documents",
     "url":"jdbc:mysql://127.0.0.1:3306/testdatabase",
     "username":"root",
     "password":"password",
-    "driver":"com.mysql.jdbc.Driver",
-    "query" :"select * from PHARMA_PRODUCTS"
+    "driver":"com.mysql.cj.jdbc.Driver",
+    "query" :"select Nom_Commercial as title, Type_Commercial as description, PHARMA_PRODUCTS.* from PHARMA_PRODUCTS"
  }
  

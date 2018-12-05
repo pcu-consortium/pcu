@@ -3,7 +3,6 @@ package org.pcu.connectors.collectors.database;
 import org.pcu.connectors.collectors.api.PcuCollector;
 import org.pcu.connectors.collectors.api.PcuCollectorConfig;
 import org.pcu.connectors.collectors.api.PcuCollectorException;
-import org.pcu.connectors.collectors.database.internal.PcuDatabaseJdbcCollector;
 import org.pcu.platform.client.PcuPlatformClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

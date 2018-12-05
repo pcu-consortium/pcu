@@ -30,6 +30,11 @@
 	<crawlers>
 		<crawler id="${crawlerid}">
 			<maxDocuments>${maxDocuments}</maxDocuments>
+			<referenceFilters>
+                <filter class="com.norconex.collector.core.filter.impl.RegexReferenceFilter" onMatch="include">
+      				.*/Solutions.*
+  				</filter>
+            </referenceFilters>
 		</crawler>
 	</crawlers>
 
