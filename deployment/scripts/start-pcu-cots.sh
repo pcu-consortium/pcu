@@ -1,5 +1,12 @@
 #!/bin/bash
 
+PCU_SCRIPTS_FOLDER="$(pwd)"
+cd ${PCU_SCRIPTS_FOLDER}/../dist
+PCU_DIST_FOLDER="$(pwd)"
+cd ${PCU_SCRIPTS_FOLDER}
+echo "Current folder : ${PCU_SCRIPTS_FOLDER}"
+echo "Dist files folder : ${PCU_DIST_FOLDER}"
+
 if [ -x "$(command -v docker)" ]; then
     echo "Docker is installed"
 else
@@ -32,9 +39,8 @@ docker run -d \
     -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
     confluentinc/cp-kafka:5.0.1
 
-echo "Start kafka : waiting..."
+echo "Start kafka : waiting 30s..."
 sleep 30
-
 
 echo "Create topics in Kafka"
 docker run \
@@ -77,4 +83,17 @@ docker run -d \
   -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
   confluentinc/cp-enterprise-control-center:5.0.1
 
+echo "Start mysql 5.6 container"
+echo ${PCU_DIST_FOLDER}
+docker run --name mysql-pcu \
+  --net=host \
+  -e MYSQL_ROOT_PASSWORD=password \
+  -v ${PCU_DIST_FOLDER}:/opt \
+  -d mysql:5.6
 
+echo "Start mysql : waiting 30s..."
+sleep 30
+
+echo "Insert data in mysql"
+docker exec mysql-pcu /bin/bash -c 'mysql -u root -ppassword </opt/jdbc/data-test.sql'
+docker exec mysql-pcu /bin/bash -c 'mysql testdatabase -u root -ppassword </opt/jdbc/data-test-content.sql'

@@ -1,7 +1,7 @@
 collectorid=PcuFilesystemCollector
 crawlerid=PcuFilesystemCrawler
 workdir=../workdirFs
-path=../dist/sample
+path=../dist/file
 dataStoreFactory=com.norconex.collector.core.data.store.impl.mvstore.MVStoreCrawlDataStoreFactory
 committer=org.pcu.connectors.collectors.filesystem.internal.PcuFilesystemCommitter
 maxDocuments=100

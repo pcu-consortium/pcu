@@ -38,7 +38,7 @@ public class PcuVfs2StorageIT {
 	private String containerName;
 	private String documentId;
 
-	private final static String SOURCE_FILE = "sample/20171206 POSS/PCU@POSS_20171206.pdf";
+	private final static String SOURCE_FILE = "file/20171206 POSS/PCU@POSS_20171206.pdf";
 
 	@BeforeEach
 	public void before() throws FileSystemException {
@@ -101,7 +101,7 @@ public class PcuVfs2StorageIT {
 		// try create file in container where file already exists
 		assertThatCode(() -> {
 			InputStream sourceInputStream = PcuVfs2StorageIT.class.getClassLoader()
-					.getResourceAsStream("sample/20171206 POSS/PCU@POSS_20171206.pdf");
+					.getResourceAsStream("file/20171206 POSS/PCU@POSS_20171206.pdf");
 			boolean created = pcuStorage.upload(sourceInputStream, containerName, documentId);
 			assertThat(created).isFalse();
 		}).doesNotThrowAnyException();
