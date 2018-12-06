@@ -5,11 +5,11 @@ server3 ansible_host=10.1.13.166 ansible_user=root ansible_python_interpreter=/u
 
 [zookeeper]
 server1 zoo_id=1
-#server2 zoo_id=2
+server2 zoo_id=2
 
 [kafka]
-server2 broker_id=1
-server3 broker_id=2
+server1 broker_id=1
+server2 broker_id=2
 
 [servers:children]
 zookeeper

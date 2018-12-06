@@ -1,8 +1,14 @@
+- name: check if kafka service exists
+  stat:
+    path: "{{ pcu_defaults.kafka2.service_folder }}/kafka.service"
+  register: st
+
 - name: stop service kafka
   service:
     name: kafka.service
     daemon_reload: yes
     state: stopped
+  when: st.stat.exists
 
 - name: Clean kafka files
   file:
