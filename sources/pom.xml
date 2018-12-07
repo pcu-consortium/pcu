@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pcu-consortium.pcu</groupId>
 	<artifactId>pcu-consortium-parent</artifactId>
@@ -93,8 +92,8 @@
 		<swagger.version>2.9.2</swagger.version>
 
 		<!-- logging : -->
-		<slf4j.version>1.7.25</slf4j.version><!-- spring-boot & logback's ; 1.7.25 -->
-		<logback.version>1.2.3</logback.version><!-- spring-boot's ; 1.2.3 -->
+		<slf4j.version>1.7.25</slf4j.version>		<!-- spring-boot & logback's ; 1.7.25 -->
+		<logback.version>1.2.3</logback.version>		<!-- spring-boot's ; 1.2.3 -->
 
 		<!-- tests : -->
 		<junit.jupiter.version>5.1.1</junit.jupiter.version>
@@ -388,6 +387,33 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.16</version>
+				<configuration>
+					<verbose>true</verbose>
+					<addSvnKeyWords>false</addSvnKeyWords>
+					<inceptionYear>2017</inceptionYear>
+					<licenseName>apache_v2</licenseName>
+					<roots>
+						<root>src/main/java</root>
+						<root>src/test</root>
+					</roots>
+					<includes>
+						<include>**/*.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- Cobertura & Coveralls.io -->
 			<plugin>
@@ -447,14 +473,14 @@
 				<version>2.22.0</version>
 
 				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- else 
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>					<!-- else 
 						error even if provide repository : ex. repository url 'http://dist.gemstone.com/maven/release' 
 						is invalid see http://stackoverflow.com/questions/28098566/maven-site-warning-the-repository-url-https-maven-repository-dev-java-net-no -->
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId><!-- generates links to source 
+				<artifactId>maven-jxr-plugin</artifactId>				<!-- generates links to source 
 					code in failed tests -->
 			</plugin>
 		</plugins>
