@@ -1,6 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logoPCU from "../style/images/logo-no-bg.png"
+import { PcuBlueCode, PcuGreyCode } from './Colors.js';
+import logoPCU from "../style/images/logo-no-bg-blue.png"
+import { SocialIcon } from 'react-social-icons';
 import {
     Collapse,
     Navbar,
@@ -15,10 +17,10 @@ import {
     Input
 } from 'reactstrap';
 
-const _navbar = { backgroundColor: '#00517c', padding: "0rem 0rem" };
-const navlink = { color: '#ffffff', border: "0px" };
-const pcuGreenColor = { color: '#8bc34a' }
-const tabsStyle = { borderBottom: "1px solid #00517c" }
+const _navbar = { backgroundColor: PcuGreyCode, padding: "0rem 0rem", borderColor: PcuBlueCode };
+const navlink = { color: PcuBlueCode, border: "0px" };
+const tabsStyle = { borderBottom: "1px solid " + PcuGreyCode }
+
 class Header extends React.Component {
     constructor(props) {
         super(props);
@@ -90,9 +92,17 @@ class Header extends React.Component {
         return (
             <div>
                 <Navbar style={_navbar} light expand="md">
-                    <NavbarBrand style={pcuGreenColor} href="/">
+                    <NavbarBrand style={{ color: PcuBlueCode }} href="/">
                         <img src={logoPCU} alt="LOGO PCU" width="60" /> PCU
                     </NavbarBrand>
+                    <nav id="socialNav" className="d-none d-lg-block d-xl-block">
+                        <h6><a style={{ color: PcuBlueCode }} href="https://pcu-consortium.github.io/">&copy; 2017 PCU Consortium</a></h6>
+                        <i><SocialIcon style={{ height: 25, width: 25 }} url="https://github.com/pcu-consortium" /> </i>
+                        <i><SocialIcon style={{ height: 25, width: 25 }} url="https://twitter.com/PCUConsortium" /> </i>
+                        <i><SocialIcon style={{ height: 25, width: 25 }} url="https://facebook.com/pcu-consortium" /> </i>
+                        <i><SocialIcon style={{ height: 25, width: 25 }} url="https://www.linkedin.com/company/pcu-consortium" /> </i>
+                        <i><SocialIcon style={{ height: 25, width: 25 }} url="https://www.slideshare.net/pcuconsortium" /> </i>
+                    </nav>
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.pageContext.isOpen} navbar>
                         <Nav className="ml-auto" tabs style={tabsStyle}>
@@ -102,7 +112,7 @@ class Header extends React.Component {
                                         onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"
                                         onKeyPress={e => { if (e.key === 'Enter') { this.handleSearchText() } }} />
                                     <InputGroupAddon addonType="append">
-                                        <Button color="light" onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log(""))}> Search</Button>
+                                        <Button style={{ color: PcuGreyCode, backgroundColor: PcuBlueCode }} onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log(""))}> Search</Button>
                                     </InputGroupAddon>
                                 </InputGroup>
                             </NavItem>

@@ -1,6 +1,7 @@
 
 import React, { Fragment } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Colors.js';
 import { Alert } from 'reactstrap';
 import axios from 'axios';
 import {
@@ -13,6 +14,7 @@ import {
     Jumbotron,
     Input
 } from 'reactstrap';
+
 const jumbotron = { backgroundColor: 'rgba(243, 243, 243, 0.8)', padding: 0, width: "100%" };
 const styleResultDetail = { color: 'rgba(120, 120, 120, 0.40)' };
 class Search extends React.Component {
@@ -152,7 +154,7 @@ class Search extends React.Component {
             });
 
             return (
-                <section className="container" style={{ backgroundColor: 'rgba(247, 247, 247, 0.39)' }} >
+                <section className="container" style={{ backgroundColor: 'rgba(247, 247, 247, 0.39)'}} >
 
                     {totalResults !== 0 ? (
                         <div className="pagination-wrapper">
@@ -242,7 +244,7 @@ class Search extends React.Component {
                             </Fragment>
                         </div>
                     ) : (
-                            <Alert color="warning">
+                            <Alert color="warning" style={{ marginTop: '1rem'}}>
                                 No Result Found
                             </Alert>
                         )

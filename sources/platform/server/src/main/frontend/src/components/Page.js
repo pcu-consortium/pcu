@@ -1,13 +1,14 @@
 
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Monitoring from '../components/Monitoring.js';
-import Search from '../components/Search.js';
+import Monitoring from './Monitoring.js';
+import Search from './Search.js';
+import Home from './Home.js';
+
 import {
     TabContent,
     TabPane
 } from 'reactstrap';
-import Home from '../components/Home.js';
 
 class Page extends Component {
     constructor(props) {
