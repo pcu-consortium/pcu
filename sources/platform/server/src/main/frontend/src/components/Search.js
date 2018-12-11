@@ -1,7 +1,7 @@
 
 import React, { Fragment } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './Colors.js';
+import { PcuBackgroundCode, PcuGreyCode, PcuBlueCode, PcuGreenCode } from './Colors.js';
 import { Alert } from 'reactstrap';
 import axios from 'axios';
 import {
@@ -11,12 +11,20 @@ import {
     Container,
     Row,
     Col,
-    Jumbotron,
+    Card,
+    CardBody,
+    CardTitle,
+    CardSubtitle,
+    CardText,
+    CardLink,
+    CardFooter,
+    Badge,
     Input
 } from 'reactstrap';
 
-const jumbotron = { backgroundColor: 'rgba(243, 243, 243, 0.8)', padding: 0, width: "100%" };
-const styleResultDetail = { color: 'rgba(120, 120, 120, 0.40)' };
+const pagination = { backgroundColor: PcuGreenCode, color: PcuBackgroundCode };
+const activePagination = { ...pagination, backgroundColor: PcuBlueCode };
+const styleResultDetail = { color: PcuBlueCode };
 class Search extends React.Component {
     constructor(props) {
         super(props);
@@ -30,12 +38,11 @@ class Search extends React.Component {
             data: { hits: { hits: [], total: 0 }, took: 0 },
             request: {}
         };
-
     }
-
 
     handleClick(e, index) {
         e.preventDefault();
+        console.log(e, index);
         let nextPage = index;
         let nextIndexOfFirstSlice = nextPage * this.state.request.query.size;
         let nextIndexOfLastSlice = (nextPage + 1) * this.state.request.query.size;
@@ -102,12 +109,95 @@ class Search extends React.Component {
             });
         }
     }
-    getTitle() {
-        if (this.props.pageContext.request && this.props.pageContext.request.query && this.request.query.query && this.request.query.query.match && this.request.query.query.match) {
-            return this.request.query.query.match.title
-        } else {
-            return ''
+
+    getTitle(data) {
+        if (data._source.title !== undefined) {
+            return data._source.title;
+        } else if (data._source['dc:title'] !== undefined) {
+            return data._source['dc:title'];
+        } else if (data._source['og:title'] !== undefined) {
+            return data._source['og:title'];
         }
+    }
+
+    getSubtitle(data) {
+        if (data._source.subject !== undefined) {
+            return data._source.subject;
+        } else if (data._source['dc:subject'] !== undefined) {
+            return data._source['dc:subject'];
+        } else if (data._source['og:site_name'] !== undefined) {
+            return data._source['og:site_name'];
+        }
+    }
+
+    getDescription(data) {
+        if (data._source.subject !== undefined) {
+            return data._source.subject;
+        } else if (data._source['dc:description'] !== undefined) {
+            return data._source['dc:description'];
+        } else if (data._source['og:description'] !== undefined) {
+            return data._source['og:description'];
+        }
+    }
+
+    getUrl(data) {
+        if (data._source['Content-Location'] !== undefined) {
+            return data._source['Content-Location'];
+        } else if (data._source['dc:source'] !== undefined) {
+            return data._source['dc:source'];
+        } else if (data._source['og:url'] !== undefined) {
+            return data._source['og:url'];
+        }
+    }
+
+    getBadges(data) {
+        let badges = [];
+
+        if (data._source['document.contentType'] !== undefined) {
+            badges.push(data._source['document.contentType']);
+        } else if (data._source['dc:format'] !== undefined) {
+            badges.push(data._source['dc:format']);
+        }
+
+        if (data._source['dc:type'] !== undefined) {
+            badges.push(data._source['dc:type']);
+        } else if (data._source['og:type'] !== undefined) {
+            badges.push(data._source['og:type']);
+        }
+        return badges;
+    }
+    pagination(c, m) {
+        console.log(c, m);
+        var current = c,
+            last = m,
+            delta = 2,
+            left = current - delta,
+            right = current + delta + 1,
+            range = [],
+            rangeWithDots = [],
+            l;
+
+        range.push(1)
+        for (let i = c - delta; i <= c + delta; i++) {
+            if (i >= left && i < right && i < m && i > 1) {
+                range.push(i);
+            }
+        }
+        range.push(m);
+
+        for (let i of range) {
+            if (l) {
+                if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                } else if (i - l !== 1) {
+                    rangeWithDots.push('...');
+                }
+            }
+            rangeWithDots.push(i);
+            l = i;
+        }
+        console.log(rangeWithDots)
+        return rangeWithDots;
     }
 
     changeNumberPage(e) {
@@ -130,31 +220,50 @@ class Search extends React.Component {
             if (this.props.pageContext.request && this.props.pageContext.request.query) {
                 requestSize = this.state.request.query.size;
             }
-            const pageNumbers = [];
             const pagesCount = Math.ceil(totalResults / requestSize);
+            const pageNumbers = this.pagination(currentPage + 1, pagesCount);
 
-            for (let i = 1; i <= pagesCount; i++) {
-                pageNumbers.push(i);
-            }
 
-            const renderData = this.state.data.hits.hits.map((data, index) => {
+            const renderDataCards = this.state.data.hits.hits.map((data, index) => {
                 return (
-                    <Row key={index}>
-                        <Jumbotron style={jumbotron} className="shadow">
-                            <h4 className="display-6" style={{ cursor: "pointer" }} onClick={() => window.open(data._source['Content-Location'], "_blank")}>{data._source.title}</h4>
-                            <p className="lead">{data._source.title}</p>
-                            <div style={{ width: "100%", overflow: "auto" }}>
-                                <a target="_blank" rel="noopener noreferrer" style={{ color: "#337ab7" }} href={data._source['Content-Location']}>{data._source['Content-Location']}</a>
-                            </div>
-                            <hr className="my-1" />
-                            <p>{data._source.title}</p>
-                        </Jumbotron>
-                    </Row>
+                    <Card key={index} style={{ color: PcuBlueCode, marginTop: '1rem', marginBottom: '1rem' }} id={data._id}>
+                        <CardBody>
+                            <CardTitle>{this.getTitle(data)}</CardTitle>
+                            {this.getSubtitle(data) !== undefined ?
+                                (
+                                    <CardSubtitle style={{ color: PcuGreenCode }}>{this.getSubtitle(data)}</CardSubtitle>
+                                ) : ('')
+                            }
+                            {this.getDescription(data) !== undefined ?
+                                (
+                                    <CardText>{this.getDescription(data)}</CardText>
+                                ) : ('')
+                            }
+                            {this.getUrl(data) !== undefined ?
+                                (
+                                    <CardLink href={this.getUrl(data)} target="_blank">{this.getUrl(data)}</CardLink>
+                                ) : ('')
+                            }
+                            {this.getBadges(data).size !== 0 ?
+                                (
+                                    <CardText>
+                                        {this.getBadges(data).map((badge) => {
+                                            return (
+                                                <Badge style={{ backgroundColor: PcuGreenCode, margin: '0.1rem' }}>{badge}</Badge>
+                                            )
+                                        }
+                                        )}
+                                    </CardText>
+                                ) : ('')
+                            }
+                        </CardBody>
+                    </Card>
                 );
+
             });
 
             return (
-                <section className="container" style={{ backgroundColor: 'rgba(247, 247, 247, 0.39)'}} >
+                <section className="container" style={{ backgroundColor: PcuBackgroundCode }} >
 
                     {totalResults !== 0 ? (
                         <div className="pagination-wrapper">
@@ -171,19 +280,24 @@ class Search extends React.Component {
                             </span>
                             <Row>
                                 <Col xs="9" style={{ width: "100%", overflow: "auto" }} >
-                                    <Pagination aria-label="Page navigation example">
+                                    <Pagination aria-label="Results">
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
                                                 onClick={e => this.handleClick(e, currentPage - 1)}
                                                 previous
                                                 href="#"
+                                                style={pagination}
                                             />
                                         </PaginationItem>
 
                                         {pageNumbers.map((page, i) =>
-                                            <PaginationItem active={i === currentPage} key={i}>
-                                                <PaginationLink onClick={e => this.handleClick(e, i)} href="#">
-                                                    {i + 1}
+                                            <PaginationItem active={page - 1 === currentPage} key={page - 1}>
+                                                <PaginationLink
+                                                    onClick={e => this.handleClick(e, page - 1)}
+                                                    href="#"
+                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)}
+                                                >
+                                                    {page}
                                                 </PaginationLink>
                                             </PaginationItem>
                                         )}
@@ -193,6 +307,7 @@ class Search extends React.Component {
                                                 onClick={e => this.handleClick(e, currentPage + 1)}
                                                 next
                                                 href="#"
+                                                style={pagination}
                                             />
                                         </PaginationItem>
                                     </Pagination>
@@ -208,9 +323,9 @@ class Search extends React.Component {
                             </Row>
                             <Fragment>
                                 <div>
-                                    <Container >
-                                        {renderData}
-                                    </Container >
+                                    <Container>
+                                        {renderDataCards}
+                                    </Container>
                                 </div >
                                 <div className="pagination-wrapper">
 
@@ -221,13 +336,18 @@ class Search extends React.Component {
                                                 onClick={e => this.handleClick(e, currentPage - 1)}
                                                 previous
                                                 href="#"
+                                                style={pagination}
                                             />
                                         </PaginationItem>
 
                                         {pageNumbers.map((page, i) =>
-                                            <PaginationItem active={i === currentPage} key={i}>
-                                                <PaginationLink onClick={e => this.handleClick(e, i)} href="#">
-                                                    {i + 1}
+                                            <PaginationItem active={page - 1 === currentPage} key={page - 1}>
+                                                <PaginationLink
+                                                    onClick={e => this.handleClick(e, page - 1)}
+                                                    href="#"
+                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)}
+                                                >
+                                                    {page}
                                                 </PaginationLink>
                                             </PaginationItem>
                                         )}
@@ -237,6 +357,7 @@ class Search extends React.Component {
                                                 onClick={e => this.handleClick(e, currentPage + 1)}
                                                 next
                                                 href="#"
+                                                style={pagination}
                                             />
                                         </PaginationItem>
                                     </Pagination>
@@ -244,12 +365,11 @@ class Search extends React.Component {
                             </Fragment>
                         </div>
                     ) : (
-                            <Alert color="warning" style={{ marginTop: '1rem'}}>
+                            <Alert style={{ marginTop: '1rem', backgroundColor: PcuGreyCode, color: PcuBlueCode }}>
                                 No Result Found
                             </Alert>
                         )
                     }
-
                 </section >
             )
         }

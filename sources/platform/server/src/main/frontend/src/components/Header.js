@@ -17,7 +17,7 @@ import {
     Input
 } from 'reactstrap';
 
-const _navbar = { backgroundColor: PcuGreyCode, padding: "0rem 0rem", borderColor: PcuBlueCode };
+const _navbar = { backgroundColor: PcuGreyCode, padding: "0rem 0.3rem", borderColor: PcuBlueCode };
 const navlink = { color: PcuBlueCode, border: "0px" };
 const tabsStyle = { borderBottom: "1px solid " + PcuGreyCode }
 

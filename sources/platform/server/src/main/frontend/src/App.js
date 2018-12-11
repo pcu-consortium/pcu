@@ -15,7 +15,6 @@ class App extends Component {
     };
   }
 
-
   changeTab(nextPageContext) {
     this.setState({
       pageContext: nextPageContext
