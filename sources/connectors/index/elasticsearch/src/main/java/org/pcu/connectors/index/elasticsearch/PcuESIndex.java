@@ -20,16 +20,14 @@ package org.pcu.connectors.index.elasticsearch;
  * #L%
  */
 
-
-
-
-
 import java.io.IOException;
 
 import org.pcu.connectors.index.PcuIndex;
 import org.pcu.connectors.index.PcuIndexException;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -37,6 +35,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.cluster.Health;
 import io.searchbox.core.Delete;
 import io.searchbox.core.Get;
 import io.searchbox.core.Index;
@@ -56,6 +55,19 @@ public class PcuESIndex implements PcuIndex {
 		factory.setHttpClientConfig(new HttpClientConfig.Builder(builder.getUri()).multiThreaded(true).build());
 		client = factory.getObject();
 		jsonParser = new JsonParser();
+	}
+
+	@Override
+	public JsonNode getStatus() {
+		try {
+			Health healthQuery = new Health.Builder().build();
+			JestResult result = client.execute(healthQuery);
+			return JsonHandler.tranform(result.getJsonObject());
+		} catch (IOException e) {
+			ObjectNode error = new ObjectMapper().createObjectNode();
+			error.put("error", e.getMessage());
+			return error;
+		}
 	}
 
 	@Override
@@ -155,5 +167,4 @@ public class PcuESIndex implements PcuIndex {
 			return result;
 		}
 	}
-
 }

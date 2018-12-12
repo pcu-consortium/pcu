@@ -13,6 +13,8 @@
     "react-scripts": "2.0.5",
     "reactstrap": "^6.5.0",
     "react-social-icons": "^3.0.0",
+    "react-json-view": "^1.19.1",
+    "react-native-json-tree": "^1.2.0",
     "webpack": "^4.19.1"
   },
   "scripts": {

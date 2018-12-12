@@ -20,10 +20,6 @@ package org.pcu.connectors.index;
  * #L%
  */
 
-
-
-
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -34,16 +30,18 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public interface PcuIndex extends AutoCloseable {
 
+	JsonNode getStatus() ;
+
 	boolean createIndex(String index) throws PcuIndexException;
-	
+
 	boolean deleteIndex(String index) throws PcuIndexException;
 
 	boolean createDocument(JsonNode document, String index, String type, String id) throws PcuIndexException;
-	
+
 	boolean deleteDocument(String index, String type, String id) throws PcuIndexException;
-	
+
 	JsonNode getDocument(String index, String type, String id) throws PcuIndexException;
-	
+
 	JsonNode getDocuments(JsonNode searchQuery) throws PcuIndexException;
 
 }

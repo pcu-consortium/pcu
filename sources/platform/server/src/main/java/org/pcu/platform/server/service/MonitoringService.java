@@ -20,37 +20,31 @@ package org.pcu.platform.server.service;
  * #L%
  */
 
-
+import java.util.HashMap;
+import java.util.Map;
 
 import org.pcu.connectors.index.PcuIndex;
-import org.pcu.connectors.index.PcuIndexException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pcu.connectors.storage.PcuStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IndexService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
+public class MonitoringService {
 
 	@Autowired
+	private PcuStorage pcuStorage;
+	@Autowired
 	private PcuIndex pcuIndex;
+	@Autowired
+	private KafkaAdmin admin;
 
-	public void createIndex(String indexId) throws PcuIndexException {
-		LOGGER.debug("create index");
-		boolean created = pcuIndex.createIndex(indexId);
-		if (!created) {
-			throw new PcuIndexException("could not create index");
-		}
-	}
-
-	public void deleteIndex(String indexId) throws PcuIndexException {
-		LOGGER.debug("delete index");
-		boolean deleted = pcuIndex.deleteIndex(indexId);
-		if (!deleted) {
-			throw new PcuIndexException("could not delete index");
-		}
+	public Map<String, Object> getStatus() {
+		Map<String, Object> resourcesStatus = new HashMap<>();
+		resourcesStatus.put("pipeline", admin.getConfig());
+		resourcesStatus.put("index", pcuIndex.getStatus());
+		resourcesStatus.put("storage", pcuStorage.getStatus());
+		return resourcesStatus;
 	}
 
 }

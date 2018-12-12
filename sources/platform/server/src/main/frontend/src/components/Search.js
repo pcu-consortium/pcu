@@ -17,7 +17,6 @@ import {
     CardSubtitle,
     CardText,
     CardLink,
-    CardFooter,
     Badge,
     Input
 } from 'reactstrap';
@@ -42,7 +41,6 @@ class Search extends React.Component {
 
     handleClick(e, index) {
         e.preventDefault();
-        console.log(e, index);
         let nextPage = index;
         let nextIndexOfFirstSlice = nextPage * this.state.request.query.size;
         let nextIndexOfLastSlice = (nextPage + 1) * this.state.request.query.size;
@@ -166,24 +164,25 @@ class Search extends React.Component {
         }
         return badges;
     }
-    pagination(c, m) {
-        console.log(c, m);
-        var current = c,
-            last = m,
-            delta = 2,
-            left = current - delta,
-            right = current + delta + 1,
+
+    pagination(currentPage, nrOfPages) {
+        var delta = 2,
             range = [],
             rangeWithDots = [],
             l;
 
-        range.push(1)
-        for (let i = c - delta; i <= c + delta; i++) {
-            if (i >= left && i < right && i < m && i > 1) {
+        range.push(1);
+
+        if (nrOfPages <= 1) {
+            return range;
+        }
+
+        for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+            if (i < nrOfPages && i > 1) {
                 range.push(i);
             }
         }
-        range.push(m);
+        range.push(nrOfPages);
 
         for (let i of range) {
             if (l) {
@@ -196,7 +195,7 @@ class Search extends React.Component {
             rangeWithDots.push(i);
             l = i;
         }
-        console.log(rangeWithDots)
+
         return rangeWithDots;
     }
 
@@ -226,7 +225,7 @@ class Search extends React.Component {
 
             const renderDataCards = this.state.data.hits.hits.map((data, index) => {
                 return (
-                    <Card key={index} style={{ color: PcuBlueCode, marginTop: '1rem', marginBottom: '1rem' }} id={data._id}>
+                    <Card key={'card' + index} style={{ color: PcuBlueCode, marginTop: '1rem', marginBottom: '1rem' }} id={data._id}>
                         <CardBody>
                             <CardTitle>{this.getTitle(data)}</CardTitle>
                             {this.getSubtitle(data) !== undefined ?
@@ -247,9 +246,9 @@ class Search extends React.Component {
                             {this.getBadges(data).size !== 0 ?
                                 (
                                     <CardText>
-                                        {this.getBadges(data).map((badge) => {
+                                        {this.getBadges(data).map((badge, i) => {
                                             return (
-                                                <Badge style={{ backgroundColor: PcuGreenCode, margin: '0.1rem' }}>{badge}</Badge>
+                                                <Badge style={{ backgroundColor: PcuGreenCode, margin: '0.1rem' }} key={'card' + index + 'badge' + i}>{badge}</Badge>
                                             )
                                         }
                                         )}
@@ -265,22 +264,25 @@ class Search extends React.Component {
             return (
                 <section className="container" style={{ backgroundColor: PcuBackgroundCode }} >
 
-                    {totalResults !== 0 ? (
                         <div className="pagination-wrapper">
-                            <div style={{ padding: "20px 0px 0px 0px" }}>
-                                <h6 >Query : {this.state.request.query.query.match.title}</h6>
+                            <div style={{ padding: "20px 0px 0px 0px", color: PcuBlueCode }}>
+                                <h6>Query : {this.state.request.query.query.match.title}</h6>
                             </div>
-                            <span style={styleResultDetail}> {totalResults === 0 ?
-                                (
-                                    <Alert color="warning">
-                                        No Result Found
-                                    </Alert>
-                                ) : ("Results :" + (indexOfFirstSlice + 1) + "-" + (indexOfLastSlice < totalResults ? indexOfLastSlice : totalResults) + " of " + totalResults + " , Search took " + this.state.data.took + "ms.")
-                            }
+                            {totalResults === 0 ?
+                            (
+                            <Alert style={{ marginTop: '1rem', backgroundColor: PcuGreyCode, color: PcuBlueCode }}>
+                                    No Result Found
+                            </Alert>
+                             ) :
+                            (
+                                <div>
+                            <span style={styleResultDetail}> 
+                                Results : {(indexOfFirstSlice + 1)} - {(indexOfLastSlice < totalResults ? indexOfLastSlice : totalResults)} of {totalResults}. Search took {this.state.data.took} ms.
+                            
                             </span>
                             <Row>
                                 <Col xs="9" style={{ width: "100%", overflow: "auto" }} >
-                                    <Pagination aria-label="Results">
+                                    <Pagination aria-label="Results" size="sm">
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
                                                 onClick={e => this.handleClick(e, currentPage - 1)}
@@ -291,12 +293,14 @@ class Search extends React.Component {
                                         </PaginationItem>
 
                                         {pageNumbers.map((page, i) =>
-                                            <PaginationItem active={page - 1 === currentPage} key={page - 1}>
+                                            <PaginationItem
+                                                active={page - 1 === currentPage}
+                                                key={(page === '...') ? 'top' + page + i : 'top' + (page - 1)}
+                                                disabled={page === '...'}>
                                                 <PaginationLink
                                                     onClick={e => this.handleClick(e, page - 1)}
                                                     href="#"
-                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)}
-                                                >
+                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)} >
                                                     {page}
                                                 </PaginationLink>
                                             </PaginationItem>
@@ -313,7 +317,7 @@ class Search extends React.Component {
                                     </Pagination>
                                 </Col>
                                 <Col xs="3">
-                                    <Input type="select" name="select" onChange={this.changeNumberPage} >
+                                    <Input type="select" name="select" onChange={this.changeNumberPage} bsSize="sm">
                                         <option value="10">10</option>
                                         <option value="20">20</option>
                                         <option value="25">25</option>
@@ -329,7 +333,7 @@ class Search extends React.Component {
                                 </div >
                                 <div className="pagination-wrapper">
 
-                                    <Pagination aria-label="Page navigation example" style={{ width: "100%", overflow: "auto" }}>
+                                    <Pagination aria-label="Page navigation example" style={{ width: "100%", overflow: "auto" }} size="sm">
 
                                         <PaginationItem disabled={currentPage <= 0}>
                                             <PaginationLink
@@ -341,12 +345,14 @@ class Search extends React.Component {
                                         </PaginationItem>
 
                                         {pageNumbers.map((page, i) =>
-                                            <PaginationItem active={page - 1 === currentPage} key={page - 1}>
+                                            <PaginationItem
+                                                active={page - 1 === currentPage}
+                                                key={(page === '...') ? 'bottom' + page + i : 'bottom' + (page - 1)}
+                                                disabled={page === '...'}>
                                                 <PaginationLink
                                                     onClick={e => this.handleClick(e, page - 1)}
                                                     href="#"
-                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)}
-                                                >
+                                                    style={page - 1 === currentPage ? (activePagination) : (pagination)} >
                                                     {page}
                                                 </PaginationLink>
                                             </PaginationItem>
@@ -363,21 +369,27 @@ class Search extends React.Component {
                                     </Pagination>
                                 </div>
                             </Fragment>
+                            </div>
+                            )}
+
+
                         </div>
-                    ) : (
-                            <Alert style={{ marginTop: '1rem', backgroundColor: PcuGreyCode, color: PcuBlueCode }}>
-                                No Result Found
-                            </Alert>
-                        )
-                    }
+                    
                 </section >
             )
         }
         else {
             return (
-                <Row >
-                    Search something
-                </Row>
+                <section className="container" style={{ backgroundColor: PcuBackgroundCode }} >
+                    <div className="pagination-wrapper">
+                        <div style={{ padding: "20px 0px 0px 0px", color: PcuBlueCode }}>
+                            <h6>Query : ''</h6>
+                        </div>
+                        <Alert style={{ marginTop: '1rem', backgroundColor: PcuGreyCode, color: PcuBlueCode }}>
+                            Cannot search on an empty field                                
+                        </Alert>
+                    </div>
+                </section>
             );
         }
     }

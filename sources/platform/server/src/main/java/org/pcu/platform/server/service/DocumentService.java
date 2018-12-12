@@ -20,10 +20,6 @@ package org.pcu.platform.server.service;
  * #L%
  */
 
-
-
-
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.pcu.connectors.index.PcuIndex;
 import org.pcu.connectors.index.PcuIndexException;

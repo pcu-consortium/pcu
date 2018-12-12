@@ -19,7 +19,7 @@ import {
 
 const _navbar = { backgroundColor: PcuGreyCode, padding: "0rem 0.3rem", borderColor: PcuBlueCode };
 const navlink = { color: PcuBlueCode, border: "0px" };
-const tabsStyle = { borderBottom: "1px solid " + PcuGreyCode }
+const tabsStyle = { borderBottom: "0px solid " + PcuBlueCode }
 
 class Header extends React.Component {
     constructor(props) {
@@ -103,7 +103,7 @@ class Header extends React.Component {
                         <i><SocialIcon style={{ height: 25, width: 25 }} url="https://www.linkedin.com/company/pcu-consortium" /> </i>
                         <i><SocialIcon style={{ height: 25, width: 25 }} url="https://www.slideshare.net/pcuconsortium" /> </i>
                     </nav>
-                    <NavbarToggler onClick={this.toggle} />
+                    <NavbarToggler onClick={this.toggle} style={{ border: "1px solid " + PcuBlueCode}} />
                     <Collapse isOpen={this.state.pageContext.isOpen} navbar>
                         <Nav className="ml-auto" tabs style={tabsStyle}>
                             <NavItem>
@@ -112,7 +112,7 @@ class Header extends React.Component {
                                         onChange={(e) => this.onSearchTextChange(e)} ref="inputSearch"
                                         onKeyPress={e => { if (e.key === 'Enter') { this.handleSearchText() } }} />
                                     <InputGroupAddon addonType="append">
-                                        <Button style={{ color: PcuGreyCode, backgroundColor: PcuBlueCode }} onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : (console.log(""))}> Search</Button>
+                                        <Button style={{ color: PcuGreyCode, backgroundColor: PcuBlueCode }} onClick={this.state.pageContext.searchText !== '' ? (this.handleSearchText) : ('')}> Search</Button>
                                     </InputGroupAddon>
                                 </InputGroup>
                             </NavItem>
