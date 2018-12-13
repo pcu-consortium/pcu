@@ -20,12 +20,9 @@ package org.pcu.platform.server;
  * #L%
  */
 
-
-
-
-
 import static com.jayway.restassured.RestAssured.delete;
 import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.head;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.post;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,10 +94,11 @@ public class PcuPlatformServerIT {
 
 	@Test
 	public void testStatus() throws IOException {
-		get("/status").then().assertThat().statusCode(HttpStatus.OK.value());
-		Response response = get("/configuration");
+		head("/status").then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
+		Response response = get("/status");
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(response.getBody().asString()).contains("bootstrap.servers");
+		assertThat(response.getBody().asString()).contains("pipeline").contains("bootstrap.servers").contains("storage")
+				.contains("index");
 	}
 
 	@Test
@@ -110,10 +108,10 @@ public class PcuPlatformServerIT {
 		post("/indexes/" + indexId).then().assertThat().statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 		byte[] fileContent = Charset.forName("UTF-8").encode("test file").array();
-		
-		given().body(fileContent).contentType(ContentType.BINARY).when().post("/ingest/"+documentId).then().assertThat()
-		.statusCode(HttpStatus.CREATED.value());
-		
+
+		given().body(fileContent).contentType(ContentType.BINARY).when().post("/ingest/" + documentId).then()
+				.assertThat().statusCode(HttpStatus.CREATED.value());
+
 		ObjectNode content = new ObjectMapper().createObjectNode();
 		content.put("author", "testAuthor");
 		Document createRequest = new Document();

@@ -26,6 +26,8 @@ package org.pcu.connectors.storage;
 
 import java.io.InputStream;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * PCU storage : connector containing all services to managed storage.
  * 
@@ -33,6 +35,8 @@ import java.io.InputStream;
  *
  */
 public interface PcuStorage extends AutoCloseable {
+	
+	JsonNode getStatus();
 
 	boolean createContainer(String containerName) throws PcuStorageException;
 

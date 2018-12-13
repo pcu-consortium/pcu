@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from "./components/Header.js";
 import Footer from "./components/Footer.js";
-import Page from "./pages/Page.js";
+import Page from "./components/Page.js";
+import { PcuBackgroundCode } from './components/Colors.js';
 
 class App extends Component {
   constructor(props) {
@@ -14,7 +15,6 @@ class App extends Component {
     };
   }
 
-
   changeTab(nextPageContext) {
     this.setState({
       pageContext: nextPageContext
@@ -23,7 +23,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{ backgroundColor: PcuBackgroundCode }}>
         <Header changeTab={(pageContext) => this.changeTab(pageContext)} />
         <Page pageContext={this.state.pageContext} />
         <Footer />

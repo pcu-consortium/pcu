@@ -20,10 +20,6 @@ package org.pcu.connectors.storage.vfs2;
  * #L%
  */
 
-
-
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +32,10 @@ import org.pcu.connectors.storage.PcuStorage;
 import org.pcu.connectors.storage.PcuStorageContainerNotFoundException;
 import org.pcu.connectors.storage.PcuStorageException;
 import org.pcu.connectors.storage.PcuStorageFileNotFoundException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class PcuVfs2Storage implements PcuStorage {
 
@@ -70,6 +70,22 @@ public class PcuVfs2Storage implements PcuStorage {
 			PcuStorage result = new PcuVfs2Storage(this);
 			return result;
 		}
+	}
+
+	@Override
+	public JsonNode getStatus() {
+		ObjectNode status = new ObjectMapper().createObjectNode();
+		status.put("path", baseConnection);
+		try {
+			status.put("exists", manager.getBaseFile().exists());
+			status.put("hidden", manager.getBaseFile().isHidden());
+			status.put("writeable", manager.getBaseFile().isWriteable());
+			status.put("readable", manager.getBaseFile().isReadable());
+			status.put("executable", manager.getBaseFile().isExecutable());
+		} catch (FileSystemException e) {
+			status.put("error", e.getCode() + ":" + e.getInfo());
+		}
+		return status;
 	}
 
 	@Override
