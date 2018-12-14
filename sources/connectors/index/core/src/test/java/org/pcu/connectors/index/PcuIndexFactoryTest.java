@@ -20,16 +20,14 @@ package org.pcu.connectors.index;
  * #L%
  */
 
-
-
-
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+import org.pcu.connectors.index.elasticsearch.PcuESIndex;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -38,49 +36,58 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class PcuIndexFactoryTest {
 
 	@Test
-	public void givenConfigurationValidES5ExpectPcuVfs2Storage() {
+	public void givenConfigurationValidES5ExpectPcuEsIndex() {
 
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("uri", "http://localhost:9200");
-		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration("ES5", configuration);
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(
+				"org.pcu.connectors.index.elasticsearch.PcuESIndex", configuration);
 		assertThatCode(() -> {
-			PcuIndexFactory.createIndex(pcuIndexConfiguration);
+			PcuIndex pcuIndex = PcuIndexFactory.createIndex(pcuIndexConfiguration);
+			assertThat(pcuIndex).isInstanceOf(PcuESIndex.class);
 		}).doesNotThrowAnyException();
 	}
 
 	@Test
-	public void givenConfigurationValidES6ExpectPcuVfs2Storage() {
+	public void givenNonExistantClassExpectIllegalArgumentException() {
 
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("uri", "http://localhost:9200");
-		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration("ES6", configuration);
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(
+				"org.pcu.connectors.index.elasticsearch.PcuFakeIndex", configuration);
 		assertThatCode(() -> {
 			PcuIndexFactory.createIndex(pcuIndexConfiguration);
-		}).doesNotThrowAnyException();
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("index class invalid");
+	}
+
+	@Test
+	public void givenNonExistantConstructorConfigurationParameterExpectIllegalArgumentException() {
+
+		ObjectNode configuration = new ObjectMapper().createObjectNode();
+		configuration.put("uri", "http://localhost:9200");
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(
+				"org.pcu.connectors.index.PcuNoConstructorIndex", configuration);
+		assertThatCode(() -> {
+			PcuIndexFactory.createIndex(pcuIndexConfiguration);
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("could not find valid constructor");
 	}
 
 	@Test
 	public void givenConfigurationNoUriExpectException() {
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
-		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration("ES6", configuration);
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(
+				"org.pcu.connectors.index.elasticsearch.PcuESIndex", configuration);
 		assertThatThrownBy(() -> {
 			PcuIndexFactory.createIndex(pcuIndexConfiguration);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("configuration invalid");
-	}
-
-	@Test
-	public void givenConfigurationInvalidTypeExpectException() {
-		ObjectNode configuration = new ObjectMapper().createObjectNode();
-		configuration.put("uri", "http://localhost:9200");
-		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration("FAKE", configuration);
-		assertThatThrownBy(() -> {
-			PcuIndexFactory.createIndex(pcuIndexConfiguration);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("type invalid");
+		}).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("instanciation of class thrown an exception")
+				.hasCause(new PcuIndexConfigurationException("configuration invalid : expected 'uri' parameter"));
 	}
 
 	@Test
 	public void givenConfigurationNoConfigurationExpectException() {
-		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration("ES6", null);
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(
+				"org.pcu.connectors.index.elasticsearch.PcuESIndex", null);
 		assertThatThrownBy(() -> {
 			PcuIndexFactory.createIndex(pcuIndexConfiguration);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("configuration invalid");

@@ -1,5 +1,7 @@
 package org.pcu.connectors.storage.vfs2;
 
+import java.io.File;
+
 /*-
  * #%L
  * PCU Storage VFS2
@@ -23,12 +25,17 @@ package org.pcu.connectors.storage.vfs2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.pcu.connectors.storage.PcuStorage;
+import org.pcu.connectors.storage.PcuStorageConfiguration;
+import org.pcu.connectors.storage.PcuStorageConfigurationException;
 import org.pcu.connectors.storage.PcuStorageContainerNotFoundException;
 import org.pcu.connectors.storage.PcuStorageException;
 import org.pcu.connectors.storage.PcuStorageFileNotFoundException;
@@ -42,34 +49,34 @@ public class PcuVfs2Storage implements PcuStorage {
 	private StandardFileSystemManager manager;
 	private String baseConnection;
 
-	private PcuVfs2Storage(Builder builder) throws FileSystemException {
-		manager = new StandardFileSystemManager();
-		manager.init();
-		baseConnection = builder.getPath();
-		manager.setBaseFile(manager.resolveFile(baseConnection));
+	public PcuVfs2Storage(PcuStorageConfiguration configuration) {
+		if (configuration.getConfigutation() == null || !configuration.getConfigutation().has("path")) {
+			throw new PcuStorageConfigurationException("configuration invalid : expected 'path' parameter");
+		}
+
+		try {
+			String validPath = null;
+			try {
+				String path = configuration.getConfigutation().get("path").asText();
+				File file = new File(path);
+				validPath = file.getCanonicalPath();
+				checkValidPath(validPath);
+			} catch (IOException ioe) {
+				throw new IllegalArgumentException("storage path invalid", ioe);
+			}
+
+			manager = new StandardFileSystemManager();
+			manager.init();
+			baseConnection = validPath;
+			manager.setBaseFile(manager.resolveFile(baseConnection));
+		} catch (FileSystemException fse) {
+			throw new IllegalArgumentException("storage instanciation error", fse);
+		}
 	}
 
 	@Override
 	public void close() throws Exception {
 
-	}
-
-	public static class Builder {
-
-		private String path;
-
-		public Builder(String path) {
-			this.path = path;
-		}
-
-		public String getPath() {
-			return path;
-		}
-
-		public PcuStorage build() throws FileSystemException {
-			PcuStorage result = new PcuVfs2Storage(this);
-			return result;
-		}
 	}
 
 	@Override
@@ -180,6 +187,19 @@ public class PcuVfs2Storage implements PcuStorage {
 			return file.delete();
 		} catch (FileSystemException e) {
 			throw new PcuStorageException("Could not delete file", e);
+		}
+	}
+
+	private static void checkValidPath(String path) throws IllegalArgumentException {
+		Path filePath = Paths.get(path);
+		if (!Files.exists(filePath)) {
+			throw new IllegalArgumentException("storage path does not exists");
+		}
+		if (!Files.isDirectory(filePath)) {
+			throw new IllegalArgumentException("storage path is not a directory");
+		}
+		if (!Files.isWritable(filePath)) {
+			throw new IllegalArgumentException("storage path missing write permission access");
 		}
 	}
 

@@ -21,9 +21,6 @@ package org.pcu.platform.server.service;
  */
 
 
-
-
-
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

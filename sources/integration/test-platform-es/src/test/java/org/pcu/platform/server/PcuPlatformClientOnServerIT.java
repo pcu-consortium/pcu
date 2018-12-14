@@ -20,10 +20,6 @@ package org.pcu.platform.server;
  * #L%
  */
 
-
-
-
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,9 +54,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "pcu.storage.type=VFS2",
-		"pcu.storage.file=PcuPlatformClientOnServerIT_pcustorage.json",
+@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = {
+		"pcu.index.class=org.pcu.connectors.index.elasticsearch.PcuESIndex", "pcu.index.file=pcuindex.json",
+		"pcu.storage.class=org.pcu.connectors.storage.vfs2.PcuVfs2Storage", "pcu.storage.file=PcuPlatformClientOnServerIT_pcustorage.json",
 		"ingest.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",
 		"ingest.topic.file=PcuPlatformClientOnServerIT-Ingest-File",
 		"index.topic.metadata=PcuPlatformClientOnServerIT-Ingest-Metadata",

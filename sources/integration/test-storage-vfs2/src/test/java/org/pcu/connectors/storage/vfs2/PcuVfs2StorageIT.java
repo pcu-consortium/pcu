@@ -20,10 +20,6 @@ package org.pcu.connectors.storage.vfs2;
  * #L%
  */
 
-
-
-
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,8 +44,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.pcu.connectors.storage.PcuStorage;
+import org.pcu.connectors.storage.PcuStorageConfiguration;
 import org.pcu.connectors.storage.PcuStorageException;
 import org.pcu.integration.TemporaryFolderExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith({ TemporaryFolderExtension.class })
 @RunWith(JUnitPlatform.class)
@@ -68,7 +68,11 @@ public class PcuVfs2StorageIT {
 	public void before() throws FileSystemException {
 		containerName = "pcu-storage-test" + UUID.randomUUID().toString();
 		documentId = UUID.randomUUID().toString();
-		pcuStorage = new PcuVfs2Storage.Builder("file:/" + temporaryFolder.getRoot().getPath()).build();
+		ObjectNode configuration = new ObjectMapper().createObjectNode();
+		configuration.put("path", temporaryFolder.getRoot().getPath());
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(PcuVfs2Storage.class.getName(),
+				configuration);
+		pcuStorage = new PcuVfs2Storage(pcuStorageConfiguration);
 	}
 
 	@Test

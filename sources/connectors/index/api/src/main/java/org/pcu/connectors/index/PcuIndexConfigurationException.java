@@ -20,13 +20,13 @@ package org.pcu.connectors.index;
  * #L%
  */
 
-public class PcuIndexException extends Exception {
+public class PcuIndexConfigurationException extends RuntimeException {
 
-	public PcuIndexException(Throwable cause) {
+	public PcuIndexConfigurationException(Throwable cause) {
 		super(cause);
 	}
 
-	public PcuIndexException(String message) {
+	public PcuIndexConfigurationException(String message) {
 		super(message);
 	}
 

@@ -23,6 +23,8 @@ package org.pcu.connectors.index.elasticsearch;
 import java.io.IOException;
 
 import org.pcu.connectors.index.PcuIndex;
+import org.pcu.connectors.index.PcuIndexConfiguration;
+import org.pcu.connectors.index.PcuIndexConfigurationException;
 import org.pcu.connectors.index.PcuIndexException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,9 +52,13 @@ public class PcuESIndex implements PcuIndex {
 	private JestClient client;
 	private JsonParser jsonParser;
 
-	private PcuESIndex(Builder builder) {
+	public PcuESIndex(PcuIndexConfiguration configuration) {
+		if (configuration.getConfigutation() == null || !configuration.getConfigutation().has("uri")) {
+			throw new PcuIndexConfigurationException("configuration invalid : expected 'uri' parameter");
+		}
 		JestClientFactory factory = new JestClientFactory();
-		factory.setHttpClientConfig(new HttpClientConfig.Builder(builder.getUri()).multiThreaded(true).build());
+		factory.setHttpClientConfig(new HttpClientConfig.Builder(configuration.getConfigutation().get("uri").asText())
+				.multiThreaded(true).build());
 		client = factory.getObject();
 		jsonParser = new JsonParser();
 	}
@@ -150,21 +156,4 @@ public class PcuESIndex implements PcuIndex {
 		client.close();
 	}
 
-	public static class Builder {
-
-		private String uri;
-
-		public Builder(String uri) {
-			this.uri = uri;
-		}
-
-		public String getUri() {
-			return uri;
-		}
-
-		public PcuIndex build() {
-			PcuIndex result = new PcuESIndex(this);
-			return result;
-		}
-	}
 }

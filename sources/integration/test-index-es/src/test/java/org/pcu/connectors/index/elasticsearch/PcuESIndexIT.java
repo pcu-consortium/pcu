@@ -36,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.pcu.connectors.index.PcuIndex;
+import org.pcu.connectors.index.PcuIndexConfiguration;
 import org.pcu.connectors.index.PcuIndexException;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -52,7 +53,10 @@ public class PcuESIndexIT {
 
 	@BeforeAll
 	public static void beforeClass() {
-		pcuIndex = new PcuESIndex.Builder("http://localhost:9200/").build();
+		ObjectNode configuration = new ObjectMapper().createObjectNode();
+		configuration.put("uri", "http://localhost:9200");
+		PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(PcuESIndex.class.getName(), configuration);
+		pcuIndex = new PcuESIndex(pcuIndexConfiguration);
 	}
 
 	@BeforeEach

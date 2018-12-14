@@ -20,10 +20,6 @@ package org.pcu.platform.server;
  * #L%
  */
 
-
-
-
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -59,11 +55,11 @@ public class PcuPlatformServerConfiguration {
 	@Bean
 	public PcuIndex pcuIndex() {
 		try {
-			String pcuIndexType = env.getProperty("pcu.index.type");
+			String pcuIndexClassName = env.getProperty("pcu.index.class");
 			String pcuIndexFile = env.getProperty("pcu.index.file");
 
-			if (pcuIndexType == null) {
-				throw new IllegalArgumentException("pcu.index.type property is mandatory");
+			if (pcuIndexClassName == null) {
+				throw new IllegalArgumentException("pcu.index.class property is mandatory");
 			}
 			if (pcuIndexFile == null) {
 				throw new IllegalArgumentException("pcu.index.file property is mandatory");
@@ -75,7 +71,7 @@ public class PcuPlatformServerConfiguration {
 				throw new IllegalArgumentException("Could not find file " + pcuIndexFile);
 			}
 			JsonNode configuration = mapper.readTree(is);
-			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexType, configuration);
+			PcuIndexConfiguration pcuIndexConfiguration = new PcuIndexConfiguration(pcuIndexClassName, configuration);
 			return PcuIndexFactory.createIndex(pcuIndexConfiguration);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load configuration");
@@ -85,11 +81,11 @@ public class PcuPlatformServerConfiguration {
 	@Bean
 	public PcuStorage pcuStorage() {
 		try {
-			String pcuStorageType = env.getProperty("pcu.storage.type");
+			String pcuStorageClassName = env.getProperty("pcu.storage.class");
 			String pcuStorageFile = env.getProperty("pcu.storage.file");
 
-			if (pcuStorageType == null) {
-				throw new IllegalArgumentException("pcu.storage.type property is mandatory");
+			if (pcuStorageClassName == null) {
+				throw new IllegalArgumentException("pcu.storage.class property is mandatory");
 			}
 			if (pcuStorageFile == null) {
 				throw new IllegalArgumentException("pcu.storage.file property is mandatory");
@@ -101,7 +97,7 @@ public class PcuPlatformServerConfiguration {
 				throw new IllegalArgumentException("Could not find file " + pcuStorageFile);
 			}
 			JsonNode configuration = mapper.readTree(is);
-			PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(pcuStorageType,
+			PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(pcuStorageClassName,
 					configuration);
 			return PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		} catch (IOException e) {

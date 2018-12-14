@@ -20,25 +20,39 @@ package org.pcu.connectors.index;
  * #L%
  */
 
-
-
-
-
-import org.pcu.connectors.index.elasticsearch.PcuESIndex;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class PcuIndexFactory {
 
 	public static PcuIndex createIndex(PcuIndexConfiguration configuration) {
-		switch (configuration.getType()) {
-		case "ES5":
-		case "ES6":
-			if (configuration.getConfigutation() == null || !configuration.getConfigutation().has("uri")) {
-				throw new IllegalArgumentException("configuration invalid");
-			}
-			return new PcuESIndex.Builder(configuration.getConfigutation().get("uri").asText()).build();
-		default:
-			throw new IllegalArgumentException("index type invalid");
+		if (configuration.getConfigutation() == null || configuration.getClassName() == null) {
+			throw new IllegalArgumentException("configuration invalid");
 		}
+
+		Class<?> clazz;
+		try {
+			clazz = Class.forName(configuration.getClassName());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("index class invalid");
+		}
+
+		Constructor<?> constructor = null;
+		try {
+			constructor = clazz.getDeclaredConstructor(PcuIndexConfiguration.class);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("could not find valid constructor");
+		}
+
+		Object pcuIndexInstance;
+		try {
+			pcuIndexInstance = constructor.newInstance(configuration);
+		} catch (InvocationTargetException ite) {
+			throw new IllegalArgumentException("instanciation of class thrown an exception", ite.getTargetException());
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+			throw new IllegalArgumentException("could not instanciate class");
+		}
+		return (PcuIndex) pcuIndexInstance;
 
 	}
 }
