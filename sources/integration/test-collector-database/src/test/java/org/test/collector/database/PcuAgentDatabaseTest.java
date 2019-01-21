@@ -20,10 +20,6 @@ package org.test.collector.database;
  * #L%
  */
 
-
-
-
-
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -66,7 +62,6 @@ public class PcuAgentDatabaseTest {
 			throws IOException, URISyntaxException {
 
 		URL createSQL = PcuAgentDatabaseTest.class.getClassLoader().getResource("create.sql");
-		
 
 		// wiremock stub
 		assertThat(server.isRunning()).isTrue();
@@ -82,10 +77,11 @@ public class PcuAgentDatabaseTest {
 		config.setPcuPlatformUrl(uri);
 		config.set("pcuIndex", "documents");
 		config.set("pcuType", "document");
-		
+
 		config.set("query", "SELECT TITLE AS title, DESCRIPTION AS description, * FROM TEST");
-		
-		config.set("url", "jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1;INIT=runscript from '"+createSQL.getPath()+"'");
+
+		config.set("url",
+				"jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1;INIT=runscript from '" + createSQL.getPath() + "'");
 		config.set("driver", "org.h2.Driver");
 		config.set("username", "root");
 		config.set("password", "123");

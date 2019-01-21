@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pcu-consortium.pcu</groupId>
 	<artifactId>pcu-consortium-parent</artifactId>
@@ -182,7 +183,11 @@
 				<artifactId>commons-io</artifactId>
 				<version>2.5</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.8.1</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-vfs2</artifactId>
@@ -473,15 +478,13 @@
 				<version>2.22.0</version>
 
 				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>					<!-- else 
-						error even if provide repository : ex. repository url 'http://dist.gemstone.com/maven/release' 
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>					<!-- else error even if provide repository : ex. repository url 'http://dist.gemstone.com/maven/release' 
 						is invalid see http://stackoverflow.com/questions/28098566/maven-site-warning-the-repository-url-https-maven-repository-dev-java-net-no -->
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>				<!-- generates links to source 
-					code in failed tests -->
+				<artifactId>maven-jxr-plugin</artifactId>				<!-- generates links to source code in failed tests -->
 			</plugin>
 		</plugins>
 	</reporting>

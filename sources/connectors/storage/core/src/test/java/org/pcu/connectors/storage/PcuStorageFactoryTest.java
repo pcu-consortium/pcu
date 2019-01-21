@@ -20,10 +20,6 @@ package org.pcu.connectors.storage;
  * #L%
  */
 
-
-
-
-
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -44,7 +40,8 @@ public class PcuStorageFactoryTest {
 
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("path", System.getProperty("java.io.tmpdir"));
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", configuration);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", configuration);
 		assertThatCode(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		}).doesNotThrowAnyException();
@@ -53,10 +50,13 @@ public class PcuStorageFactoryTest {
 	@Test
 	public void givenConfigurationNoPathExpectException() {
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", configuration);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", configuration);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("configuration invalid");
+		}).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("instanciation of class thrown an exception")
+				.hasCause(new PcuStorageConfigurationException("configuration invalid : expected 'path' parameter"));
 	}
 
 	@Test
@@ -64,7 +64,8 @@ public class PcuStorageFactoryTest {
 		URL classUrl = PcuStorageFactoryTest.class.getResource("PcuStorageFactoryTest.class");
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("path", classUrl.getPath());
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", configuration);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", configuration);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("is not a directory");
@@ -74,7 +75,8 @@ public class PcuStorageFactoryTest {
 	public void givenConfigurationInvalidDoesNotExistsPathExpectException() {
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("path", System.getProperty("java.io.tmpdir") + "fake");
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", configuration);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", configuration);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("does not exists");
@@ -84,27 +86,41 @@ public class PcuStorageFactoryTest {
 	public void givenConfigurationInvalidNotWritablePathExpectException() {
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("path", "/");
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", configuration);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", configuration);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("missing write permission access");
 	}
 
 	@Test
-	public void givenConfigurationInvalidTypeExpectException() {
+	public void givenConfigurationInvalidClassExpectException() {
 		ObjectNode configuration = new ObjectMapper().createObjectNode();
 		configuration.put("path", System.getProperty("java.io.tmpdir"));
 		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("FAKE", configuration);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("type invalid");
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("storage class invalid");
 	}
 
 	@Test
 	public void givenConfigurationNoConfigurationExpectException() {
-		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration("VFS2", null);
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.vfs2.PcuVfs2Storage", null);
 		assertThatThrownBy(() -> {
 			PcuStorageFactory.createStorage(pcuStorageConfiguration);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("configuration invalid");
+	}
+
+	@Test
+	public void givenNonExistantConstructorConfigurationParameterExpectIllegalArgumentException() {
+
+		ObjectNode configuration = new ObjectMapper().createObjectNode();
+		configuration.put("path", System.getProperty("java.io.tmpdir"));
+		PcuStorageConfiguration pcuStorageConfiguration = new PcuStorageConfiguration(
+				"org.pcu.connectors.storage.PcuNoConstructorStorage", configuration);
+		assertThatCode(() -> {
+			PcuStorageFactory.createStorage(pcuStorageConfiguration);
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("could not find valid constructor");
 	}
 }

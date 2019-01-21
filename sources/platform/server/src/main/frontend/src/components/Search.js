@@ -131,6 +131,8 @@ class Search extends React.Component {
     getDescription(data) {
         if (data._source.subject !== undefined) {
             return data._source.subject;
+        } else if (data._source['description'] !== undefined) {
+            return data._source['description'];
         } else if (data._source['dc:description'] !== undefined) {
             return data._source['dc:description'];
         } else if (data._source['og:description'] !== undefined) {

@@ -28,21 +28,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class PcuStorageConfiguration {
 
-	private String type;
+	private String className;
 	private JsonNode configuration;
 
-	public PcuStorageConfiguration(String type, JsonNode configuration) {
+	public PcuStorageConfiguration(String className, JsonNode configuration) {
 		super();
 		this.configuration = configuration;
-		this.type = type;
+		this.className = className;
 	}
 
 	public JsonNode getConfigutation() {
 		return configuration;
 	}
 
-	public String getType() {
-		return type;
+	public String getClassName() {
+		return className;
 	}
 
 }

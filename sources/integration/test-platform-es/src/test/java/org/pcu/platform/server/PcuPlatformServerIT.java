@@ -59,8 +59,9 @@ import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = { "pcu.index.type=ES6",
-		"pcu.index.file=pcuindex.json", "pcu.storage.type=VFS2", "pcu.storage.file=PcuPlatformServerIT_pcustorage.json",
+@SpringBootTest(classes = PcuPlatformServerApplication.class, properties = {
+		"pcu.index.class=org.pcu.connectors.index.elasticsearch.PcuESIndex", "pcu.index.file=pcuindex.json",
+		"pcu.storage.class=org.pcu.connectors.storage.vfs2.PcuVfs2Storage", "pcu.storage.file=PcuPlatformServerIT_pcustorage.json",
 		"ingest.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
 		"ingest.topic.file=PcuPlatformServerIT-Ingest-File", "index.topic.metadata=PcuPlatformServerIT-Ingest-Metadata",
 		"spring.kafka.consumer.group-id=pcu-platform", "spring.kafka.bootstrap-servers=localhost:29093",

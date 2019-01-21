@@ -1,4 +1,4 @@
-package org.pcu.connectors.index;
+package org.pcu.connectors.storage;
 
 /*-
  * #%L
@@ -20,13 +20,13 @@ package org.pcu.connectors.index;
  * #L%
  */
 
-public class PcuIndexException extends Exception {
+public class PcuStorageConfigurationException extends RuntimeException {
 
-	public PcuIndexException(Throwable cause) {
+	public PcuStorageConfigurationException(Throwable cause) {
 		super(cause);
 	}
 
-	public PcuIndexException(String message) {
+	public PcuStorageConfigurationException(String message) {
 		super(message);
 	}
 
