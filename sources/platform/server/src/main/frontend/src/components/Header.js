@@ -125,6 +125,10 @@ class Header extends React.Component {
                             <NavItem>
                                 <NavLink style={navlink} href="#" onClick={() => { this.props.changeTab({ ...this.state.pageContext.activeTab, activeTab: 'monitoring' }); }}>Monitoring</NavLink>
                             </NavItem>
+                            <NavItem>
+                                <NavLink style={navlink} href="swagger-ui.html">API</NavLink>
+                            </NavItem>
+                            
                         </Nav>
                     </Collapse>
                 </Navbar>
