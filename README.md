@@ -28,7 +28,7 @@ Authors : [Authors](AUTHORS.md)
 
 # PCU Package
 
-*(WIP) deploy packaged version in bintray*
+*(TODO) deploy packaged version in bintray*
 
 PCU can build a packaged version (available only on Linux).
 
@@ -110,21 +110,21 @@ This start the PCU platform server on port 8080 : http://localhost:8080
 cd deployment/pcu-entreprise-search-release/bin
 ./start-agent-filesystem.sh
 ````
-To check if data has been collected search : *PCU*
+To check if data has been collected, execute search : *PCU*
 
 4. Execute PCU provided web collector agent :
 ````bash
 cd deployment/pcu-entreprise-search-release/bin
 ./start-agent-http.sh
 ````
-To check if data has been collected search : *Open*
+To check if data has been collected, execute search : *Open*
 
 5. Execute PCU provided database collector agent :
 ````bash
 cd deployment/pcu-entreprise-search-release/bin
 ./start-agent-database.sh
 ````
-To check if data has been collected search : *ACAJOU*
+To check if data has been collected, execute search : *ACAJOU*
 
 
 # Build PCU
