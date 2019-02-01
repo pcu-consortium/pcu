@@ -12,7 +12,6 @@ Il se compose de :
 
 La définition des service sur base sur le mécanisme JEE Service Provider Interface (voir la documentation oracle sur le [SPI](https://docs.oracle.com/javase/tutorial/sound/SPI-intro.html))
 
-TODO guide de dév
 
 ### Configuration
 
@@ -22,6 +21,111 @@ La configuration de tout agent utilisant *pcu-agent* est un fichier au format JS
 * **pcuPlatformUrl** : URL du serveur *pcu-platform-server*
 
 ### Guide de développement
+
+Pour développer un agent de collecte pcu il faut créer un module maven contenant :
+* un pom.xml suivant cet exemple :
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>pcu-collectors-agent</artifactId>
+		<groupId>org.pcu-consortium.pcu</groupId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>pcu-agent-custom</artifactId>
+	<packaging>jar</packaging>
+
+	<name>PCU Agent custom</name>
+	<description>PCU Agent custom</description>
+
+	<dependencies>
+
+		<!-- PCU : -->
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-platform-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-collectors-api</artifactId>
+			<version>${project.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-collectors-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- Your custom dependencies : -->
+
+		<!-- Logs : -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+	</dependencies>
+
+</project>
+```
+
+* une classe d'execution qui implémente l'interface `PcuCollector` :
+
+```java
+package acme.pcu.collector.impl;
+
+import org.pcu.connectors.collectors.api.PcuCollector;
+import org.pcu.connectors.collectors.api.PcuCollectorConfig;
+import org.pcu.connectors.collectors.api.PcuCollectorException;
+import org.pcu.connectors.collectors.http.internal.PcuHttpNorconexCollector;
+import org.pcu.platform.client.PcuPlatformClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class PcuCustomCollector implements PcuCollector {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PcuCustomCollector.class);
+
+	public PcuCustomCollector() {
+		super();
+	}
+
+	@Override
+	public void execute(PcuPlatformClient pcuPlatformClient, PcuCollectorConfig config) throws PcuCollectorException {
+		LOGGER.debug("Execution start");
+		if (pcuPlatformClient == null) {
+			throw new PcuCollectorException("pcuPlatformClient is mandatory");
+		}
+		if (config == null) {
+			throw new PcuCollectorException("config is mandatory");
+		}
+		// TODO : execution code goes there
+		LOGGER.debug("Execution end");
+	}
+
+	@Override
+	public String getId() {
+		// Any other value possible
+		return PcuCustomCollector.class.getName();
+	}
+
+}
+```
+* déclarer le service dans le fichier SPI `META-INF/services/org.pcu.connectors.collectors.api.PcuCollector` :
+```
+acme.pcu.collector.impl.PcuCustomCollector
+```
+
+La commande `mvn clean install` exécutera le build hérité du module parent `pcu-collectors-agent` pour générer le fatjar executable.
+
 
 agent-database-jdbc
 -------------------

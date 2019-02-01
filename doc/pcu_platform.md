@@ -1,7 +1,6 @@
 Spécification Technique Détaillée : modules plateforme PCU
 ==========================================================
 
-
 pcu-platform-server
 -------------------
 
