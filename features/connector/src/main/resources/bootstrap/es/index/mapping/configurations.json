@@ -1,8 +1,0 @@
-{
-  "settings": {
-    "index.mapping.total_fields.limit": 2000,
-    "index.mapper.dynamic":true
-  },
-  "mappings": {
-  }
-}

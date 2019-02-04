@@ -39,3 +39,8 @@ local.properties
 # Thanks MacOs !
 .DS_Store
 #/server/nb-configuration.xml
+
+#specific project
+pcu-entreprise-search-release/
+pcu-entreprise-search-beta*
+.vscode

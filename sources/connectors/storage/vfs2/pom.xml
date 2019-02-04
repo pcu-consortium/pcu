@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>pcu-storage</artifactId>
+		<groupId>org.pcu-consortium.pcu</groupId>
+		<version>0.2.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>pcu-storage-vfs2</artifactId>
+	<packaging>jar</packaging>
+
+	<name>PCU Storage VFS2</name>
+	<description>PCU Storage VFS : implementation of common-vfs2</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.pcu-consortium.pcu</groupId>
+			<artifactId>pcu-storage-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-vfs2</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
