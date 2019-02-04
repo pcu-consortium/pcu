@@ -33,7 +33,7 @@ Pour développer un agent de collecte pcu il faut créer un module maven contena
 	<parent>
 		<artifactId>pcu-collectors-agent</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-agent-custom</artifactId>
 	<packaging>jar</packaging>

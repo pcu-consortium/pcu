@@ -42,7 +42,7 @@ Pour développer un connecteur aux indexes pcu il faut créer un module maven co
 	<parent>
 		<artifactId>pcu-index</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-index-custom</artifactId>
 	<packaging>jar</packaging>
@@ -174,7 +174,7 @@ Pour développer un connecteur au stockage pcu il faut créer un module maven co
 	<parent>
 		<artifactId>pcu-storage</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-storage-custom</artifactId>
 	<packaging>jar</packaging>
