@@ -8,7 +8,7 @@ https://github.com/pcu-consortium/pcu
 
 Copyright (c) 2017 The PCU Consortium
 
-[![Build Status](https://travis-ci.org/pcu-consortium/pcu.svg?branch=master)](https://travis-ci.org/pcu-consortium/pcu) [![Coverage Status](https://coveralls.io/repos/github/pcu-consortium/pcu/badge.svg?branch=master)](https://coveralls.io/github/pcu-consortium/pcu?branch=master) [![Download](https://api.bintray.com/packages/pcu-consortium/pcu/pcu-entreprise-search/images/download.svg?version=beta_20171206) ](https://bintray.com/pcu-consortium/pcu/pcu-entreprise-search/beta_20171206/view/files) [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/pcu-consortium/pcu.svg?branch=master)](https://travis-ci.org/pcu-consortium/pcu) [![Coverage Status](https://coveralls.io/repos/github/pcu-consortium/pcu/badge.svg?branch=master)](https://coveralls.io/github/pcu-consortium/pcu?branch=master) [![Download](https://api.bintray.com/packages/pcu-consortium/pcu/pcu-entreprise-search/images/download.svg?version=year2_2018) ](https://bintray.com/pcu-consortium/pcu/pcu-entreprise-search/year2_2018/view/files/) [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](https://opensource.org/licenses/Apache-2.0)
 
 =====================================================
 
@@ -28,14 +28,12 @@ Authors : [Authors](AUTHORS.md)
 
 # PCU Package
 
-*(TODO) deploy packaged version in bintray*
-
 PCU can build a packaged version (available only on Linux).
 
 The requirements are :
 * openjdk 10 (build & execute)
 * apache maven 3+ (build)
-* docker as sudo user (execute)
+* docker as sudo user (execute) (see https://docs.docker.com/install/linux/linux-postinstall/)
 
 The packaged version contains :
 * PCU platform
@@ -97,6 +95,8 @@ This create and start all the docker container used by the Platform and its prov
 * zookeeper (confluentinc/cp-zookeeper:5.0.1)
 * kafka (confluentinc/cp-kafka:5.0.1)
 * mysql-pcu (mysql:5.6)
+
+If you have elasticsearch, zookeeper, kafka or mysql running on your OS with default ports you need to stop them.
 
 2. Execute PCU platform server :
 ````bash
