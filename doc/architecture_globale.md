@@ -28,6 +28,6 @@ Le schéma représente l'infrastructure de production prévue pour la plateforme
 Architecture cible
 ------------------
 
-![Architecture cible](./include/pcu_architecture_target.png)
+![Architecture cible](./include/pcu_architecture_target.png){:height="50%" width="50%"}
 
 
