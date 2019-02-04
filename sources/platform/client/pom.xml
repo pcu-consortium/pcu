@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>pcu-platform-parent</artifactId>
 		<groupId>org.pcu-consortium.pcu</groupId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pcu-platform-client</artifactId>
 	<packaging>jar</packaging>

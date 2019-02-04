@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PCU_SCRIPTS_FOLDER="$(pwd)"
-cd ${PCU_SCRIPTS_FOLDER}/../dist
+PCU_BIN_FOLDER="$(pwd)"
+cd ${PCU_BIN_FOLDER}/../dist
 PCU_DIST_FOLDER="$(pwd)"
-cd ${PCU_SCRIPTS_FOLDER}
-echo "Current folder : ${PCU_SCRIPTS_FOLDER}"
+cd ${PCU_BIN_FOLDER}
+echo "Current folder : ${PCU_BIN_FOLDER}"
 echo "Dist files folder : ${PCU_DIST_FOLDER}"
 
 if [ -x "$(command -v docker)" ]; then
@@ -82,21 +82,6 @@ docker run \
   --rm \
   confluentinc/cp-kafka:5.0.1 \
   kafka-topics --describe --topic Ingest-Metadata --zookeeper localhost:2181
-
-echo "Start kafka control center"
-docker run -d \
-  --net=host \
-  --name=control-center \
-  --ulimit nofile=16384:16384 \
-  -p 9021:9021 \
-  -v /tmp/control-center/data:/var/lib/confluent-control-center \
-  -e CONTROL_CENTER_ZOOKEEPER_CONNECT=localhost:2181 \
-  -e CONTROL_CENTER_BOOTSTRAP_SERVERS=localhost:9092 \
-  -e CONTROL_CENTER_REPLICATION_FACTOR=1 \
-  -e CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS=1 \
-  -e CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1 \
-  -e CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS=2 \
-  confluentinc/cp-enterprise-control-center:5.0.1
 
 echo "Start mysql 5.6 container"
 echo ${PCU_DIST_FOLDER}

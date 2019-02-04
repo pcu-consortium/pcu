@@ -1,6 +1,6 @@
 collectorid=PcuHttpCollector
 crawlerid=PcuHttpCrawler
-workdir=../workdirHttp
+workdir=../data/workdirHttp
 stayOnDomain=true
 stayOnPort=true
 stayOnProtocol=true

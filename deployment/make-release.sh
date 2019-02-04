@@ -46,7 +46,7 @@ cd ${DEPLOYMENT_FOLDER}
 echo -e "${INFO} Generate release folder"
 rm -rf ${RELEASE_FOLDER}
 mkdir ${RELEASE_FOLDER}
-cp -rf ${DEPLOYMENT_FOLDER}/scripts ${RELEASE_FOLDER}/scripts
+cp -rf ${DEPLOYMENT_FOLDER}/bin ${RELEASE_FOLDER}/bin
 cp -rf ${SOURCES_FOLDER}/provided/dist ${RELEASE_FOLDER}
 cp -rf ${DEPLOYMENT_FOLDER}/config ${RELEASE_FOLDER}/config
 mkdir ${RELEASE_FOLDER}/data
